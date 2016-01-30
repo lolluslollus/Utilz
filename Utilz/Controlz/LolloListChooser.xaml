@@ -1,0 +1,85 @@
+﻿<uctl:OpObsOrControl
+    x:Class="Utilz.Controlz.LolloListChooser"
+    x:Name="me"
+    xmlns:uctl="using:Utilz.Controlz"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    UseLayoutRounding="True"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid >
+        <Border BorderThickness="0" 
+            BorderBrush="{ThemeResource ButtonBorderThemeBrush}"
+            Tapped="OnMyTextBlock_Tapped"
+            Background="Transparent"
+            Visibility="{Binding ElementName=me, Path=SelectorVisibility}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="MyTextBlock"
+                    Style="{Binding ElementName=me, Path=TextBlockStyle}"
+                    TextWrapping="Wrap"
+                    MaxWidth="200"
+                    IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
+                    Tapped="OnMyTextBlock_Tapped"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"/>
+                <AppBarButton IsCompact="True" Icon="Edit"
+                    Style="{Binding ElementName=me, Path=AppBarButtonStyle}"
+                    IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
+                    Tapped="OnMyTextBlock_Tapped"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Border>
+        <Canvas>
+            <Popup x:Name="MyPopup" IsOpen="False" 
+                Canvas.ZIndex="999"
+                Closed="OnMyPopup_Closed">
+                <Grid x:Name="MyPoupGrid" Background="{ThemeResource FlyoutBackgroundThemeBrush}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="1" Text="{Binding ElementName=me, Path=ListHeaderText}" Style="{StaticResource ListItemTextStyle}"/>
+                    <ScrollViewer Grid.Row="3"
+                        HorizontalScrollMode="Disabled" VerticalScrollMode="Enabled"
+                        HorizontalScrollBarVisibility="Hidden"
+                        VerticalScrollBarVisibility="Auto"
+                        BringIntoViewOnFocusChange="True"
+                        Background="{ThemeResource FlyoutBackgroundThemeBrush}">
+                        <!--SelectionChanged="OnMyListView_SelectionChanged"-->
+                        <ListView
+                            x:Name="MyListView" 
+                            ItemsSource="{Binding ElementName=me, Path=ItemsSource}"
+                            Background="{ThemeResource FlyoutBackgroundThemeBrush}"
+                            Loaded="OnMyListViewLoaded"
+                            Unloaded="OnMyListViewUnloaded">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical" Background="{ThemeResource FlyoutBackgroundThemeBrush}"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderThickness="0" 
+                                        Background="{ThemeResource FlyoutBackgroundThemeBrush}"
+                                        IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
+                                        Tapped="OnItemBorder_Tapped">
+                                        <TextBlock Text="{Binding Text}"
+                                            Style="{Binding ElementName=me, Path=TextItemStyle}"
+                                            Margin="10"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollViewer>
+                </Grid>
+            </Popup>
+        </Canvas>
+    </Grid>
+</uctl:OpObsOrControl>
