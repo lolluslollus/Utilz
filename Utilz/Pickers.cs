@@ -42,7 +42,6 @@ namespace Utilz
 
 		public static async Task<StorageFile> PickOpenFileAsync(string[] extensions)
 		{
-			// test for phone: bring it to the UI thread
 			StorageFile file = null;
 			try
 			{
