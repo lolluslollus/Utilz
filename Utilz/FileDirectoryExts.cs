@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.FileProperties;
-using Windows.Storage.Streams;
 
 namespace Utilz
 {
@@ -14,7 +9,7 @@ namespace Utilz
 	{
 		//	private static readonly ulong MaxBufferSize = 16 * 1024 * 1024;
 
-		//// LOLLO TODO test the following, it is a smarter way to copy files (it rpevents errorr when they are too large)
+		//// LOLLO NOTE you can test the following, it is a smarter way to copy files (it rpevents errorr when they are too large)
 		//	public static async Task<StorageFile> CopyAsync(this StorageFile self, StorageFolder desiredFolder, string desiredNewName, CreationCollisionOption option)
 		//	{
 		//		StorageFile desiredFile = await desiredFolder.CreateFileAsync(desiredNewName, option);
@@ -38,21 +33,10 @@ namespace Utilz
 		//		await desiredTransaction.CommitAsync();
 
 		//		return desiredFile;
-		//	}
-
-		//	private static IBuffer BytesToBuffer(byte[] bytes)
-		//	{
-		//		using (var dataWriter = new DataWriter())
-		//		{
-		//			dataWriter.WriteBytes(bytes);
-		//			return dataWriter.DetachBuffer();
-		//		}
-		//	}
-		
+		//	}	
 
 		public static Task CopyDirContentsAsync(this StorageFolder from, StorageFolder toDirectory, int maxDepth = 0)
 		{
-			// copy its contents
 			return new FileDirectoryExts().CopyDirContents2Async(from, toDirectory, maxDepth);
 		}
 
@@ -60,7 +44,7 @@ namespace Utilz
 		{
 			if (file == null) return 0;
 
-			BasicProperties fileProperties = await file.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false);
+			var fileProperties = await file.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false);
 			if (fileProperties != null) return fileProperties.Size;
 			else return 0;
 		}
@@ -85,16 +69,17 @@ namespace Utilz
 			}
 		}
 
+		
 		private class FileDirectoryExts
 		{
 			internal FileDirectoryExts() { }
 			private int _currentDepth = 0;
 			// LOLLO TODO what if you copy a directory to an existing one? Shouldn't you delete the contents first? No! But then, shouldn't you issue a warning?
-			internal async Task CopyDirContents2Async(StorageFolder from, StorageFolder to, int maxDepth = 0)
+			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(StorageFolder from, StorageFolder to, int maxDepth = 0)
 			{
 				try
 				{
-					if (from == null || to == null) return;
+					if (from == null || to == null) return Data.OpenableObservableData.BoolWhenOpen.Error;
 					// read files
 					var filesDepth0 = await from.GetFilesAsync().AsTask().ConfigureAwait(false);
 					// copy files
@@ -131,7 +116,7 @@ namespace Utilz
 				}
 
 				_currentDepth += 1;
-				if (_currentDepth > maxDepth) return;
+				if (_currentDepth > maxDepth) return Data.OpenableObservableData.BoolWhenOpen.Yes;
 				// read dirs
 				var dirsDepth0 = await from.GetFoldersAsync().AsTask().ConfigureAwait(false);
 				// copy dirs
@@ -140,6 +125,8 @@ namespace Utilz
 					var dirTo = await to.CreateFolderAsync(dirFrom.Name, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false);
 					await CopyDirContents2Async(dirFrom, dirTo).ConfigureAwait(false);
 				}
+
+				return Data.OpenableObservableData.BoolWhenOpen.Error;
 			}
 		}
 	}

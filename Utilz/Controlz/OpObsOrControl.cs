@@ -19,8 +19,8 @@ namespace Utilz.Controlz
 			//_orientationSensor = SimpleOrientationSensor.GetDefault();
 			//if (_orientationSensor != null) { _lastOrientation = _orientationSensor.GetCurrentOrientation(); }
 			UseLayoutRounding = true;
-			Loaded += Open;
-			Unloaded += Close;
+			Loaded += Load;
+			Unloaded += Unload;
 		}
 		//~OpObsOrControl() // this fucks up
 		//{
@@ -37,7 +37,7 @@ namespace Utilz.Controlz
 		private ApplicationView _appView = null;
 		public ApplicationView AppView { get { return _appView; } }
 
-		private void Open(object sender, RoutedEventArgs e)
+		private void Load(object sender, RoutedEventArgs e)
 		{
 			AddAppViewHandlers();
 			AddBackHandlers();
@@ -45,11 +45,11 @@ namespace Utilz.Controlz
 			OnLoaded();
 		}
 
-		private void Close(object sender, RoutedEventArgs e)
+		private void Unload(object sender, RoutedEventArgs e)
 		{
-			OnUnloaded();
 			RemoveAppViewHandlers();
 			RemoveBackHandlers();
+			OnUnloaded();
 		}
 		protected virtual void OnLoaded()
 		{ }
