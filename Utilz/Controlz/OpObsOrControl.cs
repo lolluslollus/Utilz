@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Utilz.Data;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -12,15 +13,15 @@ namespace Utilz.Controlz
 	/// </summary>
 	public abstract class OpObsOrControl : OpenableObservableControl, IOpenable
 	{
-		#region ctor
+		#region lifecycle
 		public OpObsOrControl() : base()
-        {
+		{
 			_appView = ApplicationView.GetForCurrentView();
 			//_orientationSensor = SimpleOrientationSensor.GetDefault();
 			//if (_orientationSensor != null) { _lastOrientation = _orientationSensor.GetCurrentOrientation(); }
 			UseLayoutRounding = true;
-			Loaded += Load;
-			Unloaded += Unload;
+			Loaded += OnLoaded;
+			Unloaded += OnUnloaded;
 		}
 		//~OpObsOrControl() // this fucks up
 		//{
@@ -31,30 +32,31 @@ namespace Utilz.Controlz
 		//    }
 		//    catch (Exception exc) { }
 		//}
-		#endregion ctor
 
-		#region common
-		private ApplicationView _appView = null;
-		public ApplicationView AppView { get { return _appView; } }
-
-		private void Load(object sender, RoutedEventArgs e)
+		private async void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			AddAppViewHandlers();
 			AddBackHandlers();
+
+			await OpenAsync();
+
 			OnVisibleBoundsChanged(_appView, null);
-			OnLoaded();
 		}
 
-		private void Unload(object sender, RoutedEventArgs e)
+		private void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			RemoveAppViewHandlers();
 			RemoveBackHandlers();
-			OnUnloaded();
+
+			Task close = CloseAsync();
 		}
-		protected virtual void OnLoaded()
-		{ }
-		protected virtual void OnUnloaded()
-		{ }
+		#endregion lifecycle
+
+
+		#region appView
+		private ApplicationView _appView = null;
+		public ApplicationView AppView { get { return _appView; } }
+
 		private bool _isAppViewHandlersActive = false;
 		private void AddAppViewHandlers()
 		{
@@ -94,7 +96,7 @@ namespace Utilz.Controlz
 			if (bpr != null) bpr.BackOrHardSoftKeyPressed -= OnHardwareOrSoftwareButtons_BackPressed;
 			_isBackHandlersActive = false;
 		}
-		#endregion common
+		#endregion appView
 
 
 		#region goBack

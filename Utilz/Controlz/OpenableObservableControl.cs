@@ -122,7 +122,7 @@ namespace Utilz.Controlz
 			return Task.CompletedTask;
 		}
 
-		public virtual async Task<bool> CloseAsync()
+		public async Task<bool> CloseAsync()
 		{
 			if (_isOpen)
 			{
