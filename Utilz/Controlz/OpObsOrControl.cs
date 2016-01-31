@@ -23,33 +23,25 @@ namespace Utilz.Controlz
 			Loaded += OnLoaded;
 			Unloaded += OnUnloaded;
 		}
-		//~OpObsOrControl() // this fucks up
-		//{
-		//    try
-		//    {
-		//        this.Loaded -= OnLoadedInternal;
-		//        this.Unloaded -= OnUnloadedInternal;
-		//    }
-		//    catch (Exception exc) { }
-		//}
 
 		private async void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			AddAppViewHandlers();
 			AddBackHandlers();
 
-			await OpenAsync();
+			await OnLoadedMayOverrideAsync();
 
 			OnVisibleBoundsChanged(_appView, null);
 		}
-
-		private void OnUnloaded(object sender, RoutedEventArgs e)
+		protected virtual Task OnLoadedMayOverrideAsync() { return Task.CompletedTask; }
+		private async void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			RemoveAppViewHandlers();
 			RemoveBackHandlers();
 
-			Task close = CloseAsync();
+			await OnUnloadedMayOverrideAsync();
 		}
+		protected virtual Task OnUnloadedMayOverrideAsync() { return Task.CompletedTask; }
 		#endregion lifecycle
 
 

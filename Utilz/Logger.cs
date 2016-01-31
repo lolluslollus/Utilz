@@ -53,7 +53,7 @@ namespace Utilz
             catch (Exception exc)
             {
                 if (SemaphoreSlimSafeRelease.IsAlive(_semaphore))
-                    Debug.WriteLine("ERROR in Logger.ClearAll(): " + exc.ToString());
+                    Debug.WriteLine("ERROR in Logger.ReadAsync(): " + exc.ToString());
             }
             finally
             {

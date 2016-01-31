@@ -21,7 +21,7 @@ namespace Utilz
         {
 			if (_isObserving) CollectionChanged?.Invoke(this, e); // base.OnCollectionChanged(e); // this was all, it's smarter now
 
-			//if (_isObserving) // LOLLO TODO check if we really need this
+			//if (_isObserving) // LOLLO TODO check if we really need this in the UniFiler
 			//{
 			//    try
 			//    {
