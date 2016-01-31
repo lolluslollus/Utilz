@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Utilz.Data;
@@ -127,6 +128,7 @@ namespace Utilz.Controlz
 			if (_isOpen)
 			{
 				_cts?.CancelSafe(true);
+				Debug.WriteLine("cts safely cancelled");
 
 				try
 				{
@@ -135,6 +137,7 @@ namespace Utilz.Controlz
 					{
 						_cts?.Dispose();
 						_cts = null;
+						Debug.WriteLine("cts is null");
 
 						IsEnabledAllowed = false;
 						IsOpen = false;

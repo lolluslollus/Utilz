@@ -18,7 +18,7 @@ namespace Utilz
 			string output = string.Empty;
 			foreach (var item in settings.Values)
 			{
-				Debug.WriteLine(item.Key + " = " + item.Value.ToString());
+				// Debug.WriteLine(item.Key + " = " + item.Value.ToString());
 				output += (item.Key + " = " + item.Value.ToString() + System.Environment.NewLine);
 			}
 			return output;
@@ -28,7 +28,7 @@ namespace Utilz
 		{
 			try
 			{
-				Debug.WriteLine("writing value " + value + " into reg key " + regKey);
+				// Debug.WriteLine("writing value " + value + " into reg key " + regKey);
 				var settings = ApplicationData.Current.LocalSettings;
 				settings.Values[regKey] = value;
 				return true;
@@ -51,7 +51,7 @@ namespace Utilz
 				{
 					valueStr = valueObj.ToString();
 				}
-				Debug.WriteLine("reg key " + regKey + " has value " + valueStr);
+				// Debug.WriteLine("reg key " + regKey + " has value " + valueStr);
 			}
 			catch (Exception ex)
 			{

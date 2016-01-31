@@ -1871,6 +1871,7 @@ namespace SQLite
 
 		public TableMapping(Type type, CreateFlags createFlags = CreateFlags.None)
 		{
+			_insertCommandMap = new ConcurrentStringDictionary(); // LOLLO moved this here from the bottom
 			MappedType = type;
 
 #if USE_NEW_REFLECTION_API
@@ -1926,7 +1927,7 @@ namespace SQLite
 				// People should not be calling Get/Find without a PK
 				GetByPrimaryKeySql = string.Format("select * from \"{0}\" limit 1", TableName);
 			}
-			_insertCommandMap = new ConcurrentStringDictionary();
+//			_insertCommandMap = new ConcurrentStringDictionary();
 		}
 
 		public bool HasAutoIncPK { get; private set; }
