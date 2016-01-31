@@ -109,7 +109,7 @@ namespace Utilz
 		{
 			try
 			{
-				semaphore.Release();
+				semaphore?.Release();
 				return true;
 			}
 			catch { }
@@ -142,7 +142,7 @@ namespace Utilz
 		{
 			try
 			{
-				semaphore.Dispose();
+				semaphore?.Dispose();
 				return true;
 			}
 			catch { }

@@ -1,4 +1,4 @@
-﻿<uctl:OpObsOrControl
+﻿<uctl:BackOrientOpenObservControl
     x:Class="Utilz.Controlz.LolloListChooser"
     x:Name="me"
     xmlns:uctl="using:Utilz.Controlz"
@@ -82,4 +82,4 @@
             </Popup>
         </Canvas>
     </Grid>
-</uctl:OpObsOrControl>
+</uctl:BackOrientOpenObservControl>

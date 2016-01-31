@@ -11,7 +11,7 @@ using Windows.UI.Xaml.Input;
 
 namespace Utilz.Controlz
 {
-    public sealed partial class LolloListChooser : OpObsOrControl
+    public sealed partial class LolloListChooser : BackOrientOpenObservControl
 	{
         #region properties
         private const string DefaultPlaceholderText = "Select an item";
@@ -199,7 +199,7 @@ namespace Utilz.Controlz
         #endregion construct and dispose
 
         #region popup
-        protected override void OnHardwareOrSoftwareButtons_BackPressed(object sender, BackOrHardSoftKeyPressedEventArgs e)
+        protected override void OnHardwareOrSoftwareButtons_BackPressed_MayOverride(object sender, BackOrHardSoftKeyPressedEventArgs e)
         {
             if (IsPopupOpen)
             {
@@ -207,14 +207,13 @@ namespace Utilz.Controlz
                 IsPopupOpen = false;
             }
         }
-        protected override void OnVisibleBoundsChanged(ApplicationView sender, object args)
+        protected override void OnVisibleBoundsChangedMayOverride(ApplicationView sender, object args)
         {
             if (IsPopupOpen)
             {
                 IsPopupOpen = false;
                 // UpdatePopupSizeAndPlacement(); // this screws up, let's just close the popup for now
             }
-            // base.OnVisibleBoundsChanged(sender, args);
         }
         /// <summary>
         /// Only call this in the IsPopupOpen change handler.

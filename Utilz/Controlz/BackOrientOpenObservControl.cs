@@ -6,15 +6,10 @@ using Windows.UI.Xaml;
 
 namespace Utilz.Controlz
 {
-	/// <summary>
-	/// This is a smarter UserControl that can be opened and closed, asynchronously. 
-	/// It will stay disabled as long as it is closed.
-	/// Do not bind to IsEnabled, but to IsEnabledOverride instead.
-	/// </summary>
-	public abstract class OpObsOrControl : OpenableObservableControl, IOpenable
+	public abstract class BackOrientOpenObservControl : OpenableObservableControl, IOpenable
 	{
 		#region lifecycle
-		public OpObsOrControl() : base()
+		public BackOrientOpenObservControl() : base()
 		{
 			_appView = ApplicationView.GetForCurrentView();
 			//_orientationSensor = SimpleOrientationSensor.GetDefault();
@@ -31,7 +26,7 @@ namespace Utilz.Controlz
 
 			await OnLoadedMayOverrideAsync();
 
-			OnVisibleBoundsChanged(_appView, null);
+			OnVisibleBoundsChangedMayOverride(_appView, null);
 		}
 		protected virtual Task OnLoadedMayOverrideAsync() { return Task.CompletedTask; }
 		private async void OnUnloaded(object sender, RoutedEventArgs e)
@@ -56,17 +51,22 @@ namespace Utilz.Controlz
 			if (_isAppViewHandlersActive == false && av != null)
 			{
 				_isAppViewHandlersActive = true;
-				av.VisibleBoundsChanged += OnVisibleBoundsChanged;
+				av.VisibleBoundsChanged += OnVisibleBoundsChangedMayOverride;
 			}
 		}
 
 		private void RemoveAppViewHandlers()
 		{
 			var av = _appView;
-			if (av != null) av.VisibleBoundsChanged -= OnVisibleBoundsChanged;
+			if (av != null) av.VisibleBoundsChanged -= OnVisibleBoundsChangedMayOverride;
 			_isAppViewHandlersActive = false;
 		}
 
+		protected virtual void OnVisibleBoundsChangedMayOverride(ApplicationView sender, object args) { }
+		#endregion appView
+
+
+		#region goBack
 		private bool _isBackHandlersActive = false;
 		private void AddBackHandlers()
 		{
@@ -74,7 +74,7 @@ namespace Utilz.Controlz
 			if (_isBackHandlersActive == false && bpr != null)
 			{
 				_isBackHandlersActive = true;
-				bpr.BackOrHardSoftKeyPressed += OnHardwareOrSoftwareButtons_BackPressed;
+				bpr.BackOrHardSoftKeyPressed += OnHardwareOrSoftwareButtons_BackPressed_MayOverride;
 			}
 		}
 
@@ -85,14 +85,11 @@ namespace Utilz.Controlz
 
 		private void RemoveBackHandlers(IBackPressedRaiser bpr)
 		{
-			if (bpr != null) bpr.BackOrHardSoftKeyPressed -= OnHardwareOrSoftwareButtons_BackPressed;
+			if (bpr != null) bpr.BackOrHardSoftKeyPressed -= OnHardwareOrSoftwareButtons_BackPressed_MayOverride;
 			_isBackHandlersActive = false;
 		}
-		#endregion appView
-
-
-		#region goBack
-		protected virtual void OnHardwareOrSoftwareButtons_BackPressed(object sender, BackOrHardSoftKeyPressedEventArgs e) { }
+		
+		protected virtual void OnHardwareOrSoftwareButtons_BackPressed_MayOverride(object sender, BackOrHardSoftKeyPressedEventArgs e) { }
 
 		public IBackPressedRaiser BackPressedRaiser
 		{
@@ -100,19 +97,15 @@ namespace Utilz.Controlz
 			set { SetValue(BackPressedRaiserProperty, value); }
 		}
 		public static readonly DependencyProperty BackPressedRaiserProperty =
-			DependencyProperty.Register("BackPressedRaiser", typeof(IBackPressedRaiser), typeof(OpObsOrControl), new PropertyMetadata(null, OnBackPressedRaiserChanged));
+			DependencyProperty.Register("BackPressedRaiser", typeof(IBackPressedRaiser), typeof(BackOrientOpenObservControl), new PropertyMetadata(null, OnBackPressedRaiserChanged));
 		private static void OnBackPressedRaiserChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
-			var instance = obj as OpObsOrControl;
+			var instance = obj as BackOrientOpenObservControl;
 			instance.RemoveBackHandlers(args.OldValue as IBackPressedRaiser);
 			instance.AddBackHandlers();
 		}
 		#endregion goBack
 
-
-		#region rotation
-		protected virtual void OnVisibleBoundsChanged(ApplicationView sender, object args) { }
-		#endregion rotation
 
 		// the following works but we don't need it
 		//#region sensor

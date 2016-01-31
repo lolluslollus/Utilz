@@ -113,7 +113,7 @@
     <Compile Include="Controlz\ObservableControl.cs" />
     <Compile Include="Controlz\ObservablePage.cs" />
     <Compile Include="Controlz\OpenableObservableControl.cs" />
-    <Compile Include="Controlz\OpObsOrControl.cs" />
+    <Compile Include="Controlz\BackOrientOpenObservControl.cs" />
     <Compile Include="Controlz\TextBlockScaler.cs" />
     <Compile Include="Controlz\UniversalWrapPanel.cs" />
     <Compile Include="Data\DbBoundObservableData.cs" />
