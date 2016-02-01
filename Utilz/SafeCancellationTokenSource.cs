@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Utilz
@@ -136,8 +137,12 @@ namespace Utilz
 			try
 			{
 				var lcts = cts;
-				lock (cts._lock)
+				/// Stopwatch sw0 = new Stopwatch(); sw0.Start();
+				lock (cts._lock) // this lock takes 0 msec and up to 400 ticks on x86 in debug mode
 				{
+					//sw0.Stop();
+					//Debug.WriteLine("msec to acquire lock = " + sw0.ElapsedMilliseconds);
+					//Debug.WriteLine("ticks to acquire lock = " + sw0.ElapsedTicks);
 					if (lcts == null) return new CancellationToken(cancelTokenIfCtsNull);
 					if (!lcts._isDisposed) return lcts.Token;
 					return new CancellationToken(cancelTokenIfCtsNull);
