@@ -302,7 +302,7 @@ namespace Utilz.Controlz
             }
         }
 
-        private bool _isMyListViewEventHandlersActive = false;
+        private volatile bool _isMyListViewEventHandlersActive = false;
         private void OnMyListViewLoaded(object sender, RoutedEventArgs e)
         {
             if (!_isMyListViewEventHandlersActive)

@@ -6,7 +6,7 @@ namespace Utilz
 {
 	public class SafeCancellationTokenSource : CancellationTokenSource
 	{
-		private readonly object _lock = new object();
+		//private readonly object _lock = new object(); // LOLLO TODO it looks like I don't need the lock. Make sure.
 		private volatile bool _isDisposed = false;
 		public bool IsDisposed { get { return _isDisposed; } }
 
@@ -14,11 +14,11 @@ namespace Utilz
 		{
 			try
 			{
-				lock (_lock)
-				{
+				//lock (_lock)
+				//{
 					_isDisposed = true;
 					base.Dispose(disposing);
-				}
+				//}
 			}
 			catch (Exception ex)
 			{
@@ -30,13 +30,14 @@ namespace Utilz
 		{
 			try
 			{
-				lock (_lock)
-				{
+				//lock (_lock)
+				//{
 					if (!_isDisposed) Cancel(throwOnFirstException);
-				}
+				//}
 			}
 			catch (OperationCanceledException) { } // maniman
 			catch (ObjectDisposedException) { }
+			catch (AggregateException) { }
 			catch (Exception ex)
 			{
 				Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
@@ -49,11 +50,11 @@ namespace Utilz
 			{
 				try
 				{
-					lock (_lock)
-					{
+					//lock (_lock)
+					//{
 						if (!_isDisposed) return Token.IsCancellationRequested;
 						else return true;
-					}
+					//}
 				}
 				catch (OperationCanceledException) // maniman
 				{
@@ -138,15 +139,15 @@ namespace Utilz
 			{
 				var lcts = cts;
 				/// Stopwatch sw0 = new Stopwatch(); sw0.Start();
-				lock (cts._lock) // this lock takes 0 msec and up to 400 ticks on x86 in debug mode
-				{
+				//lock (cts._lock) // this lock takes 0 msec and up to 400 ticks on x86 in debug mode
+				//{
 					//sw0.Stop();
 					//Debug.WriteLine("msec to acquire lock = " + sw0.ElapsedMilliseconds);
 					//Debug.WriteLine("ticks to acquire lock = " + sw0.ElapsedTicks);
 					if (lcts == null) return new CancellationToken(cancelTokenIfCtsNull);
 					if (!lcts._isDisposed) return lcts.Token;
 					return new CancellationToken(cancelTokenIfCtsNull);
-				}
+				//}
 			}
 			catch (Exception ex)
 			{

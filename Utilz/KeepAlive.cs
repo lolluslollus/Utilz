@@ -5,9 +5,10 @@ namespace Utilz
 {
 	public static class KeepAlive
 	{
-		private static Windows.System.Display.DisplayRequest _appDisplayRequest = null; //new Windows.System.Display.DisplayRequest();
-		private const long LongMax = 10000L; // 2147483647L;
-		private static long _displayRequestRefCount = 0;
+		private static volatile Windows.System.Display.DisplayRequest _appDisplayRequest = null; //new Windows.System.Display.DisplayRequest();
+		private const int MAX_COUNT = 10000; // 2147483647L;
+		private static int _displayRequestRefCount = 0;
+		private static readonly object _countLock = new object();
 
 		/// <summary>
 		/// Always call this from the UI thread
@@ -18,8 +19,11 @@ namespace Utilz
 		{
 			try
 			{
-				if (isMustKeepAlive) SetTrue();
-				else SetFalse();
+				lock (_countLock)
+				{
+					if (isMustKeepAlive) SetTrue();
+					else SetFalse();
+				}
 			}
 			catch (Exception ex)
 			{
@@ -39,7 +43,7 @@ namespace Utilz
 
 		private static void SetTrue()
 		{
-			if (_displayRequestRefCount < LongMax)
+			if (_displayRequestRefCount < MAX_COUNT)
 			{
 				if (_appDisplayRequest == null) _appDisplayRequest = new Windows.System.Display.DisplayRequest();
 				_appDisplayRequest.RequestActive();
@@ -50,13 +54,15 @@ namespace Utilz
 		/// <summary>
 		/// Always call this from the UI thread
 		/// </summary>
-		/// <param name="isMustKeepAlive"></param>
 		[STAThread]
 		public static void StopKeepAlive()
 		{
 			try
 			{
-				while (_displayRequestRefCount > 0) SetFalse();
+				lock (_countLock)
+				{
+					while (_displayRequestRefCount > 0) SetFalse();
+				}
 			}
 			catch (Exception ex)
 			{

@@ -13,7 +13,7 @@ namespace Utilz
 {
     public class ProportionsTrigger : StateTriggerBase
     {
-        private ApplicationView _appView = null;
+        private volatile ApplicationView _appView = null;
         //private SimpleOrientationSensor _orientationSensor;
 
         private FrameworkElement _targetElement;
@@ -30,7 +30,7 @@ namespace Utilz
             }
         }
 
-        private bool _isHandlersActive = false;
+        private volatile bool _isHandlersActive = false;
         private async Task AddHandlersAsync()
         {
             //if (_orientationSensor == null) _orientationSensor = SimpleOrientationSensor.GetDefault();

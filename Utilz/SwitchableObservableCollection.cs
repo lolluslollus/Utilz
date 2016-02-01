@@ -10,7 +10,7 @@ namespace Utilz
 	// LOLLO http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
 	public class SwitchableObservableCollection<T> : ObservableCollection<T>
 	{
-		protected bool _isObserving = true;
+		protected volatile bool _isObserving = true;
 		public bool IsObserving { get { return _isObserving; } set { _isObserving = value; } }
 
 		public static readonly int MAX_CAPACITY = int.MaxValue - 1; // MS limit

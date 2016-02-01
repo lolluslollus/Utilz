@@ -328,7 +328,7 @@ namespace Utilz.Controlz
 
 
 		#region back
-		private bool _isBackHandlersRegistered = false;
+		private volatile bool _isBackHandlersRegistered = false;
 		private Task RegisterBackEventHandlersAsync()
 		{
 			return RunInUiThreadAsync(delegate

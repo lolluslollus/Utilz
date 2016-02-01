@@ -44,7 +44,7 @@ namespace Utilz.Controlz
 		private ApplicationView _appView = null;
 		public ApplicationView AppView { get { return _appView; } }
 
-		private bool _isAppViewHandlersActive = false;
+		private volatile bool _isAppViewHandlersActive = false;
 		private void AddAppViewHandlers()
 		{
 			var av = _appView;
@@ -67,7 +67,7 @@ namespace Utilz.Controlz
 
 
 		#region goBack
-		private bool _isBackHandlersActive = false;
+		private volatile bool _isBackHandlersActive = false;
 		private void AddBackHandlers()
 		{
 			var bpr = BackPressedRaiser;

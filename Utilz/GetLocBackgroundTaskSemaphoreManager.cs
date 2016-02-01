@@ -10,7 +10,7 @@ namespace Utilz
         // the only way is with a named Mutex (compare SuspensionManager) or a named semaphore.
 
         private const string SEMAPHORE_NAME = "GPSHikingMate10_GetLocBackgroundTaskSemaphore";
-        private static Semaphore _backgroundTaskSemaphore = null;
+        private static volatile Semaphore _backgroundTaskSemaphore = null;
         public static bool TryWait()
         {
             if (_backgroundTaskSemaphore == null) _backgroundTaskSemaphore = new Semaphore(1, 1, SEMAPHORE_NAME);

@@ -9,7 +9,7 @@ namespace Utilz
 {
     public sealed class DispatcherTimerPlus : DispatcherTimer, IDisposable
     {
-        private DispatcherTimer _dispatcherTimer = null;
+        private volatile DispatcherTimer _dispatcherTimer = null;
         private Action _action = null;
         private TimeSpan _interval = new TimeSpan(0, 0, 5);
 
