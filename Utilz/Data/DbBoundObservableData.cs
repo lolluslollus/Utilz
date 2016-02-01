@@ -40,7 +40,10 @@ namespace Utilz.Data
 			}
 		}
 		// LOLLO the following are various experiments with SetProperty
-		// Atomicity bugs maybe? Also try inserting a big delay and see what happens. A semaphore may fix it.
+		// 
+		// LOLLO TODO Atomicity bugs maybe? Also try inserting a big delay and see what happens. A semaphore may fix it.
+		// see http://www.blackwasp.co.uk/Volatile.aspx for good volatile stuff.
+		//
 		//protected async void SetProperty1(object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		//{
 		//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
