@@ -1,23 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Utilz
 {
 	public class SafeCancellationTokenSource : CancellationTokenSource
 	{
+		private readonly object _lock = new object();
 		private volatile bool _isDisposed = false;
 		public bool IsDisposed { get { return _isDisposed; } }
 
 		protected override void Dispose(bool disposing)
 		{
-			_isDisposed = true;
 			try
 			{
-				base.Dispose(disposing);
+				lock (_lock)
+				{
+					_isDisposed = true;
+					base.Dispose(disposing);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -29,7 +29,10 @@ namespace Utilz
 		{
 			try
 			{
-				if (!_isDisposed) Cancel(throwOnFirstException);
+				lock (_lock)
+				{
+					if (!_isDisposed) Cancel(throwOnFirstException);
+				}
 			}
 			catch (OperationCanceledException) { } // maniman
 			catch (ObjectDisposedException) { }
@@ -43,23 +46,26 @@ namespace Utilz
 		{
 			get
 			{
-				try
+				lock (_lock)
 				{
-					if (!_isDisposed) return Token.IsCancellationRequested;
-					else return true;
-				}
-				catch (OperationCanceledException) // maniman
-				{
-					return true;
-				}
-				catch (ObjectDisposedException)
-				{
-					return true;
-				}
-				catch (Exception ex)
-				{
-					Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
-					return true;
+					try
+					{
+						if (!_isDisposed) return Token.IsCancellationRequested;
+						else return true;
+					}
+					catch (OperationCanceledException) // maniman
+					{
+						return true;
+					}
+					catch (ObjectDisposedException)
+					{
+						return true;
+					}
+					catch (Exception ex)
+					{
+						Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+						return true;
+					}
 				}
 			}
 		}
@@ -71,26 +77,42 @@ namespace Utilz
 		{
 			get
 			{
-				try
+				lock (_lock)
 				{
-					if (!_isDisposed) return Token;
-					else return new CancellationToken(true);
-				}
-				catch (Exception ex)
-				{
-					Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
-					return new CancellationToken(true);
+					try
+					{
+						if (!_isDisposed) return Token;
+						else return new CancellationToken(true);
+					}
+					catch (Exception ex)
+					{
+						Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+						return new CancellationToken(true);
+					}
 				}
 			}
 		}
-	}
 
-	//public static class SafeCancellationTokenSourceExtensions
-	//{
-	//	public static bool IsAlive(this SafeCancellationTokenSource cts)
-	//	{
-	//		var lcts = cts;
-	//		return (lcts != null && !lcts.IsDisposed);
-	//	}
-	//}
+		public static bool IsNullOrCancellationRequestedSafe(SafeCancellationTokenSource cts)
+		{
+			var lcts = cts;
+			if (lcts == null || lcts.IsCancellationRequestedSafe) return true;
+			else return false;
+		}
+
+		public static CancellationToken GetCancellationTokenSafe(SafeCancellationTokenSource cts, bool cancelTokenIfCtsNull = true)
+		{
+			try
+			{
+				var lcts = cts;
+				if (lcts?.IsDisposed == false) return lcts.TokenSafe;
+				else return new CancellationToken(cancelTokenIfCtsNull);
+			}
+			catch (Exception ex)
+			{
+				Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+				return new CancellationToken(true);
+			}
+		}
+	}
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using Utilz.Data;
 using Windows.UI.Xaml;
@@ -55,23 +54,6 @@ namespace Utilz.Controlz
 
 		private volatile SafeCancellationTokenSource _cts = null;
 		protected SafeCancellationTokenSource Cts { get { return _cts; } }
-		protected CancellationToken CancellationTokenSafe
-		{
-			get
-			{
-				try
-				{
-					var cts = _cts;
-					if (cts != null) return cts.TokenSafe;
-					else return new CancellationToken(false); // we must be optimistic, or the methods running in separate tasks will always crap out
-				}
-				catch (Exception ex)
-				{
-					Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
-					return new CancellationToken(true);
-				}
-			}
-		}
 		#endregion properties
 
 
