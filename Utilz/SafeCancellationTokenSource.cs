@@ -25,7 +25,7 @@ namespace Utilz
 			}
 		}
 
-		public void CancelSafe(bool throwOnFirstException = false)
+		public void CancelSafe(bool throwOnFirstException)
 		{
 			try
 			{
@@ -42,71 +42,106 @@ namespace Utilz
 			}
 		}
 
-		public bool IsCancellationRequestedSafe
+		private bool IsCancellationRequestedSafe
 		{
 			get
 			{
-				lock (_lock)
+				try
 				{
-					try
+					lock (_lock)
 					{
 						if (!_isDisposed) return Token.IsCancellationRequested;
 						else return true;
 					}
-					catch (OperationCanceledException) // maniman
-					{
-						return true;
-					}
-					catch (ObjectDisposedException)
-					{
-						return true;
-					}
-					catch (Exception ex)
-					{
-						Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
-						return true;
-					}
 				}
-			}
-		}
-		/// <summary>
-		/// Always gets a CancellationToken, even if the object is disposed.
-		/// In this case, the token will say "operation cancelled".
-		/// </summary>
-		public CancellationToken TokenSafe
-		{
-			get
-			{
-				lock (_lock)
+				catch (OperationCanceledException) // maniman
 				{
-					try
-					{
-						if (!_isDisposed) return Token;
-						else return new CancellationToken(true);
-					}
-					catch (Exception ex)
-					{
-						Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
-						return new CancellationToken(true);
-					}
+					return true;
+				}
+				catch (ObjectDisposedException)
+				{
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+					return true;
 				}
 			}
 		}
 
+		//private CancellationToken TokenSafe
+		//{
+		//	get
+		//	{
+		//		try
+		//		{
+		//			lock (_lock)
+		//			{
+		//				if (!_isDisposed) return Token;
+		//				else return new CancellationToken(true);
+		//			}
+		//		}
+		//		catch (Exception ex)
+		//		{
+		//			Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+		//			return new CancellationToken(true);
+		//		}
+		//	}
+		//}
+
+		/// <summary>
+		/// Returns true if the given token is null, disposed or has a cancelled token, false otherwise.
+		/// </summary>
+		/// <param name="cts"></param>
+		/// <returns></returns>
 		public static bool IsNullOrCancellationRequestedSafe(SafeCancellationTokenSource cts)
 		{
-			var lcts = cts;
-			if (lcts == null || lcts.IsCancellationRequestedSafe) return true;
+			if (cts?.IsCancellationRequestedSafe == false) return false;
+			else return true;
+		}
+
+		/// <summary>
+		/// Returns true if the given token is null, disposed or has a cancelled token, false otherwise.
+		/// </summary>
+		/// <param name="cts"></param>
+		/// <returns></returns>
+		public static bool IsNotNullAndCancellationRequestedSafe(SafeCancellationTokenSource cts)
+		{
+			if (cts?.IsCancellationRequestedSafe == true) return true;
 			else return false;
 		}
 
+		/// <summary>
+		/// Always gets a CancellationToken, even if the given token is disposed.
+		/// In this case, the token will be cancelled if cancelTokenIfCtsNull is true, otherwise not.
+		/// </summary>
+		/// <param name="cts"></param>
+		/// <param name="cancelTokenIfCtsNull"></param>
+		/// <returns></returns>
 		public static CancellationToken GetCancellationTokenSafe(SafeCancellationTokenSource cts, bool cancelTokenIfCtsNull = true)
 		{
+			//try
+			//{
+			//	var lcts = cts;
+			//	if (lcts?.IsDisposed == false) return lcts.TokenSafe;
+			//	else return new CancellationToken(cancelTokenIfCtsNull);
+			//}
+			//catch (Exception ex)
+			//{
+			//	Logger.Add_TPL(ex.ToString(), Logger.ForegroundLogFilename);
+			//	return new CancellationToken(true);
+			//}
+
 			try
 			{
 				var lcts = cts;
-				if (lcts?.IsDisposed == false) return lcts.TokenSafe;
-				else return new CancellationToken(cancelTokenIfCtsNull);
+				lock (cts._lock)
+				{
+					if (lcts == null) return new CancellationToken(cancelTokenIfCtsNull);
+					if (!lcts._isDisposed) return lcts.Token;
+					return new CancellationToken(cancelTokenIfCtsNull);
+				}
 			}
 			catch (Exception ex)
 			{

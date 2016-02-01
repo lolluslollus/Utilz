@@ -114,6 +114,7 @@
     <Compile Include="Controlz\ObservablePage.cs" />
     <Compile Include="Controlz\OpenableObservableControl.cs" />
     <Compile Include="Controlz\BackOrientOpenObservControl.cs" />
+    <Compile Include="Controlz\OpenableObservablePage.cs" />
     <Compile Include="Controlz\TextBlockScaler.cs" />
     <Compile Include="Controlz\UniversalWrapPanel.cs" />
     <Compile Include="Data\DbBoundObservableData.cs" />
@@ -143,6 +144,9 @@
     </SDKReference>
     <SDKReference Include="SQLite.UAP.2015, Version=3.10.2">
       <Name>SQLite for Universal App Platform</Name>
+    </SDKReference>
+    <SDKReference Include="WindowsMobile, Version=10.0.10586.0">
+      <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
   <ItemGroup />
