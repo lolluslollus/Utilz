@@ -13,15 +13,16 @@ namespace Utilz
 		protected bool _isObserving = true;
 		public bool IsObserving { get { return _isObserving; } set { _isObserving = value; } }
 
-		protected uint _capacity = UInt32.MaxValue;
-		public uint Capacity { get { return _capacity; } }
+		public static readonly int MAX_CAPACITY = int.MaxValue - 1; // MS limit
+		protected int _capacity = MAX_CAPACITY;
+		public int Capacity { get { return _capacity; } }
 
 		public SwitchableObservableCollection() : base() { }
 		public SwitchableObservableCollection(IEnumerable<T> collection) : base(collection) { }
-		public SwitchableObservableCollection(uint capacity) : base() { _capacity = capacity; }
+		public SwitchableObservableCollection(int capacity) : base() { _capacity = capacity; }
 		public SwitchableObservableCollection(bool isObserving) : base() { _isObserving = isObserving; }
 		public SwitchableObservableCollection(bool isObserving, IEnumerable<T> collection) : base(collection) { _isObserving = isObserving; }
-		public SwitchableObservableCollection(bool isObserving, uint capacity) : base() { _isObserving = isObserving; _capacity = capacity; }
+		public SwitchableObservableCollection(bool isObserving, int capacity) : base() { _isObserving = isObserving; _capacity = capacity; }
 
 
 		public void AddRange(IEnumerable<T> range)
