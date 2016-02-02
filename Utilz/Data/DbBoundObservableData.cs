@@ -120,19 +120,20 @@ namespace Utilz.Data
 				return fldValue;
 			}
 		}
-		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters
-		protected T GetProperty<T>(ref T fldValue) where T : class
-		{
-			return Volatile.Read(ref fldValue);
-		}
-		protected bool GetProperty(ref bool fldValue)
-		{
-			return Volatile.Read(ref fldValue);
-		}
-		protected int GetProperty(ref int fldValue)
-		{
-			return Volatile.Read(ref fldValue);
-		}
+		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters.
+		// However, they seem slower than the volatile keyword on the private field by a factor of 3 to 5.
+		//protected T GetProperty<T>(ref T fldValue) where T : class
+		//{
+		//	return Volatile.Read(ref fldValue);
+		//}
+		//protected bool GetProperty(ref bool fldValue)
+		//{
+		//	return Volatile.Read(ref fldValue);
+		//}
+		//protected int GetProperty(ref int fldValue)
+		//{
+		//	return Volatile.Read(ref fldValue);
+		//}
 
 		//protected Task SetProperty4(ref object fldValue, object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		//{
