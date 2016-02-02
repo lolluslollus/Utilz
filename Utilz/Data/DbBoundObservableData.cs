@@ -43,6 +43,20 @@ namespace Utilz.Data
 		// 
 		// LOLLO TODO Atomicity bugs maybe? Also try inserting a big delay and see what happens. A semaphore may fix it.
 		// see http://www.blackwasp.co.uk/Volatile.aspx for good volatile stuff.
+		// and https://blogs.msdn.microsoft.com/ericlippert/2011/06/16/atomicity-volatility-and-immutability-are-different-part-three/
+		// and http://www.albahari.com/threading/part2.aspx
+		// my idea is: in general, use locks when writing and volatile when reading.
+		// the trouble only applies to fields, which can be written to or read from by different threads at the same time.
+		// MSDN is even more restrictive ( https://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k(volatile_CSharpKeyword);k(TargetFrameworkMoniker-.NETCore,Version%3Dv5.0);k(DevLang-csharp)&rd=true )
+		// they say: The volatile keyword indicates that a field might be modified by multiple threads that are executing at the same time.
+		// However, the simple blackwasp example above suggests that thread A can change a field and thread B will not see the new value unless it is volatile.
+		// This is also some basic mt.
+		// Anyway:
+		// Atomicity, volatility and immutability are 3 very different things. One does not imply the other. Immutability even negates volatility.
+		// Only atomic fields can be volatilised.
+		// locks are atomic by construction.
+		// volatile is apparently a very complex affair and must be understood thoroughly. Otherwise, better use locks, read/write locks etc.
+		// but how can I put them into this generic SetProperty<T>() ?
 		//
 		//protected async void SetProperty1(object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		//{
