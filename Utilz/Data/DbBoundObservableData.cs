@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Utilz.Data
@@ -118,6 +119,19 @@ namespace Utilz.Data
 			{
 				return fldValue;
 			}
+		}
+		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters
+		protected T GetProperty<T>(ref T fldValue) where T : class
+		{
+			return Volatile.Read(ref fldValue);
+		}
+		protected bool GetProperty(ref bool fldValue)
+		{
+			return Volatile.Read(ref fldValue);
+		}
+		protected int GetProperty(ref int fldValue)
+		{
+			return Volatile.Read(ref fldValue);
 		}
 
 		//protected Task SetProperty4(ref object fldValue, object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
