@@ -32,6 +32,7 @@ namespace Utilz.Data
 		public virtual string ParentId
 		{
 			get { return _parentId; }
+			// get { return GetProperty(ref _parentId, null); }
 			set
 			{
 				string newValue = value ?? DEFAULT_ID;
@@ -45,6 +46,8 @@ namespace Utilz.Data
 		// see http://www.blackwasp.co.uk/Volatile.aspx for good volatile stuff.
 		// and https://blogs.msdn.microsoft.com/ericlippert/2011/06/16/atomicity-volatility-and-immutability-are-different-part-three/
 		// and http://www.albahari.com/threading/part2.aspx
+		// and http://www.drdobbs.com/parallel/writing-lock-free-code-a-corrected-queue/210604448
+		// 
 		// my idea is: in general, use locks when writing and volatile when reading.
 		// the trouble only applies to fields, which can be written to or read from by different threads at the same time.
 		// MSDN is even more restrictive ( https://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k(volatile_CSharpKeyword);k(TargetFrameworkMoniker-.NETCore,Version%3Dv5.0);k(DevLang-csharp)&rd=true )
@@ -56,7 +59,7 @@ namespace Utilz.Data
 		// Only atomic fields can be volatilised.
 		// locks are atomic by construction.
 		// volatile is apparently a very complex affair and must be understood thoroughly. Otherwise, better use locks, read/write locks etc.
-		// but how can I put them into this generic SetProperty<T>() ?
+		// but how can I put them into this generic SetProperty<T>() ? A simple answer could be the SetProperty<T> lower down, the second override.
 		//
 		//protected async void SetProperty1(object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		//{
@@ -98,6 +101,22 @@ namespace Utilz.Data
 						await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
 					}
 				});
+			}
+		}
+
+		protected void SetProperty<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		{
+			lock (locker)
+			{
+				SetProperty<T>(ref fldValue, newValue, onlyIfDifferent, propertyName);
+			}
+		}
+
+		protected T GetProperty<T>(ref T fldValue, object locker)
+		{
+			lock (locker)
+			{
+				return fldValue;
 			}
 		}
 
