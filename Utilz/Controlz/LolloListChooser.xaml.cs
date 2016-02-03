@@ -295,11 +295,7 @@ namespace Utilz.Controlz
         public event EventHandler<TextAndTag> ItemSelected;
         private void RaiseItemSelected(object sender, TextAndTag e)
         {
-            var listener = ItemSelected;
-            if (listener != null)
-            {
-                listener(sender, e);
-            }
+			ItemSelected?.Invoke(sender, e);
         }
 
         private volatile bool _isMyListViewEventHandlersActive = false;

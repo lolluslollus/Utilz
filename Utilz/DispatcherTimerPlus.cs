@@ -56,7 +56,7 @@ namespace Utilz
         }
         private void OnAnimationTimer_Tick(object sender, object e)
         {
-            if (_action != null) _action.Invoke();
+            _action?.Invoke();
         }
     }
 }

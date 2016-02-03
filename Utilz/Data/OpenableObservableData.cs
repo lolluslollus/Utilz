@@ -19,7 +19,7 @@ namespace Utilz.Data
 		public bool IsOpen { get { return _isOpen; } protected set { if (_isOpen != value) { _isOpen = value; RaisePropertyChanged_UI(); } } }
 
 		private readonly object _ctsLocker = new object(); // LOLLO TODO I use a locker now, check if this is faster than volatile. It should be way faster when reading.
-														   // LOLLO TODO if it is better, use it for the other classes that own a SafeCancellationTokenSource, too.
+														   // LOLLO TODO if it is better, use it for the other openable classes that own a SafeCancellationTokenSource, too.
 		private SafeCancellationTokenSource _cts = null;
 		[IgnoreDataMember]
 		[Ignore]
