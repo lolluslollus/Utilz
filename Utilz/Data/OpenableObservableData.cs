@@ -18,8 +18,18 @@ namespace Utilz.Data
 		[Ignore]
 		public bool IsOpen { get { return _isOpen; } protected set { if (_isOpen != value) { _isOpen = value; RaisePropertyChanged_UI(); } } }
 
-		private volatile SafeCancellationTokenSource _cts = null;
-		protected SafeCancellationTokenSource Cts { get { return _cts; } }
+		private readonly object _ctsLocker = new object(); // LOLLO TODO I use a locker now, check if this is faster than volatile. It should be way faster when reading.
+														   // LOLLO TODO if it is better, use it for the other classes that own a SafeCancellationTokenSource, too.
+		private SafeCancellationTokenSource _cts = null;
+		[IgnoreDataMember]
+		[Ignore]
+		protected SafeCancellationTokenSource Cts
+		{
+			get
+			{
+				lock (_ctsLocker) { return _cts; }
+			}
+		}
 		#endregion properties
 
 
@@ -34,8 +44,11 @@ namespace Utilz.Data
 					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
 					if (!_isOpen)
 					{
-						_cts?.Dispose();
-						_cts = new SafeCancellationTokenSource();
+						lock (_ctsLocker)
+						{
+							_cts?.Dispose();
+							_cts = new SafeCancellationTokenSource();
+						}
 
 						await OpenMayOverrideAsync().ConfigureAwait(false);
 
@@ -65,15 +78,21 @@ namespace Utilz.Data
 		{
 			if (_isOpen)
 			{
-				_cts?.CancelSafe(true);
+				lock (_ctsLocker)
+				{
+					_cts?.CancelSafe(true);
+				}
 
 				try
 				{
 					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
 					if (_isOpen)
 					{
-						_cts?.Dispose();
-						_cts = null;
+						lock (_ctsLocker)
+						{
+							_cts?.Dispose();
+							_cts = null;
+						}
 
 						IsOpen = false;
 						await CloseMayOverrideAsync().ConfigureAwait(false);

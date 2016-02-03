@@ -5,7 +5,7 @@ namespace Utilz
 {
 	public static class KeepAlive
 	{
-		private static volatile Windows.System.Display.DisplayRequest _appDisplayRequest = null; //new Windows.System.Display.DisplayRequest();
+		private static Windows.System.Display.DisplayRequest _appDisplayRequest = null; //new Windows.System.Display.DisplayRequest();
 		private const int MAX_COUNT = 10000; // 2147483647L;
 		private static int _displayRequestRefCount = 0;
 		private static readonly object _countLock = new object();
