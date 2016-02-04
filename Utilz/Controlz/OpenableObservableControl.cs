@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Utilz.Data;
 using Windows.UI.Xaml;
@@ -52,8 +53,24 @@ namespace Utilz.Controlz
 			});
 		}
 
-		private volatile SafeCancellationTokenSource _cts = null;
-		protected SafeCancellationTokenSource Cts { get { return _cts; } }
+		private readonly object _ctsLocker = new object();
+		private SafeCancellationTokenSource _cts = null;
+		protected SafeCancellationTokenSource Cts
+		{
+			get
+			{
+				lock (_ctsLocker) { return _cts; }
+			}
+		}
+
+		private CancellationToken _cancToken;
+		protected CancellationToken CancToken
+		{
+			get
+			{
+				lock (_ctsLocker) { return _cancToken; }
+			}
+		}
 		#endregion properties
 
 
@@ -76,8 +93,12 @@ namespace Utilz.Controlz
 					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
 					if (!_isOpen)
 					{
-						_cts?.Dispose();
-						_cts = new SafeCancellationTokenSource();
+						lock (_ctsLocker)
+						{
+							_cts?.Dispose();
+							_cts = new SafeCancellationTokenSource();
+							_cancToken = _cts.Token;
+						}
 
 						await OpenMayOverrideAsync().ConfigureAwait(false);
 
@@ -109,15 +130,22 @@ namespace Utilz.Controlz
 		{
 			if (_isOpen)
 			{
-				_cts?.CancelSafe(true);
+				lock (_ctsLocker)
+				{
+					_cts?.CancelSafe(true);
+				}
 
 				try
 				{
 					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
 					if (_isOpen)
 					{
-						_cts?.Dispose();
-						_cts = null;
+						lock (_ctsLocker)
+						{
+							_cts?.Dispose();
+							_cts = null;
+							_cancToken = new CancellationToken(true); // CancellationToken is not nullable and not disposable
+						}
 
 						IsEnabledAllowed = false;
 						IsOpen = false;
@@ -180,13 +208,14 @@ namespace Utilz.Controlz
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						func();
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -206,9 +235,10 @@ namespace Utilz.Controlz
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen) return func();
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -228,13 +258,14 @@ namespace Utilz.Controlz
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						await funcAsync().ConfigureAwait(false);
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -253,9 +284,10 @@ namespace Utilz.Controlz
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen) return await funcAsync().ConfigureAwait(false);
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -275,13 +307,14 @@ namespace Utilz.Controlz
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						await Task.Run(delegate { return funcAsync(); }).ConfigureAwait(false);
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))

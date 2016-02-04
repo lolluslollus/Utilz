@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -18,8 +19,7 @@ namespace Utilz.Data
 		[Ignore]
 		public bool IsOpen { get { return _isOpen; } protected set { if (_isOpen != value) { _isOpen = value; RaisePropertyChanged_UI(); } } }
 
-		private readonly object _ctsLocker = new object(); // LOLLO TODO I use a locker now, check if this is faster than volatile. It should be way faster when reading.
-														   // LOLLO TODO if it is better, use it for the other openable classes that own a SafeCancellationTokenSource, too.
+		private readonly object _ctsLocker = new object();
 		private SafeCancellationTokenSource _cts = null;
 		[IgnoreDataMember]
 		[Ignore]
@@ -28,6 +28,17 @@ namespace Utilz.Data
 			get
 			{
 				lock (_ctsLocker) { return _cts; }
+			}
+		}
+
+		private CancellationToken _cancToken;
+		[IgnoreDataMember]
+		[Ignore]
+		protected CancellationToken CancToken
+		{
+			get
+			{
+				lock (_ctsLocker) { return _cancToken; }
 			}
 		}
 		#endregion properties
@@ -48,6 +59,7 @@ namespace Utilz.Data
 						{
 							_cts?.Dispose();
 							_cts = new SafeCancellationTokenSource();
+							_cancToken = _cts.Token;
 						}
 
 						await OpenMayOverrideAsync().ConfigureAwait(false);
@@ -92,6 +104,7 @@ namespace Utilz.Data
 						{
 							_cts?.Dispose();
 							_cts = null;
+							_cancToken = new CancellationToken(true); // CancellationToken is not nullable and not disposable
 						}
 
 						IsOpen = false;
@@ -128,13 +141,14 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						func();
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -153,9 +167,10 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen) return func();
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -174,13 +189,14 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false); // LOLLO TODO check what happens now that I put CancToken into the semaphore
 					if (_isOpen)
 					{
 						await funcAsync().ConfigureAwait(false);
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -199,9 +215,10 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen) return await funcAsync().ConfigureAwait(false);
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -221,13 +238,14 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						await Task.Run(func).ConfigureAwait(false);
 						return true;
 					}
 				}
+				catch (OperationCanceledException) { }
 				catch (Exception ex)
 				{
 					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
@@ -250,12 +268,16 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						if (func()) result = BoolWhenOpen.Yes;
 						else result = BoolWhenOpen.No;
 					}
+				}
+				catch (OperationCanceledException)
+				{
+					result = BoolWhenOpen.ObjectClosed;
 				}
 				catch (Exception ex)
 				{
@@ -279,12 +301,16 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						await funcAsync().ConfigureAwait(false);
 						return BoolWhenOpen.Yes;
 					}
+				}
+				catch (OperationCanceledException)
+				{
+					return BoolWhenOpen.ObjectClosed;
 				}
 				catch (Exception ex)
 				{
