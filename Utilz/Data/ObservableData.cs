@@ -54,7 +54,7 @@ namespace Utilz.Data
 
 
 		#region UIThread
-		protected static async Task RunInUiThreadAsync(DispatchedHandler action)
+		protected async Task RunInUiThreadAsync(DispatchedHandler action)
 		{
 			try
 			{

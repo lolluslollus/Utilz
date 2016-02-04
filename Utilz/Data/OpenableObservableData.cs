@@ -109,7 +109,7 @@ namespace Utilz.Data
 
 						IsOpen = false;
 						await CloseMayOverrideAsync().ConfigureAwait(false);
-					
+
 						return true;
 					}
 				}

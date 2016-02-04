@@ -5,11 +5,17 @@ namespace Utilz
 {
 	public sealed class SemaphoreSlimSafeRelease : SemaphoreSlim
 	{
+		//private const int MAX_COUNT_ABSURD = -1;
 		private volatile bool _isDisposed = false;
 		public bool IsDisposed { get { return _isDisposed; } }
 
+		//private int _maxCount = MAX_COUNT_ABSURD;
+
 		public SemaphoreSlimSafeRelease(int initialCount) : base(initialCount) { }
-		public SemaphoreSlimSafeRelease(int initialCount, int maxCount) : base(initialCount, maxCount) { }
+		public SemaphoreSlimSafeRelease(int initialCount, int maxCount) : base(initialCount, maxCount)
+		{
+			//_maxCount = maxCount;
+		}
 
 		protected override void Dispose(bool disposing)
 		{
@@ -37,7 +43,8 @@ namespace Utilz
 		{
 			try
 			{
-				if (IsAlive(semaphore))
+				// the following commented out stuff wouldbe nice to avoid the exception but it is not atomic, so we leave it.
+				if (IsAlive(semaphore) /*&& semaphore.CurrentCount < semaphore._maxCount*/)
 				{
 					semaphore.Release();
 					return true;
