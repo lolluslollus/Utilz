@@ -17,11 +17,10 @@
             Tapped="OnMyTextBlock_Tapped"
             Background="Transparent"
             Visibility="{Binding ElementName=me, Path=SelectorVisibility}">
-            <StackPanel Orientation="Horizontal">
+            <uctl:UniversalWrapPanel Orientation="Horizontal">
                 <TextBlock x:Name="MyTextBlock"
                     Style="{Binding ElementName=me, Path=TextBlockStyle}"
                     TextWrapping="Wrap"
-                    MaxWidth="200"
                     IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                     Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
@@ -32,7 +31,7 @@
                     Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-            </StackPanel>
+            </uctl:UniversalWrapPanel>
         </Border>
         <Canvas>
             <Popup x:Name="MyPopup" IsOpen="False" 
@@ -71,6 +70,7 @@
                                         IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                                         Tapped="OnItemBorder_Tapped">
                                         <TextBlock Text="{Binding Text}"
+											TextWrapping="Wrap"
                                             Style="{Binding ElementName=me, Path=TextItemStyle}"
                                             Margin="10"/>
                                     </Border>
