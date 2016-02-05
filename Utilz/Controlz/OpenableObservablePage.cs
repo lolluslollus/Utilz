@@ -73,13 +73,13 @@ namespace Utilz.Controlz
 
 		private readonly object _ctsLocker = new object();
 		private SafeCancellationTokenSource _cts = null;
-		protected SafeCancellationTokenSource Cts
-		{
-			get
-			{
-				lock (_ctsLocker) { return _cts; }
-			}
-		}
+		//protected SafeCancellationTokenSource Cts
+		//{
+		//	get
+		//	{
+		//		lock (_ctsLocker) { return _cts; }
+		//	}
+		//}
 
 		private CancellationToken _cancToken;
 		protected CancellationToken CancToken
