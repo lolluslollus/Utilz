@@ -11,7 +11,7 @@ using Windows.UI.Xaml;
 
 namespace Utilz
 {
-    public class ProportionsTrigger : StateTriggerBase
+    public sealed class ProportionsTrigger : StateTriggerBase
     {
         private volatile ApplicationView _appView = null;
         //private SimpleOrientationSensor _orientationSensor;

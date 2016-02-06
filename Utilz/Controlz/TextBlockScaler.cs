@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Utilz.Controlz
 {
-	public class TextBlockScaler : UserControl
+	public sealed class TextBlockScaler : UserControl
 	{
 		private long _onTextChangedToken = default(long);
 		private double _origFontSize = default(double);

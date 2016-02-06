@@ -327,7 +327,7 @@ namespace Utilz.Controlz
         #endregion event handlers
     }
 
-    public class TextAndTag
+    public sealed class TextAndTag
     {
         private string _text = "";
         public string Text { get { return _text; } set { _text = value; } }

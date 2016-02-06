@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Utilz
 {
-	public class GetLocBackgroundTaskSemaphoreManager
+	public static class GetLocBackgroundTaskSemaphoreManager
     {
         // there is only one way of finding out if the core application is running, if we want to be independent of app crashes; 
         // otherwise, we can use the registry - but it's too fragile if the app crashes.

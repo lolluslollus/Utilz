@@ -42,7 +42,7 @@ namespace Utilz.Data
 			}
 		}
 
-		protected Func<Task> _runAsSoonAsOpen = null;
+		//protected Func<Task> _runAsSoonAsOpen = null;
 		#endregion properties
 
 
@@ -68,16 +68,16 @@ namespace Utilz.Data
 
 						IsOpen = true;
 
-						try
-						{
-							var runAsSoonAsOpen = _runAsSoonAsOpen;
-							if (runAsSoonAsOpen != null)
-							{
-								Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
-							}
-						}
-						catch { }
-						finally { _runAsSoonAsOpen = null; }
+						//try
+						//{
+						//	var runAsSoonAsOpen = _runAsSoonAsOpen;
+						//	if (runAsSoonAsOpen != null)
+						//	{
+						//		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
+						//	}
+						//}
+						//catch { }
+						//finally { _runAsSoonAsOpen = null; }
 
 						return true;
 					}

@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Controls;
 // LOLLO downloaded from https://github.com/gregstoll/UniversalWrapPanel
 namespace Utilz.Controlz
 {
-	public class UniversalWrapPanel : Panel
+	public sealed class UniversalWrapPanel : Panel
     {
 
         public Orientation Orientation

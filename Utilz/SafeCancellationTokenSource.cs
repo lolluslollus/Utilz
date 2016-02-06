@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Utilz
 {
-	public class SafeCancellationTokenSource : CancellationTokenSource
+	public sealed class SafeCancellationTokenSource : CancellationTokenSource
 	{
 		private volatile bool _isDisposed = false;
 		public bool IsDisposed { get { return _isDisposed; } }

@@ -9,7 +9,7 @@ using Windows.Storage.Pickers;
 
 namespace Utilz
 {
-	public class Pickers
+	public static class Pickers
 	{
 		private const string PICKED_FOLDER_TOKEN = "PickedFolderToken";
 		private const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";

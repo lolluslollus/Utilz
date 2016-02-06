@@ -160,7 +160,7 @@ namespace Utilz.Controlz
 	{
 		event EventHandler<BackOrHardSoftKeyPressedEventArgs> BackOrHardSoftKeyPressed;
 	}
-	public class BackOrHardSoftKeyPressedEventArgs : EventArgs
+	public sealed class BackOrHardSoftKeyPressedEventArgs : EventArgs
 	{
 		public bool Handled { get; set; }
 	}
