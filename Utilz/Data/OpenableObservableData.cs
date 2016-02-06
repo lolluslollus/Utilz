@@ -41,6 +41,8 @@ namespace Utilz.Data
 				lock (_ctsLocker) { return _cancToken; }
 			}
 		}
+
+		protected Func<Task> _runAsSoonAsOpen = null;
 		#endregion properties
 
 
@@ -76,6 +78,16 @@ namespace Utilz.Data
 				finally
 				{
 					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
+					try
+					{
+						var runAsSoonAsOpen = _runAsSoonAsOpen;
+						if (runAsSoonAsOpen != null)
+						{
+							Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
+						}
+					}
+					catch { }
+					finally { _runAsSoonAsOpen = null; }
 				}
 			}
 			return false;
