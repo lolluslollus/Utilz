@@ -157,14 +157,6 @@ namespace LolloChartMobile
 			public double YMax;
 		}
 		public event EventHandler<ChartTappedArguments> ChartTapped;
-		private void RaiseChartTapped(ChartTappedArguments args)
-		{
-			var listener = ChartTapped;
-			if (listener != null)
-			{
-				listener(this, args);
-			}
-		}
 		#endregion events
 
 		private void SetLineStyles()
@@ -229,7 +221,7 @@ namespace LolloChartMobile
 			if (GridChartArea.Visibility == Visibility.Visible && GridChartArea.ActualHeight > 0.0 && GridChartArea.ActualWidth > 0.0)
 			{
 				Point touchPosition = e.GetPosition(GridChartArea);
-				RaiseChartTapped(new ChartTappedArguments() { X = touchPosition.X, Y = touchPosition.Y, XMax = GridChartArea.ActualWidth, YMax = GridChartArea.ActualHeight });
+				ChartTapped?.Invoke(this, new ChartTappedArguments() { X = touchPosition.X, Y = touchPosition.Y, XMax = GridChartArea.ActualWidth, YMax = GridChartArea.ActualHeight });
 			}
 		}
 

@@ -23,6 +23,7 @@ namespace Utilz.Data
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+
 		/// <summary>
 		/// Runs in the UI thread if available, otherwise queues the operation in it.
 		/// </summary>
@@ -31,7 +32,7 @@ namespace Utilz.Data
 		{
 			await RunInUiThreadAsync(delegate
 			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+				RaisePropertyChanged(propertyName);
 			}).ConfigureAwait(false);
 		}
 		protected async void RaisePropertyChangedUrgent_UI([CallerMemberName] string propertyName = "")
@@ -40,7 +41,7 @@ namespace Utilz.Data
 			{
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
 				{
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+					RaisePropertyChanged(propertyName);
 				}).AsTask().ConfigureAwait(false);
 			}
 			catch (InvalidOperationException) // called from a background task: ignore

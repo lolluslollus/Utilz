@@ -19,11 +19,12 @@ namespace Utilz.Controlz
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+
 		protected void RaisePropertyChanged_UI([CallerMemberName] string propertyName = "")
 		{
 			try
 			{
-				Task raise = RunInUiThreadAsync(delegate { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); });
+				Task raise = RunInUiThreadAsync(delegate { RaisePropertyChanged(propertyName); });
 			}
 			catch (Exception ex)
 			{
