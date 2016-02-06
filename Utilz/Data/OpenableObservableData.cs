@@ -67,6 +67,18 @@ namespace Utilz.Data
 						await OpenMayOverrideAsync().ConfigureAwait(false);
 
 						IsOpen = true;
+
+						try
+						{
+							var runAsSoonAsOpen = _runAsSoonAsOpen;
+							if (runAsSoonAsOpen != null)
+							{
+								Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
+							}
+						}
+						catch { }
+						finally { _runAsSoonAsOpen = null; }
+
 						return true;
 					}
 				}
@@ -78,16 +90,6 @@ namespace Utilz.Data
 				finally
 				{
 					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-					try
-					{
-						var runAsSoonAsOpen = _runAsSoonAsOpen;
-						if (runAsSoonAsOpen != null)
-						{
-							Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
-						}
-					}
-					catch { }
-					finally { _runAsSoonAsOpen = null; }
 				}
 			}
 			return false;
