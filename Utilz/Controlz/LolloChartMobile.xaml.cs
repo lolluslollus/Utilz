@@ -84,10 +84,6 @@ namespace LolloChartMobile
 		}
 		public static DependencyProperty TitleProperty =
 			DependencyProperty.Register("Title", typeof(string), typeof(LolloChart), new PropertyMetadata(string.Empty));
-		private static void OnTitleChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-		{
-			if (args.NewValue != null) (obj as LolloChart).LBTitle.Text = args.NewValue.ToString();
-		}
 
 		public Style TitleStyle
 		{
@@ -95,13 +91,60 @@ namespace LolloChartMobile
 			set { SetValue(TitleStyleProperty, value); }
 		}
 		public static readonly DependencyProperty TitleStyleProperty =
-			DependencyProperty.Register("TitleStyle", typeof(Style), typeof(LolloChart), new PropertyMetadata(null, OnTitleStyleChanged));
-		private static void OnTitleStyleChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-		{
-			if (args.NewValue != null && args.NewValue is Style) (obj as LolloChart).LBTitle.Style = args.NewValue as Style;
-		}
+			DependencyProperty.Register("TitleStyle", typeof(Style), typeof(LolloChart), new PropertyMetadata(null));
 
-		private ApplicationView _appView = null;
+
+		public double LeftColumnWidth
+		{
+			get { return (double)GetValue(LeftColumnWidthProperty); }
+			set { SetValue(LeftColumnWidthProperty, value); }
+		}
+		public static readonly DependencyProperty LeftColumnWidthProperty =
+			DependencyProperty.Register("LeftColumnWidth", typeof(double), typeof(LolloChart), new PropertyMetadata(50.0));
+
+		public double RightColumnWidth
+		{
+			get { return (double)GetValue(RightColumnWidthProperty); }
+			set { SetValue(RightColumnWidthProperty, value); }
+		}
+		public static readonly DependencyProperty RightColumnWidthProperty =
+			DependencyProperty.Register("RightColumnWidth", typeof(double), typeof(LolloChart), new PropertyMetadata(50.0));
+
+
+		public double TitleRowHeight
+		{
+			get { return (double)GetValue(TitleRowHeightProperty); }
+			set { SetValue(TitleRowHeightProperty, value); }
+		}
+		public static readonly DependencyProperty TitleRowHeightProperty =
+			DependencyProperty.Register("TitleRowHeight", typeof(double), typeof(LolloChart), new PropertyMetadata(50.0));
+
+		public double TopRowHeight
+		{
+			get { return (double)GetValue(TopRowHeightProperty); }
+			set { SetValue(TopRowHeightProperty, value); }
+		}
+		public static readonly DependencyProperty TopRowHeightProperty =
+			DependencyProperty.Register("TopRowHeight", typeof(double), typeof(LolloChart), new PropertyMetadata(30.0));
+
+		public double BottomRowHeight
+		{
+			get { return (double)GetValue(BottomRowHeightProperty); }
+			set { SetValue(BottomRowHeightProperty, value); }
+		}
+		public static readonly DependencyProperty BottomRowHeightProperty =
+			DependencyProperty.Register("BottomRowHeight", typeof(double), typeof(LolloChart), new PropertyMetadata(30.0));
+
+		public double FooterHeight
+		{
+			get { return (double)GetValue(FooterHeightProperty); }
+			set { SetValue(FooterHeightProperty, value); }
+		}
+		public static readonly DependencyProperty FooterHeightProperty =
+			DependencyProperty.Register("FooterHeight", typeof(double), typeof(LolloChart), new PropertyMetadata(30.0));
+
+
+		private readonly ApplicationView _appView = null;
 		private ApplicationViewOrientation _prevOrientation;
 		#endregion properties
 
@@ -257,8 +300,8 @@ namespace LolloChartMobile
 				double maxAcceptableWidth = Math.Min(Math.Min(Math.Min(imposedWidth, imposedMaxWidth), availableWidth), availableSize.Width);
 				double maxAcceptableHeight = Math.Min(Math.Min(Math.Min(imposedHeight, imposedMaxHeight), availableHeight), availableSize.Height);
 
-				double widthAvailableForCentre = Math.Max(maxAcceptableWidth - MainCol0.Width.Value - MainCol2.Width.Value, 0.0);
-				double heightAvailableForCentre = Math.Max(maxAcceptableHeight - MainRow0.Height.Value - MainRow1.Height.Value - MainRow3.Height.Value - MainRow4.Height.Value, 0.0);
+				double widthAvailableForCentre = Math.Max(maxAcceptableWidth - GridYLabelsLeft.Width - GridYLabelsRight.Width, 0.0);
+				double heightAvailableForCentre = Math.Max(maxAcceptableHeight - TitleGrid.Height - GridXLabelsTop.Height - GridXLabelsBottom.Height - FooterGrid.Height, 0.0);
 
 				TitleGrid.Width = maxAcceptableWidth;
 				GridXLabelsTop.Width = widthAvailableForCentre;
@@ -267,13 +310,16 @@ namespace LolloChartMobile
 				GridChartArea.Height = heightAvailableForCentre;
 				GridYLabelsRight.Height = heightAvailableForCentre;
 				GridXLabelsBottom.Width = widthAvailableForCentre;
+				FooterGrid.Width = maxAcceptableWidth;
 
+				LayoutRoot.Measure(new Size(maxAcceptableWidth, maxAcceptableHeight));
 				TitleGrid.Measure(new Size(maxAcceptableWidth, TitleGrid.Height));
 				GridXLabelsTop.Measure(new Size(widthAvailableForCentre, GridXLabelsTop.Height));
 				GridYLabelsLeft.Measure(new Size(GridYLabelsLeft.Width, heightAvailableForCentre));
 				GridChartArea.Measure(new Size(widthAvailableForCentre, heightAvailableForCentre));
 				GridYLabelsRight.Measure(new Size(GridYLabelsRight.Width, heightAvailableForCentre));
 				GridXLabelsBottom.Measure(new Size(widthAvailableForCentre, GridXLabelsBottom.Height));
+				FooterGrid.Measure(new Size(maxAcceptableWidth, FooterGrid.Height));
 
 				if (maxAcceptableWidth == 0.0 || maxAcceptableHeight == 0.0) return new Size(0.0, 0.0);
 				else return new Size(maxAcceptableWidth, maxAcceptableHeight);
@@ -651,14 +697,6 @@ namespace LolloChartMobile
 					MyTBs.Add(tb);
 					Container.Children.Add(tb);
 				}
-
-				//// LOLLO TODO remove when done testing BEGIN
-				//TextBlock newTB = new TextBlock() { Tag = Tag, Text = "LOL" + DataPoints.Count() + " " + Container.Children.Count };
-				//MyTBs.Add(newTB);
-				//Container.Children.Add(newTB);
-				//Canvas.SetZIndex(newTB, 800);
-				//Canvas.SetTop(newTB, 100);
-				//// LOLLO TODO remove when done testing END
 			}
 
 			Draw();
@@ -671,37 +709,34 @@ namespace LolloChartMobile
 		{ }
 		protected override void Draw()
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return;
-			if (MyTBs == null || MyTBs.Count == 0) return; //there may be empty objects for what I know
+			if (Container == null || Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || DataPoints == null || MyTBs == null) return;
 			double offset = MyTBs[0].FontSize / 4; //assume font height = twice font width
 			double[] drawPoints = new double[DataPoints.GetUpperBound(0) + 1];
 			if (ScaleType == ScaleType.Linear)
 			{
-				drawPoints = Scaler.ScaleLinear(DataPoints[0], DataPoints[DataPoints.GetUpperBound(0)], 0, Container.ActualWidth, DataPoints);
+				drawPoints = Scaler.ScaleLinear(DataPoints.First(), DataPoints.Last(), 0, Container.ActualWidth, DataPoints);
 			}
 			else if (ScaleType == ScaleType.Logarithmic)
 			{
-				drawPoints = Scaler.ScaleLogarithmic(DataPoints[0], DataPoints[DataPoints.GetUpperBound(0)], 0, Container.ActualWidth, DataPoints);
+				drawPoints = Scaler.ScaleLogarithmic(DataPoints.First(), DataPoints.Last(), 0, Container.ActualWidth, DataPoints);
 			}
 			for (int i = 0; i <= drawPoints.GetUpperBound(0); i++)
 			{
 				try
 				{
-					// MyTBs[i].Text = Convert.ToDecimal(DataPoints[i]).ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
-					MyTBs[i].Text = DataPoints[i].ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
+					try
+					{
+						MyTBs[i].Text = DataPoints[i].ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
+					}
+					catch (FormatException)
+					{
+						MyTBs[i].Text = DataPoints[i].ToString(CultureInfo.CurrentUICulture);
+					}
+					Canvas.SetLeft(MyTBs[i], drawPoints[i] - (offset * MyTBs[i].Text.Length));
+					Canvas.SetTop(MyTBs[i], 0.0);
+					Canvas.SetZIndex(MyTBs[i], 999);
 				}
-				catch (FormatException)
-				{
-					// MyTBs[i].Text = Convert.ToDecimal(DataPoints[i]).ToString(CultureInfo.CurrentUICulture);
-					MyTBs[i].Text = DataPoints[i].ToString(CultureInfo.CurrentUICulture);
-				}
-				Canvas.SetLeft(MyTBs[i], drawPoints[i] - (offset * MyTBs[i].Text.Length));
-				Canvas.SetTop(MyTBs[i], 0.0);
-				Canvas.SetZIndex(MyTBs[i], 700);
-				//MyTBs[i].Content = Convert.ToDecimal(DataPoints[i]).ToString();
-				//MyTBs[i].Margin = new Thickness(drawPoints[i] - (offset * MyTBs[i].Text.Length), 0, 0, 0);
-				//MyTBs[i].Margin = new Thickness(drawPoints[i] - (offset * MyTBs[i].Content.ToString().Length), 0, 0, 0);
-				//MyTBs[i].Foreground = Brushes.Green;  TEST disabled to see if it picks up the template YES it does
+				catch (ArgumentException) { }
 			}
 		}
 	}
@@ -729,7 +764,6 @@ namespace LolloChartMobile
 				drawPoints[i] = drawPoints[i] - offset;//account for the font size, too
 			}
 
-			//for (int i = drawPoints.GetUpperBound(0); i >= drawPoints.GetLowerBound(0); i--)
 			for (int i = 0; i <= drawPoints.GetUpperBound(0); i++)
 			{
 				try
@@ -744,10 +778,9 @@ namespace LolloChartMobile
 					}
 					Canvas.SetLeft(MyTBs[i], 0.0);
 					Canvas.SetTop(MyTBs[i], drawPoints[i]);
-					Canvas.SetZIndex(MyTBs[i], 800);
+					Canvas.SetZIndex(MyTBs[i], 999);
 				}
-				catch (ArgumentException)
-				{ }
+				catch (ArgumentException) { }
 			}
 		}
 	}
@@ -967,7 +1000,7 @@ namespace LolloChartMobile
 				}
 				Canvas.SetLeft(Cross, crossPoint.X - Cross.Width / 2);
 				Canvas.SetTop(Cross, crossPoint.Y - Cross.Height / 2);
-				Canvas.SetZIndex(Cross, 900);
+				Canvas.SetZIndex(Cross, 999);
 			}
 			else
 			{
