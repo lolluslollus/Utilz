@@ -14,12 +14,6 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="ChartStyleDictionary.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			<!--<x:Double x:Key="GridHeightSmall">30</x:Double>
-			<x:Double x:Key="GridHeightMedium">50</x:Double>
-			<x:Double x:Key="GridWidthSmall">50</x:Double>
-			<GridLength x:Key="GridHeightSmall_ForGrid">30</GridLength>
-			<GridLength x:Key="GridHeightMedium_ForGrid">50</GridLength>
-			<GridLength x:Key="GridWidthSmall_ForGrid">50</GridLength>-->
 		</ResourceDictionary>
 	</UserControl.Resources>
 
@@ -36,22 +30,10 @@
 			<ColumnDefinition x:Name="MainCol1" />
 			<ColumnDefinition x:Name="MainCol2" Width="Auto"/>
 		</Grid.ColumnDefinitions>
-		<!--<Grid.RowDefinitions>
-			<RowDefinition x:Name="MainRow0" Height="{StaticResource GridHeightMedium_ForGrid}"/>
-			<RowDefinition x:Name="MainRow1" Height="{StaticResource GridHeightSmall_ForGrid}"/>
-			<RowDefinition x:Name="MainRow2" />
-			<RowDefinition x:Name="MainRow3" Height="{StaticResource GridHeightSmall_ForGrid}"/>
-			<RowDefinition x:Name="MainRow4" Height="{StaticResource GridHeightSmall_ForGrid}"/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition x:Name="MainCol0" Width="{StaticResource GridWidthSmall_ForGrid}"/>
-			<ColumnDefinition x:Name="MainCol1" />
-			<ColumnDefinition x:Name="MainCol2" Width="{StaticResource GridWidthSmall_ForGrid}"/>
-		</Grid.ColumnDefinitions>-->
 
 		<Grid x:Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
 			Height="{x:Bind TitleRowHeight, Mode=OneWay}">
-			<TextBlock x:Name="LBTitle" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+			<TextBlock
 				Text="{x:Bind Title, Mode=OneWay}"
 				Style="{x:Bind TitleStyle, Mode=OneWay}"
 				TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center"/>
@@ -78,6 +60,10 @@
 		</Grid>
 		<Grid x:Name="FooterGrid" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
 			Height="{x:Bind FooterHeight, Mode=OneWay}">
+			<TextBlock
+				Text="{x:Bind Footnote, Mode=OneWay}"
+				Style="{x:Bind FootnoteStyle, Mode=OneWay}"
+				TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center"/>
 		</Grid>
 	</Grid>
 </UserControl>

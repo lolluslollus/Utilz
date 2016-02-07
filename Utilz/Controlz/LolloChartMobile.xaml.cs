@@ -93,6 +93,21 @@ namespace LolloChartMobile
 		public static readonly DependencyProperty TitleStyleProperty =
 			DependencyProperty.Register("TitleStyle", typeof(Style), typeof(LolloChart), new PropertyMetadata(null));
 
+		public string Footnote
+		{
+			get { return (string)GetValue(FootnoteProperty); }
+			set { SetValue(FootnoteProperty, value); }
+		}
+		public static DependencyProperty FootnoteProperty =
+			DependencyProperty.Register("Footnote", typeof(string), typeof(LolloChart), new PropertyMetadata(string.Empty));
+
+		public Style FootnoteStyle
+		{
+			get { return (Style)GetValue(FootnoteStyleProperty); }
+			set { SetValue(FootnoteStyleProperty, value); }
+		}
+		public static readonly DependencyProperty FootnoteStyleProperty =
+			DependencyProperty.Register("FootnoteStyle", typeof(Style), typeof(LolloChart), new PropertyMetadata(null));
 
 		public double LeftColumnWidth
 		{
