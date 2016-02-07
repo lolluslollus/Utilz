@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using Windows.Foundation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -360,38 +361,38 @@ namespace LolloChartMobile
 					 Y2GridScale.Min, Y2GridScale.Max,
 					 XY4DataSeries.Points);
 			}
-			if (XPrimaryGridLines != null)
+			if (XPrimaryGridLines != null && XGridScale != null)
 			{
-				if (_XPrimaryGridLines_Internal == null) _XPrimaryGridLines_Internal = new XGridLines_Internal(GridChartArea, XGridScale.ScaleType, XPrimaryGridLines.Points, XGridScale.Min, XGridScale.Max, PrimaryGridLineThickness, ChartObjectTag.X1PrimaryGridlines, GridLineStyle);
+				if (_XPrimaryGridLines_Internal == null) _XPrimaryGridLines_Internal = new XGridLines_Internal(GridChartArea, XGridScale.ScaleType, XPrimaryGridLines.Points, XGridScale.Min, XGridScale.Max, PrimaryGridLineThickness, ChartObjectTag.XPrimaryGridlines, GridLineStyle);
 				else _XPrimaryGridLines_Internal.ReInit(XGridScale.ScaleType, XPrimaryGridLines.Points, XGridScale.Min, XGridScale.Max);
 			}
-			if (XSecondaryGridLines != null && XPrimaryGridLines != null)
+			if (XSecondaryGridLines != null && XPrimaryGridLines != null && XGridScale != null)
 			{
-				if (_XSecondaryGridLines_Internal == null) _XSecondaryGridLines_Internal = new XGridLines_Internal(GridChartArea, XGridScale.ScaleType, XSecondaryGridLines.Points, XGridScale.Min, XGridScale.Max, SecondaryGridLineThickness, ChartObjectTag.X1SecondaryGridlines, GridLineStyle);
+				if (_XSecondaryGridLines_Internal == null) _XSecondaryGridLines_Internal = new XGridLines_Internal(GridChartArea, XGridScale.ScaleType, XSecondaryGridLines.Points, XGridScale.Min, XGridScale.Max, SecondaryGridLineThickness, ChartObjectTag.XSecondaryGridlines, GridLineStyle);
 				else _XSecondaryGridLines_Internal.ReInit(XGridScale.ScaleType, XSecondaryGridLines.Points, XGridScale.Min, XGridScale.Max);
 			}
-			if (XPrimaryGridLines != null && XGridLabels != null)
+			if (XPrimaryGridLines != null && XGridLabels != null && XGridScale != null)
 			{
 				if (_XGridLabels_Internal == null) _XGridLabels_Internal = new XGridLabels_Internal(CanvasXLabelsBottom, XGridScale.ScaleType, XGridLabels.Points, XGridLabels.DataPointsFormat, ChartObjectTag.XGridLabels);
 				else _XGridLabels_Internal.ReInit(XGridScale.ScaleType, XGridLabels.Points, XGridLabels.DataPointsFormat);
 			}
 
-			if (YPrimaryGridLines != null)
+			if (YPrimaryGridLines != null && Y1GridScale != null)
 			{
-				if (_YPrimaryGridLines_Internal == null) _YPrimaryGridLines_Internal = new YGridLines_Internal(GridChartArea, Y1GridScale.ScaleType, YPrimaryGridLines.Points, Y1GridScale.Min, Y1GridScale.Max, PrimaryGridLineThickness, ChartObjectTag.Y1PrimaryGridlines, GridLineStyle);
+				if (_YPrimaryGridLines_Internal == null) _YPrimaryGridLines_Internal = new YGridLines_Internal(GridChartArea, Y1GridScale.ScaleType, YPrimaryGridLines.Points, Y1GridScale.Min, Y1GridScale.Max, PrimaryGridLineThickness, ChartObjectTag.YPrimaryGridlines, GridLineStyle);
 				else _YPrimaryGridLines_Internal.ReInit(Y1GridScale.ScaleType, YPrimaryGridLines.Points, Y1GridScale.Min, Y1GridScale.Max);
 			}
-			if (YSecondaryGridLines != null && YPrimaryGridLines != null)
+			if (YSecondaryGridLines != null /*&& YPrimaryGridLines != null*/ && Y2GridScale != null)
 			{
-				if (_YSecondaryGridLines_Internal == null) _YSecondaryGridLines_Internal = new YGridLines_Internal(GridChartArea, Y1GridScale.ScaleType, YSecondaryGridLines.Points, Y1GridScale.Min, Y1GridScale.Max, SecondaryGridLineThickness, ChartObjectTag.Y1SecondaryGridlines, GridLineStyle);
-				else _YSecondaryGridLines_Internal.ReInit(Y1GridScale.ScaleType, YSecondaryGridLines.Points, Y1GridScale.Min, Y1GridScale.Max);
+				if (_YSecondaryGridLines_Internal == null) _YSecondaryGridLines_Internal = new YGridLines_Internal(GridChartArea, Y2GridScale.ScaleType, YSecondaryGridLines.Points, Y2GridScale.Min, Y2GridScale.Max, SecondaryGridLineThickness, ChartObjectTag.YSecondaryGridlines, GridLineStyle);
+				else _YSecondaryGridLines_Internal.ReInit(Y2GridScale.ScaleType, YSecondaryGridLines.Points, Y2GridScale.Min, Y2GridScale.Max);
 			}
-			if (YPrimaryGridLines != null && Y1GridLabels != null)
+			if (YPrimaryGridLines != null && Y1GridLabels != null && Y1GridScale != null)
 			{
 				if (_Y1GridLabels_Internal == null) _Y1GridLabels_Internal = new YGridLabels_Internal(CanvasYLabelsLeft, Y1GridScale.ScaleType, Y1GridLabels.Points, Y1GridLabels.DataPointsFormat, ChartObjectTag.Y1GridLabels);
 				else _Y1GridLabels_Internal.ReInit(Y1GridScale.ScaleType, Y1GridLabels.Points, Y1GridLabels.DataPointsFormat);
 			}
-			if (YPrimaryGridLines != null && Y2GridLabels != null)
+			if (YPrimaryGridLines != null && Y2GridLabels != null && Y2GridScale != null)
 			{
 				if (_Y2GridLabels_Internal == null) _Y2GridLabels_Internal = new YGridLabels_Internal(CanvasYLabelsRight, Y2GridScale.ScaleType, Y2GridLabels.Points, Y2GridLabels.DataPointsFormat, ChartObjectTag.Y2GridLabels);
 				else _Y2GridLabels_Internal.ReInit(Y2GridScale.ScaleType, Y2GridLabels.Points, Y2GridLabels.DataPointsFormat);
@@ -456,7 +457,7 @@ namespace LolloChartMobile
 			Container = container;
 			Tag = tag;
 		}
-		protected virtual void Draw() { }
+		protected abstract void Draw();
 		internal void ClearChartObjectsWithMyTag()
 		{
 			for (int i = 0; i < Container.Children.Count; i++)
@@ -544,10 +545,13 @@ namespace LolloChartMobile
 		}
 		internal virtual void ReInit(ScaleType scaleType, double[] points, double minimum, double maximum)
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return; // LOLLO added this
+			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return; // LOLLO added this
 			if (scaleType != ScaleType || points != DataPoints || minimum != Minimum || maximum != Maximum)
 			{
+				ScaleType = scaleType;
 				DataPoints = points;
+				Minimum = minimum;
+				Maximum = maximum;
 				MyLines.Clear();
 				ClearChartObjectsWithMyTag();
 				for (int i = 0; i <= DataPoints.GetUpperBound(0); i++)
@@ -556,8 +560,6 @@ namespace LolloChartMobile
 					MyLines.Add(line);
 					Container.Children.Add(line);
 				}
-				Minimum = minimum;
-				Maximum = maximum;
 			}
 			Draw();
 		}
@@ -594,7 +596,7 @@ namespace LolloChartMobile
 		{ }
 		protected override void Draw()
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return;
+			if (Container == null || Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || DataPoints == null || MyLines == null) return;
 			double[] drawPoints = new double[DataPoints.GetUpperBound(0) + 1];
 			if (ScaleType == ScaleType.Linear)
 			{
@@ -635,21 +637,30 @@ namespace LolloChartMobile
 		}
 		internal virtual void ReInit(ScaleType scaleType, double[] points, string dataPointsFormat)
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return; // LOLLO added this
-			DataPointsFormat = dataPointsFormat;
-			if (scaleType != ScaleType || points != DataPoints)
+			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return; // LOLLO added this
+			if (scaleType != ScaleType || points != DataPoints || dataPointsFormat != DataPointsFormat)
 			{
+				ScaleType = scaleType;
 				DataPoints = points;
+				DataPointsFormat = dataPointsFormat;
 				MyTBs.Clear();
 				ClearChartObjectsWithMyTag();
 				for (int i = 0; i <= DataPoints.GetUpperBound(0); i++)
 				{
 					TextBlock tb = new TextBlock() { Tag = Tag };
-					//                    Label tb = new Label() { Tag = Tag };
 					MyTBs.Add(tb);
 					Container.Children.Add(tb);
 				}
+
+				//// LOLLO TODO remove when done testing BEGIN
+				//TextBlock newTB = new TextBlock() { Tag = Tag, Text = "LOL" + DataPoints.Count() + " " + Container.Children.Count };
+				//MyTBs.Add(newTB);
+				//Container.Children.Add(newTB);
+				//Canvas.SetZIndex(newTB, 800);
+				//Canvas.SetTop(newTB, 100);
+				//// LOLLO TODO remove when done testing END
 			}
+
 			Draw();
 		}
 	}
@@ -686,7 +697,7 @@ namespace LolloChartMobile
 				}
 				Canvas.SetLeft(MyTBs[i], drawPoints[i] - (offset * MyTBs[i].Text.Length));
 				Canvas.SetTop(MyTBs[i], 0.0);
-				Canvas.SetZIndex(MyTBs[i], 999);
+				Canvas.SetZIndex(MyTBs[i], 700);
 				//MyTBs[i].Content = Convert.ToDecimal(DataPoints[i]).ToString();
 				//MyTBs[i].Margin = new Thickness(drawPoints[i] - (offset * MyTBs[i].Text.Length), 0, 0, 0);
 				//MyTBs[i].Margin = new Thickness(drawPoints[i] - (offset * MyTBs[i].Content.ToString().Length), 0, 0, 0);
@@ -701,44 +712,39 @@ namespace LolloChartMobile
 		{ }
 		protected override void Draw()
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return;
-			if (MyTBs == null || MyTBs.Count == 0) return;
+			if (Container == null || Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || DataPoints == null || MyTBs == null) return;
 			double offset = MyTBs[0].FontSize / 2;
 			double[] drawPoints = new double[DataPoints.GetUpperBound(0) + 1];
+
 			if (ScaleType == ScaleType.Linear)
 			{
-				drawPoints = Scaler.ScaleLinear(DataPoints[0], DataPoints[DataPoints.GetUpperBound(0)], 0, Container.ActualHeight, DataPoints);
+				drawPoints = Scaler.ScaleLinear(DataPoints.First(), DataPoints.Last(), 0, Container.ActualHeight, DataPoints);
 			}
 			else if (ScaleType == ScaleType.Logarithmic)
 			{
-				drawPoints = Scaler.ScaleLogarithmic(DataPoints[0], DataPoints[DataPoints.GetUpperBound(0)], 0, Container.ActualHeight, DataPoints);
+				drawPoints = Scaler.ScaleLogarithmic(DataPoints.First(), DataPoints.Last(), 0, Container.ActualHeight, DataPoints);
 			}
 			for (int i = 0; i <= drawPoints.GetUpperBound(0); i++) //the Panel coordinates start from the top left, while the Y axis starts from the bottom left
 			{
-				//drawPoints[i] = Container.ActualHeight - drawPoints[i] - offset;//account for the font size, too
 				drawPoints[i] = drawPoints[i] - offset;//account for the font size, too
 			}
+
+			//for (int i = drawPoints.GetUpperBound(0); i >= drawPoints.GetLowerBound(0); i--)
 			for (int i = 0; i <= drawPoints.GetUpperBound(0); i++)
 			{
 				try
 				{
 					try
 					{
-						// MyTBs[i].Text = Convert.ToDecimal(DataPoints[i]).ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
 						MyTBs[i].Text = DataPoints[i].ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
 					}
 					catch (FormatException)
 					{
-						// MyTBs[i].Text = Convert.ToDecimal(DataPoints[i]).ToString(CultureInfo.CurrentUICulture);
 						MyTBs[i].Text = DataPoints[i].ToString(CultureInfo.CurrentUICulture);
 					}
 					Canvas.SetLeft(MyTBs[i], 0.0);
 					Canvas.SetTop(MyTBs[i], drawPoints[i]);
-					Canvas.SetZIndex(MyTBs[i], 999);
-					//MyTBs[i].Margin = new Thickness(0, drawPoints[i], 0, 0);
-
-					//MyTBs[i].Content = Convert.ToDecimal(DataPoints[i]).ToString();
-					//MyTBs[i].Foreground = Brushes.Green;
+					Canvas.SetZIndex(MyTBs[i], 800);
 				}
 				catch (ArgumentException)
 				{ }
@@ -932,38 +938,6 @@ namespace LolloChartMobile
 			}
 		}
 
-		//protected void DrawCrossInternal()
-		//{
-		//    if (DataPoints == null || Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return;
-		//    if (CrossPointX >= 0)
-		//    {
-		//        Point crossPoint;
-		//        int crossPointIndexAdjusted4Shrinking = Convert.ToInt32(Math.Floor(
-		//            Convert.ToDouble(CrossPointX) / Convert.ToDouble(DataPoints.GetUpperBound(0) + 1) * Convert.ToDouble(MyPolyline.Points.Count)
-		//            ));
-		//        if (_isHistogram)
-		//        {
-		//            crossPoint = new Point((MyPolyline.Points[crossPointIndexAdjusted4Shrinking].X + MyPolyline.Points[crossPointIndexAdjusted4Shrinking + 1].X) * .5,
-		//                MyPolyline.Points[crossPointIndexAdjusted4Shrinking].Y);
-		//        }
-		//        else
-		//        {
-		//            crossPoint = MyPolyline.Points[crossPointIndexAdjusted4Shrinking];
-		//        }
-
-		//        if (!CrossCanvas.Children.Contains(Cross))
-		//        {
-		//            CrossCanvas.Children.Add(Cross);
-		//        }
-		//        Canvas.SetLeft(Cross, crossPoint.X - Cross.Width / 2);
-		//        Canvas.SetTop(Cross, crossPoint.Y - Cross.Height / 2);
-		//        Canvas.SetZIndex(Cross, 999);
-		//    }
-		//    else
-		//    {
-		//        CrossCanvas.Children.Clear();
-		//    }
-		//}
 		protected void DrawCrossInternal()
 		{
 			if (DataPoints == null || Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0) return;
@@ -993,7 +967,7 @@ namespace LolloChartMobile
 				}
 				Canvas.SetLeft(Cross, crossPoint.X - Cross.Width / 2);
 				Canvas.SetTop(Cross, crossPoint.Y - Cross.Height / 2);
-				Canvas.SetZIndex(Cross, 999);
+				Canvas.SetZIndex(Cross, 900);
 			}
 			else
 			{
@@ -1164,6 +1138,6 @@ namespace LolloChartMobile
 		}
 	}
 	public enum ScaleType { Linear, Logarithmic };
-	internal enum ChartObjectTag { XAxis, YAxis, XY1DataSeries, XY2DataSeries, XY3DataSeries, XY4DataSeries, X1PrimaryGridlines, X1SecondaryGridlines, XGridLabels, Y1PrimaryGridlines, Y1SecondaryGridlines, Y1GridLabels, Y2GridLabels }
+	internal enum ChartObjectTag { XAxis, YAxis, XY1DataSeries, XY2DataSeries, XY3DataSeries, XY4DataSeries, XPrimaryGridlines, XSecondaryGridlines, XGridLabels, YPrimaryGridlines, YSecondaryGridlines, Y1GridLabels, Y2GridLabels }
 	#endregion services
 }

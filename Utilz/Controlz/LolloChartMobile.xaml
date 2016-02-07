@@ -15,10 +15,10 @@
 			</ResourceDictionary.MergedDictionaries>
 			<x:Double x:Key="GridHeightSmall">30</x:Double>
 			<x:Double x:Key="GridHeightMedium">50</x:Double>
-			<x:Double x:Key="GridWidthSmall">40</x:Double>
+			<x:Double x:Key="GridWidthSmall">50</x:Double>
 			<GridLength x:Key="GridHeightSmall_ForGrid">30</GridLength>
 			<GridLength x:Key="GridHeightMedium_ForGrid">50</GridLength>
-			<GridLength x:Key="GridWidthSmall_ForGrid">40</GridLength>
+			<GridLength x:Key="GridWidthSmall_ForGrid">50</GridLength>
 		</ResourceDictionary>
 	</UserControl.Resources>
 
@@ -46,15 +46,15 @@
 			Height="{StaticResource GridHeightSmall}">
 			<Canvas x:Name="CanvasXLabelsTop" />
 		</Grid>
-		<Grid x:Name="GridYLabelsLeft" Grid.Row="2" Grid.Column="0" Canvas.ZIndex="200"
+		<Grid x:Name="GridYLabelsLeft" Grid.Row="2" Grid.Column="0" Canvas.ZIndex="250"
 			Width="{StaticResource GridWidthSmall}">
-			<Canvas x:Name="CanvasYLabelsLeft" />
+			<Canvas x:Name="CanvasYLabelsLeft"/>
 		</Grid>
 		<Grid x:Name="GridChartArea" Grid.Row="2" Grid.Column="1" Canvas.ZIndex="100"
             Background="Transparent"
 			HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
             Tapped="OnGridChartArea_Tapped"/>
-		<Grid x:Name="GridYLabelsRight" Grid.Row="2" Grid.Column="2" Canvas.ZIndex="200"
+		<Grid x:Name="GridYLabelsRight" Grid.Row="2" Grid.Column="2" Canvas.ZIndex="250"
 			Width="{StaticResource GridWidthSmall}">
 			<Canvas x:Name="CanvasYLabelsRight" />
 		</Grid>
