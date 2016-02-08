@@ -23,29 +23,7 @@ namespace Utilz
 
 		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
 		{
-			if (_isObserving) CollectionChanged?.Invoke(this, e); // base.OnCollectionChanged(e); // this was all, it's smarter now
-
-			//if (_isObserving) // LOLLO TODO check if we really need this in the UniFiler
-			//{
-			//    try
-			//    {
-			//        if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-			//        {
-			//            CollectionChanged?.Invoke(this, e);
-			//        }
-			//        else
-			//        {
-			//            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
-			//            {
-			//                CollectionChanged?.Invoke(this, e);
-			//            }).AsTask().ConfigureAwait(false);
-			//        }
-			//    }
-			//    catch (Exception ex)
-			//    {
-			//        Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-			//    }
-			//}
+			if (_isObserving) CollectionChanged?.Invoke(this, e); // base.OnCollectionChanged(e); NO!
 		}
 	}
 }

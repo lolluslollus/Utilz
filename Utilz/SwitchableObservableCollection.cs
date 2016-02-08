@@ -84,32 +84,9 @@ namespace Utilz
 			}
 		}
 
-		//public override event NotifyCollectionChangedEventHandler CollectionChanged;
 		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
 		{
-			if (_isObserving) base.OnCollectionChanged(e); // this was all, it's smarter now
-
-			//if (_isObserving)
-			//{
-			//	try
-			//	{
-			//		if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-			//		{
-			//			CollectionChanged?.Invoke(this, e);
-			//		}
-			//		else
-			//		{
-			//			await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
-			//			{
-			//				CollectionChanged?.Invoke(this, e);
-			//			}).AsTask().ConfigureAwait(false);
-			//		}
-			//	}
-			//	catch (Exception ex)
-			//	{
-			//		Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-			//	}
-			//}
+			if (_isObserving) base.OnCollectionChanged(e);
 		}
 		protected override void OnPropertyChanged(PropertyChangedEventArgs e)
 		{

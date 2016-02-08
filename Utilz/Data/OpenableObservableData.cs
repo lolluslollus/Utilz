@@ -203,7 +203,7 @@ namespace Utilz.Data
 			{
 				try
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false); // LOLLO TODO check what happens now that I put CancToken into the semaphore
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
 						await funcAsync().ConfigureAwait(false);
