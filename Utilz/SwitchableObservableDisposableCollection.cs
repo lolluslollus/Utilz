@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
-
+using Windows.ApplicationModel.Core;
 
 namespace Utilz
 {
@@ -21,9 +21,10 @@ namespace Utilz
 
 		public override event NotifyCollectionChangedEventHandler CollectionChanged;
 
-		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
 		{
-			if (_isObserving) CollectionChanged?.Invoke(this, e); // base.OnCollectionChanged(e); NO!
+			bool hta = CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess; // LOLLO TODO remove when done testing
+			if (_isObserving) CollectionChanged?.Invoke(this, args); // base.OnCollectionChanged(e); NO!
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace Utilz
 		public bool IsObserving { get { return _isObserving; } set { _isObserving = value; } }
 
 		public static readonly int MAX_CAPACITY = int.MaxValue - 1; // MS limit
-		protected int _capacity = MAX_CAPACITY;
+		private int _capacity = MAX_CAPACITY;
 		public int Capacity { get { return _capacity; } }
 
 		public SwitchableObservableCollection() : base() { }
@@ -23,7 +23,6 @@ namespace Utilz
 		public SwitchableObservableCollection(bool isObserving) : base() { _isObserving = isObserving; }
 		public SwitchableObservableCollection(bool isObserving, IEnumerable<T> collection) : base(collection) { _isObserving = isObserving; }
 		public SwitchableObservableCollection(bool isObserving, int capacity) : base() { _isObserving = isObserving; _capacity = capacity; }
-
 
 		public void AddRange(IEnumerable<T> range)
 		{
@@ -47,11 +46,12 @@ namespace Utilz
 			OnPropertyChanged(new PropertyChangedEventArgs("Count"));
 			OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
 			// this is tricky: call Reset first to make sure the controls will respond properly and not only add one item
-			OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
+			// LOLLO TODO check this, I took it out so the list viewers don't lose the position.
+			//OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add, changedItems: newItems, startingIndex: newStartingIndex));
 		}
 
-		public void ReplaceRange(IEnumerable<T> range)
+		public void ReplaceAll(IEnumerable<T> range)
 		{
 			// get out if no new items
 			if (range == null || range.Count() < 1)
@@ -61,7 +61,6 @@ namespace Utilz
 			else
 			{
 				// prepare data for firing the events
-				int newStartingIndex = Count;
 				var newItems = new List<T>();
 				newItems.AddRange(range);
 
@@ -80,7 +79,7 @@ namespace Utilz
 				// this is tricky: call Reset first to make sure the controls will respond properly and not only add one item
 				// when clearing a collection, only .Reset is thrown!
 				OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
-				OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add, changedItems: newItems, startingIndex: newStartingIndex));
+				OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add, changedItems: newItems, startingIndex: 0));
 			}
 		}
 
