@@ -85,7 +85,8 @@ namespace Utilz
 				var delTasks = new List<Task>();
 				foreach (var item in contents)
 				{
-					delTasks.Add(item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask());
+					delTasks.Add(Task.Run(() => item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask()));
+					//delTasks.Add(item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask());
 				}
 				await Task.WhenAll(delTasks).ConfigureAwait(false);
 			}
@@ -95,12 +96,12 @@ namespace Utilz
 			}
 		}
 
-		
+
 		private class FileDirectoryExts
 		{
 			internal FileDirectoryExts() { }
 			private int _currentDepth = 0;
-			// LOLLO TODO what if you copy a directory to an existing one? Shouldn't you delete the contents first? No! But then, shouldn't you issue a warning?
+
 			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(StorageFolder from, StorageFolder to, int maxDepth = 0)
 			{
 				try
@@ -112,8 +113,9 @@ namespace Utilz
 					var copyTasks = new List<Task>();
 					foreach (var file in filesDepth0)
 					{
-						copyTasks.Add(file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask());
-						await Logger.AddAsync("File copied: " + file.Name, Logger.FileErrorLogFilename, Logger.Severity.Info).ConfigureAwait(false);
+						copyTasks.Add(Task.Run(() => file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask()));
+						//copyTasks.Add(file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask());
+						// await Logger.AddAsync("File copied: " + file.Name, Logger.FileErrorLogFilename, Logger.Severity.Info).ConfigureAwait(false);
 					}
 					await Task.WhenAll(copyTasks).ConfigureAwait(false);
 
