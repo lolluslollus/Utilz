@@ -76,5 +76,47 @@ namespace Utilz.Data
 			}
 		}
 		#endregion UIThread
+
+
+		#region get and set
+		protected T GetProperty<T>(ref T fldValue, object locker)
+		{
+			lock (locker)
+			{
+				return fldValue;
+			}
+		}
+		protected T GetProperty<T>(ref T fldValue)
+		{
+			return fldValue;
+		}
+		protected void SetProperty<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		{
+			bool isValueChanged = false;
+			lock (locker)
+			{
+				T oldValue = fldValue;
+				if (!newValue.Equals(oldValue) || !onlyIfDifferent)
+				{
+					fldValue = newValue;
+					isValueChanged = true;
+				}
+			}
+			// separate to avoid deadlocks
+			if (isValueChanged)
+			{
+				RaisePropertyChanged_UI(propertyName);
+			}
+		}
+		protected void SetProperty<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		{
+			T oldValue = fldValue;
+			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
+			{
+				fldValue = newValue;
+				RaisePropertyChanged_UI(propertyName);
+			}
+		}
+		#endregion get and set
 	}
 }

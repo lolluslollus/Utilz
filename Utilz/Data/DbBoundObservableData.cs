@@ -37,7 +37,7 @@ namespace Utilz.Data
 			set
 			{
 				string newValue = value ?? DEFAULT_ID;
-				SetProperty(ref _parentId, newValue);
+				SetPropertyUpdatingDb(ref _parentId, newValue);
 				// if (_parentId != newValue) { _parentId = newValue; RaisePropertyChanged_UI(); /*Task upd = UpdateDbAsync();*/ }
 			}
 		}
@@ -84,7 +84,7 @@ namespace Utilz.Data
 		//	}
 		//}
 
-		protected void SetProperty<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
 			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
@@ -105,21 +105,43 @@ namespace Utilz.Data
 			}
 		}
 
-		protected void SetProperty<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
+			bool isValueChanged = false;
 			lock (locker)
 			{
-				SetProperty<T>(ref fldValue, newValue, onlyIfDifferent, propertyName);
+				T oldValue = fldValue;
+				if (!newValue.Equals(oldValue) || !onlyIfDifferent)
+				{
+					fldValue = newValue;
+					isValueChanged = true;
+				}
+			}
+			// separate to avoid deadlocks
+			if (isValueChanged)
+			{
+				RaisePropertyChanged_UI(propertyName);
+
+				Task db = RunFunctionIfOpenAsyncA_MT(async delegate
+				{
+					if (UpdateDbMustOverride() == false)
+					{
+						//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
+						//	GetType().GetField(attributeName)?.SetValue(this, oldValue);
+						//	RaisePropertyChanged_UI(propertyName);
+						await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
+					}
+				});
 			}
 		}
 
-		protected T GetProperty<T>(ref T fldValue, object locker)
-		{
-			lock (locker)
-			{
-				return fldValue;
-			}
-		}
+		//protected T GetProperty<T>(ref T fldValue, object locker)
+		//{
+		//	lock (locker)
+		//	{
+		//		return fldValue;
+		//	}
+		//}
 		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters.
 		// However, they seem slower than the volatile keyword on the private field by a factor of 3 to 5.
 		//protected T GetProperty<T>(ref T fldValue) where T : class
