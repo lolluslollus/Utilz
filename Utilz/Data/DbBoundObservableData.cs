@@ -33,11 +33,9 @@ namespace Utilz.Data
 		public virtual string ParentId
 		{
 			get { return _parentId; }
-			// get { return GetProperty(ref _parentId, null); }
 			set
 			{
-				string newValue = value ?? DEFAULT_ID;
-				SetPropertyUpdatingDb(ref _parentId, newValue);
+				SetPropertyUpdatingDb(ref _parentId, value ?? DEFAULT_ID);
 				// if (_parentId != newValue) { _parentId = newValue; RaisePropertyChanged_UI(); /*Task upd = UpdateDbAsync();*/ }
 			}
 		}
@@ -60,30 +58,8 @@ namespace Utilz.Data
 		// Only atomic fields can be volatilised.
 		// locks are atomic by construction.
 		// volatile is apparently a very complex affair and must be understood thoroughly. Otherwise, better use locks, read/write locks etc.
-		// but how can I put them into this generic SetProperty<T>() ? A simple answer could be the SetProperty<T> lower down, the second override.
+		// but how can I put them into this generic SetProperty<T>() ? A simple answer could be the SetProperty<T> lower down.
 		//
-		//protected async void SetProperty1(object newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
-		//{
-		//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
-		//	var fieldInfo = GetType().GetField(attributeName);
-
-		//	object oldValue = fieldInfo.GetValue(this);
-		//	if (newValue != oldValue || !onlyIfDifferent)
-		//	{
-		//		fieldInfo.SetValue(this, newValue);
-
-		//		await RunFunctionIfOpenAsyncA_MT(async delegate
-		//		{
-		//			if (UpdateDbMustOverride() == false)
-		//			{
-		//				fieldInfo.SetValue(this, oldValue);
-		//				await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
-		//			}
-		//		});
-		//		RaisePropertyChanged_UI(propertyName);
-		//	}
-		//}
-
 		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
@@ -135,13 +111,6 @@ namespace Utilz.Data
 			}
 		}
 
-		//protected T GetProperty<T>(ref T fldValue, object locker)
-		//{
-		//	lock (locker)
-		//	{
-		//		return fldValue;
-		//	}
-		//}
 		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters.
 		// However, they seem slower than the volatile keyword on the private field by a factor of 3 to 5.
 		//protected T GetProperty<T>(ref T fldValue) where T : class
