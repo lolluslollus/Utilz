@@ -73,7 +73,7 @@ namespace Utilz.Data
 						//	var runAsSoonAsOpen = _runAsSoonAsOpen;
 						//	if (runAsSoonAsOpen != null)
 						//	{
-						//		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen);
+						//		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen, CancToken);
 						//	}
 						//}
 						//catch { }
@@ -255,7 +255,7 @@ namespace Utilz.Data
 					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
-						await Task.Run(func).ConfigureAwait(false);
+						await Task.Run(func, CancToken).ConfigureAwait(false);
 						return true;
 					}
 				}

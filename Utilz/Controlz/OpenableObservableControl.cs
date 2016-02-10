@@ -310,7 +310,7 @@ namespace Utilz.Controlz
 					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
-						await Task.Run(delegate { return funcAsync(); }).ConfigureAwait(false);
+						await Task.Run(delegate { return funcAsync(); }, CancToken).ConfigureAwait(false);
 						return true;
 					}
 				}

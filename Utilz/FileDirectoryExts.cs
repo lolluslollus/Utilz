@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -35,9 +36,9 @@ namespace Utilz
 		//		return desiredFile;
 		//	}	
 
-		public static Task CopyDirContentsAsync(this StorageFolder from, StorageFolder toDirectory, int maxDepth = 0)
+		public static Task CopyDirContentsAsync(this StorageFolder from, StorageFolder toDirectory, CancellationToken cancToken, int maxDepth = 0)
 		{
-			return new FileDirectoryExts().CopyDirContents2Async(from, toDirectory, maxDepth);
+			return new FileDirectoryExts().CopyDirContents2Async(from, toDirectory, cancToken, maxDepth);
 		}
 
 		public static async Task<ulong> GetFileSizeAsync(this StorageFile file)
@@ -75,6 +76,11 @@ namespace Utilz
 			return output;
 		}
 
+		/// <summary>
+		/// no canc token here? LOLLO TODO check it
+		/// </summary>
+		/// <param name="dir"></param>
+		/// <returns></returns>
 		public static async Task DeleteDirContentsAsync(this StorageFolder dir)
 		{
 			try
@@ -96,24 +102,45 @@ namespace Utilz
 			}
 		}
 
+		public static async Task DeleteDirContentsAsync(this StorageFolder dir, CancellationToken cancToken)
+		{
+			try
+			{
+				if (dir == null) return;
+
+				var contents = await dir.GetItemsAsync().AsTask().ConfigureAwait(false);
+				var delTasks = new List<Task>();
+				foreach (var item in contents)
+				{
+					delTasks.Add(Task.Run(() => item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask(cancToken), cancToken));
+					//delTasks.Add(item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask());
+				}
+				await Task.WhenAll(delTasks).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
+			}
+		}
+
 
 		private class FileDirectoryExts
 		{
 			internal FileDirectoryExts() { }
 			private int _currentDepth = 0;
 
-			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(StorageFolder from, StorageFolder to, int maxDepth = 0)
+			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(StorageFolder from, StorageFolder to, CancellationToken cancToken, int maxDepth = 0)
 			{
 				try
 				{
 					if (from == null || to == null) return Data.OpenableObservableData.BoolWhenOpen.Error;
 					// read files
-					var filesDepth0 = await from.GetFilesAsync().AsTask().ConfigureAwait(false);
+					var filesDepth0 = await from.GetFilesAsync().AsTask(cancToken).ConfigureAwait(false);
 					// copy files
 					var copyTasks = new List<Task>();
 					foreach (var file in filesDepth0)
 					{
-						copyTasks.Add(Task.Run(() => file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask()));
+						copyTasks.Add(Task.Run(() => file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask(), cancToken));
 						//copyTasks.Add(file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask());
 						// await Logger.AddAsync("File copied: " + file.Name, Logger.FileErrorLogFilename, Logger.Severity.Info).ConfigureAwait(false);
 					}
@@ -138,6 +165,7 @@ namespace Utilz
 
 					//}
 				}
+				catch (OperationCanceledException) { return Data.OpenableObservableData.BoolWhenOpen.ObjectClosed; }
 				catch (Exception ex)
 				{
 					await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
@@ -151,7 +179,7 @@ namespace Utilz
 				foreach (var dirFrom in dirsDepth0)
 				{
 					var dirTo = await to.CreateFolderAsync(dirFrom.Name, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false);
-					await CopyDirContents2Async(dirFrom, dirTo).ConfigureAwait(false);
+					await CopyDirContents2Async(dirFrom, dirTo, cancToken).ConfigureAwait(false);
 				}
 
 				return Data.OpenableObservableData.BoolWhenOpen.Error;
