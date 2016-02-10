@@ -308,9 +308,9 @@ namespace Utilz.Controlz
 				try
 				{
 					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
+					if (_isOpen && funcAsync != null)
 					{
-						await Task.Run(delegate { return funcAsync(); }, CancToken).ConfigureAwait(false);
+						await Task.Run(funcAsync, CancToken).ConfigureAwait(false);
 						return true;
 					}
 				}

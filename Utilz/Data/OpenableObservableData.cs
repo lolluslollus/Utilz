@@ -253,9 +253,35 @@ namespace Utilz.Data
 				try
 				{
 					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
+					if (_isOpen && func != null)
 					{
 						await Task.Run(func, CancToken).ConfigureAwait(false);
+						return true;
+					}
+				}
+				catch (OperationCanceledException) { }
+				catch (Exception ex)
+				{
+					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+				}
+				finally
+				{
+					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
+				}
+			}
+			return false;
+		}
+		protected async Task<bool> RunFunctionIfOpenAsyncT_MT(Func<Task> funcAsync)
+		{
+			if (_isOpen)
+			{
+				try
+				{
+					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+					if (_isOpen && funcAsync != null)
+					{
+						await Task.Run(funcAsync, CancToken).ConfigureAwait(false);
 						return true;
 					}
 				}
