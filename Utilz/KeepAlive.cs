@@ -8,7 +8,7 @@ namespace Utilz
 		private static Windows.System.Display.DisplayRequest _appDisplayRequest = null; //new Windows.System.Display.DisplayRequest();
 		private const int MAX_COUNT = 10000; // 2147483647L;
 		private static int _displayRequestRefCount = 0;
-		private static readonly object _countLock = new object();
+		private static readonly object _countLocker = new object();
 
 		/// <summary>
 		/// Always call this from the UI thread
@@ -19,7 +19,7 @@ namespace Utilz
 		{
 			try
 			{
-				lock (_countLock)
+				lock (_countLocker)
 				{
 					if (isMustKeepAlive) SetTrue();
 					else SetFalse();
@@ -59,7 +59,7 @@ namespace Utilz
 		{
 			try
 			{
-				lock (_countLock)
+				lock (_countLocker)
 				{
 					while (_displayRequestRefCount > 0) SetFalse();
 				}
