@@ -60,13 +60,13 @@ namespace Utilz.Data
 		// volatile is apparently a very complex affair and must be understood thoroughly. Otherwise, better use locks, read/write locks etc.
 		// but how can I put them into this generic SetProperty<T>() ? A simple answer could be the SetProperty<T> lower down.
 		//
-		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
 			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
 			{
 				fldValue = newValue;
-				RaisePropertyChanged_UI(propertyName);
+				if (raise) RaisePropertyChanged_UI(propertyName);
 
 				Task db = RunFunctionIfOpenAsyncA_MT(async delegate
 				{
@@ -81,7 +81,7 @@ namespace Utilz.Data
 			}
 		}
 
-		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyLockingUpdatingDb<T>(ref T fldValue, T newValue, object locker, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			bool isValueChanged = false;
 			lock (locker)
@@ -96,7 +96,7 @@ namespace Utilz.Data
 			// separate to avoid deadlocks
 			if (isValueChanged)
 			{
-				RaisePropertyChanged_UI(propertyName);
+				if (raise) RaisePropertyChanged_UI(propertyName);
 
 				Task db = RunFunctionIfOpenAsyncA_MT(async delegate
 				{
