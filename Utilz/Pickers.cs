@@ -42,18 +42,11 @@ namespace Utilz
 			}
 			catch (Exception ex)
 			{
-				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
 			}
 			finally
 			{
-				if (directory != null)
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
-				}
-				else
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_FOLDER_TOKEN);
-				}
+				SetLastPickedFolder(directory);
 			}
 			return directory;
 
@@ -84,18 +77,11 @@ namespace Utilz
 			}
 			catch (Exception ex)
 			{
-				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
 			}
 			finally
 			{
-				if (file != null)
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
-				}
-				else
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_OPEN_FILE_TOKEN);
-				}
+				SetLastPickedOpenFile(file);
 			}
 			return file;
 		}
@@ -125,18 +111,11 @@ namespace Utilz
 			}
 			catch (Exception ex)
 			{
-				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
 			}
 			finally
 			{
-				if (file != null)
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
-				}
-				else
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_SAVE_FILE_TOKEN);
-				}
+				SetLastPickedSaveFile(file);
 			}
 			return file;
 		}
@@ -155,20 +134,14 @@ namespace Utilz
 			return result;
 		}
 
-		public static void SetLastPickedOpenFile(StorageFile file)
-		{
-			if (file != null)
-			{
-				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
-			}
-		}
-
 		public static async Task<StorageFile> GetLastPickedOpenFileAsync()
 		{
 			StorageFile result = null;
 			try
 			{
 				result = await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(PICKED_OPEN_FILE_TOKEN).AsTask().ConfigureAwait(false);
+				//if (result != null) Logger.Add_TPL("Pickers got file " + result.Name + " from FAL", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
+				//else Logger.Add_TPL("Pickers got no file from FAL", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
 			}
 			catch
 			{
@@ -189,6 +162,47 @@ namespace Utilz
 				result = null;
 			}
 			return result;
+		}
+
+		public static void SetLastPickedFolder(StorageFolder directory)
+		{
+			if (directory != null)
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
+			}
+			else
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_FOLDER_TOKEN);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_FOLDER_TOKEN);
+			}
+		}
+
+		public static void SetLastPickedOpenFile(StorageFile file)
+		{
+			if (file != null)
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
+			}
+			else
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_OPEN_FILE_TOKEN);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_OPEN_FILE_TOKEN);
+			}
+		}
+		public static void SetLastPickedSaveFile(StorageFile file)
+		{
+			if (file != null)
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
+			}
+			else
+			{
+				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_SAVE_FILE_TOKEN);
+				Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_SAVE_FILE_TOKEN);
+			}
 		}
 	}
 }

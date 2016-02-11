@@ -79,7 +79,7 @@ namespace Utilz.Data
 
 
 		#region get and set
-		protected T GetProperty<T>(ref T fldValue, object locker)
+		protected T GetPropertyLocking<T>(ref T fldValue, object locker)
 		{
 			lock (locker)
 			{
@@ -90,7 +90,7 @@ namespace Utilz.Data
 		{
 			return fldValue;
 		}
-		protected void SetPropertyRaising<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyLocking<T>(ref T fldValue, T newValue, object locker, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			bool isValueChanged = false;
 			lock (locker)
@@ -103,18 +103,18 @@ namespace Utilz.Data
 				}
 			}
 			// separate to avoid deadlocks
-			if (isValueChanged)
+			if (isValueChanged && raise)
 			{
 				RaisePropertyChanged_UI(propertyName);
 			}
 		}
-		protected void SetPropertyRaising<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetProperty<T>(ref T fldValue, T newValue, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
 			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
 			{
 				fldValue = newValue;
-				RaisePropertyChanged_UI(propertyName);
+				if (raise) RaisePropertyChanged_UI(propertyName);
 			}
 		}
 		#endregion get and set
