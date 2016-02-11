@@ -90,7 +90,7 @@ namespace Utilz.Data
 		{
 			return fldValue;
 		}
-		protected void SetProperty<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyRaising<T>(ref T fldValue, T newValue, object locker, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			bool isValueChanged = false;
 			lock (locker)
@@ -108,7 +108,7 @@ namespace Utilz.Data
 				RaisePropertyChanged_UI(propertyName);
 			}
 		}
-		protected void SetProperty<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
+		protected void SetPropertyRaising<T>(ref T fldValue, T newValue, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
 			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
