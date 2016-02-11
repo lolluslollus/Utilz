@@ -21,20 +21,41 @@ namespace Utilz
 			//if (unsnapped)
 			//{
 
-			var openPicker = new FolderPicker();
-			openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-			openPicker.ViewMode = PickerViewMode.List;
+			StorageFolder directory = null;
+			try
+			{
+				Task<StorageFolder> dirTask = null;
+				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
+				{
+					var openPicker = new FolderPicker();
+					openPicker.ViewMode = PickerViewMode.List;
+					openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
-			foreach (var ext in extensions)
-			{
-				openPicker.FileTypeFilter.Add(ext);
+					foreach (var ext in extensions)
+					{
+						openPicker.FileTypeFilter.Add(ext);
+					}
+					dirTask = openPicker.PickSingleFolderAsync().AsTask();
+				});
+
+				directory = await dirTask;
 			}
-			var folder = await openPicker.PickSingleFolderAsync();
-			if (folder != null)
+			catch (Exception ex)
 			{
-				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_FOLDER_TOKEN, folder);
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
 			}
-			return folder;
+			finally
+			{
+				if (directory != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_FOLDER_TOKEN);
+				}
+			}
+			return directory;
 
 			//}
 			//return false;
@@ -49,7 +70,6 @@ namespace Utilz
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
 				{
 					var openPicker = new FileOpenPicker();
-
 					openPicker.ViewMode = PickerViewMode.List;
 					openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
@@ -59,37 +79,65 @@ namespace Utilz
 					}
 					fileTask = openPicker.PickSingleFileAsync().AsTask();
 				});
+
 				file = await fileTask;
-				if (file != null)
-				{
-					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
-				}
 			}
 			catch (Exception ex)
 			{
 				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
+			}
+			finally
+			{
+				if (file != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_OPEN_FILE_TOKEN);
+				}
 			}
 			return file;
 		}
 
 		public static async Task<StorageFile> PickSaveFileAsync(string[] extensions, string suggestedFileName = "")
 		{
-			var picker = new FileSavePicker();
-			picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-			if (!string.IsNullOrWhiteSpace(suggestedFileName)) picker.SuggestedFileName = suggestedFileName;
-
-			foreach (var ext in extensions)
+			StorageFile file = null;
+			try
 			{
-				var exts = new List<string>(); exts.Add(ext);
-				picker.FileTypeChoices.Add(ext + " file", exts);
-			}
+				Task<StorageFile> fileTask = null;
+				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
+				{
+					var picker = new FileSavePicker();
+					picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+					if (!string.IsNullOrWhiteSpace(suggestedFileName)) picker.SuggestedFileName = suggestedFileName;
 
-			var file = await picker.PickSaveFileAsync();
-			if (file != null)
+					foreach (var ext in extensions)
+					{
+						var exts = new List<string>(); exts.Add(ext);
+						picker.FileTypeChoices.Add(ext + " file", exts);
+					}
+
+					fileTask = picker.PickSaveFileAsync().AsTask();
+				});
+
+				file = await fileTask;
+			}
+			catch (Exception ex)
 			{
-				Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
+				await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename).ConfigureAwait(false);
 			}
-
+			finally
+			{
+				if (file != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_SAVE_FILE_TOKEN);
+				}
+			}
 			return file;
 		}
 
