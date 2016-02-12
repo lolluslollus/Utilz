@@ -19,7 +19,7 @@ namespace Utilz
 			foreach (var item in settings.Values)
 			{
 				// Debug.WriteLine(item.Key + " = " + item.Value.ToString());
-				output += (item.Key + " = " + item.Value.ToString() + System.Environment.NewLine);
+				output += (item.Key + " = " + item.Value.ToString() + Environment.NewLine);
 			}
 			return output;
 		}

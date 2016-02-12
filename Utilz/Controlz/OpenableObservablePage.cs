@@ -93,7 +93,7 @@ namespace Utilz.Controlz
 
 
 		#region ctor
-		public OpenableObservablePage() : base()
+		protected OpenableObservablePage() : base()
 		{
 			Application.Current.Resuming += OnResuming;
 			Application.Current.Suspending += OnSuspending;

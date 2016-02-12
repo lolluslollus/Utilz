@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -67,12 +68,11 @@ namespace Utilz
 			string output = string.Empty;
 			// Debug.WriteLine("start reading local folder contents");
 			var filez = await GetFilesInFolderAsync(ApplicationData.Current.LocalFolder).ConfigureAwait(false);
+			//return filez.Aggregate(output, (current, item) => current + (item.Path + item.Name + Environment.NewLine));
 			foreach (var item in filez)
 			{
-				// Debug.WriteLine(item.Path, item.Name);
 				output += (item.Path + item.Name + Environment.NewLine);
 			}
-			// Debug.WriteLine("end reading local folder contents");
 			return output;
 		}
 
@@ -108,7 +108,7 @@ namespace Utilz
 			{
 				if (dir == null) return;
 
-				var contents = await dir.GetItemsAsync().AsTask().ConfigureAwait(false);
+				var contents = await dir.GetItemsAsync().AsTask(cancToken).ConfigureAwait(false);
 				var delTasks = new List<Task>();
 				foreach (var item in contents)
 				{
@@ -140,7 +140,7 @@ namespace Utilz
 					var copyTasks = new List<Task>();
 					foreach (var file in filesDepth0)
 					{
-						copyTasks.Add(Task.Run(() => file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask(), cancToken));
+						copyTasks.Add(Task.Run(() => file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask(cancToken), cancToken));
 						//copyTasks.Add(file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask());
 						// await Logger.AddAsync("File copied: " + file.Name, Logger.FileErrorLogFilename, Logger.Severity.Info).ConfigureAwait(false);
 					}
@@ -174,11 +174,11 @@ namespace Utilz
 				_currentDepth += 1;
 				if (_currentDepth > maxDepth) return Data.OpenableObservableData.BoolWhenOpen.Yes;
 				// read dirs
-				var dirsDepth0 = await from.GetFoldersAsync().AsTask().ConfigureAwait(false);
+				var dirsDepth0 = await from.GetFoldersAsync().AsTask(cancToken).ConfigureAwait(false);
 				// copy dirs
 				foreach (var dirFrom in dirsDepth0)
 				{
-					var dirTo = await to.CreateFolderAsync(dirFrom.Name, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false);
+					var dirTo = await to.CreateFolderAsync(dirFrom.Name, CreationCollisionOption.ReplaceExisting).AsTask(cancToken).ConfigureAwait(false);
 					await CopyDirContents2Async(dirFrom, dirTo, cancToken).ConfigureAwait(false);
 				}
 

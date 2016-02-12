@@ -110,7 +110,7 @@ namespace Utilz
 			{
 				string fullMessage = GetFullMsg(severity, verbose, memberName, sourceFilePath, sourceLineNumber, msg);
 				Debug.WriteLine(fullMessage);
-				await Task.Run(() => { return Add2Async(fullMessage, fileName); }).ConfigureAwait(false);
+				await Task.Run(() => Add2Async(fullMessage, fileName)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -225,8 +225,7 @@ namespace Utilz
 		{
 			EmailRecipient emailRecipient = new EmailRecipient(recipient);
 
-			EmailMessage emailMsg = new EmailMessage();
-			emailMsg.Subject = string.Format("Feedback from {0} with logs", appName);
+			EmailMessage emailMsg = new EmailMessage { Subject = string.Format("Feedback from {0} with logs", appName) };
 			emailMsg.To.Add(emailRecipient);
 			//emailMsg.Body = await ReadAllLogsIntoStringAsync(); // LOLLO this only works with a short body...
 

@@ -34,7 +34,7 @@ namespace Utilz.Controlz
 
 
 		#region construct dispose
-		public ObservablePage() { }
+		protected ObservablePage() { }
 		#endregion construct dispose
 
 

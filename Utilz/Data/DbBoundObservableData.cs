@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -163,7 +164,7 @@ namespace Utilz.Data
 		#endregion properties
 
 		#region construct and dispose
-		public DbBoundObservableData() : base()
+		protected DbBoundObservableData() : base()
 		{
 			_id = Guid.NewGuid().ToString(); // LOLLO copying Id from a DBIndex assigned by the DB is tempting,
 											 // but it fails because DbIndex is only set when the record is put into the DB,
@@ -180,11 +181,7 @@ namespace Utilz.Data
 		public static bool Check(IEnumerable<DbBoundObservableData> items)
 		{
 			if (items == null) return false;
-			foreach (var item in items)
-			{
-				if (!item.CheckMeMustOverride()) return false;
-			}
-			return true;
+			return items.All(item => item.CheckMeMustOverride());
 		}
 
 		protected abstract bool UpdateDbMustOverride();

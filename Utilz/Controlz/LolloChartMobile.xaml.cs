@@ -171,8 +171,8 @@ namespace LolloChartMobile
 			if (IsHandlersActive == false)
 			{
 				_appView.VisibleBoundsChanged += OnAppView_VisibleBoundsChanged;
-				IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
-				SizeChanged += new SizeChangedEventHandler(OnSizeChanged);
+				IsEnabledChanged += OnIsEnabledChanged;
+				SizeChanged += OnSizeChanged;
 				IsHandlersActive = true;
 			}
 		}
@@ -524,13 +524,10 @@ namespace LolloChartMobile
 			for (int i = 0; i < Container.Children.Count; i++)
 			{
 				FrameworkElement item = Container.Children[i] as FrameworkElement;
-				if (item != null)
+				if (item?.Tag is ChartObjectTag && (ChartObjectTag)(item.Tag) == Tag)
 				{
-					if (item.Tag != null && item.Tag is ChartObjectTag && (ChartObjectTag)(item.Tag) == Tag)
-					{
-						Container.Children.Remove(item);
-						i -= 1;
-					}
+					Container.Children.Remove(item);
+					i -= 1;
 				}
 			}
 		}
@@ -1049,7 +1046,7 @@ namespace LolloChartMobile
 	#region public classes
 	public sealed class GridLines
 	{
-		private double[] _Points;
+		private readonly double[] _Points;
 		public double[] Points { get { return _Points; } }
 		public GridLines(double[] points)
 		{
@@ -1074,7 +1071,7 @@ namespace LolloChartMobile
 		public double Min { get { return _Min; } set { _Min = value; } }
 		private double _Max;
 		public double Max { get { return _Max; } set { _Max = value; } }
-		private ScaleType _ScaleType;
+		private readonly ScaleType _ScaleType;
 		public ScaleType ScaleType { get { return _ScaleType; } }
 		public GridScale(ScaleType scaleType, double min, double max)
 		{
@@ -1085,7 +1082,7 @@ namespace LolloChartMobile
 	}
 	public sealed class XYDataSeries
 	{
-		private bool _isHistogram = false;
+		private readonly bool _isHistogram = false;
 		public bool IsHistogram { get { return _isHistogram; } }
 		private double[,] _Points;
 		public double[,] Points { get { return _Points; } set { _Points = value; } }

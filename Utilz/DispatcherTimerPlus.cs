@@ -7,7 +7,7 @@ namespace Utilz
 	{
 		private volatile DispatcherTimer _dispatcherTimer = null;
 		private Action _action = null;
-		private TimeSpan _interval = new TimeSpan(0, 0, 5);
+		private readonly TimeSpan _interval = new TimeSpan(0, 0, 5);
 
 		public DispatcherTimerPlus(Action action, int seconds)
 		{

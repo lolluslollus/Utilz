@@ -9,7 +9,7 @@ namespace Utilz.Controlz
 	public abstract class BackOrientOpenObservControl : OpenableObservableControl, IOpenable
 	{
 		#region lifecycle
-		public BackOrientOpenObservControl() : base()
+		protected BackOrientOpenObservControl() : base()
 		{
 			_appView = ApplicationView.GetForCurrentView();
 			//_orientationSensor = SimpleOrientationSensor.GetDefault();
@@ -41,7 +41,7 @@ namespace Utilz.Controlz
 
 
 		#region appView
-		private ApplicationView _appView = null;
+		private readonly ApplicationView _appView = null;
 		public ApplicationView AppView { get { return _appView; } }
 
 		private volatile bool _isAppViewHandlersActive = false;

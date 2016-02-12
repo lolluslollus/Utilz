@@ -75,14 +75,7 @@ namespace Utilz.Controlz
 				double testFontSize = Math.Sqrt((ActualHeight - TextBlock.Padding.Top - Padding.Top - TextBlock.Padding.Bottom - Padding.Bottom)
 					* (ActualWidth - TextBlock.Padding.Left - Padding.Left - TextBlock.Padding.Right - Padding.Right) / TextBlock.Text.Length)
 					* SAFETY_FACTOR;
-				if (testFontSize < _origFontSize)
-				{
-					TextBlock.FontSize = testFontSize;
-				}
-				else
-				{
-					TextBlock.FontSize = _origFontSize;
-				}
+				TextBlock.FontSize = testFontSize < _origFontSize ? testFontSize : _origFontSize;
 			}
 		}
 	}

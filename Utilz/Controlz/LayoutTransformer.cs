@@ -267,18 +267,7 @@ namespace Utilz.Controlz
                 }
 
                 //DiagnosticWriteLine("MeasureOverride < " + availableSize);
-                Size measureSize;
-                if (_childActualSize == Size.Empty)
-                {
-                    // Determine the largest size after the transformation
-                    measureSize = ComputeLargestTransformedSize(availableSize);
-                }
-                else
-                {
-                    // Previous measure/arrange pass determined that Child.DesiredSize was larger than believed
-                    //DiagnosticWriteLine("  Using _childActualSize");
-                    measureSize = _childActualSize;
-                }
+                Size measureSize = _childActualSize == Size.Empty ? ComputeLargestTransformedSize(availableSize) : _childActualSize;
 
                 // Perform a mesaure on the _transformRoot (containing Child)
                 //DiagnosticWriteLine("  _transformRoot.Measure < " + measureSize);

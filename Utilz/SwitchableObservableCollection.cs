@@ -14,7 +14,7 @@ namespace Utilz
 		public bool IsObserving { get { return _isObserving; } set { _isObserving = value; } }
 
 		public static readonly int MAX_CAPACITY = int.MaxValue - 1; // MS limit
-		private int _capacity = MAX_CAPACITY;
+		private readonly int _capacity = MAX_CAPACITY;
 		public int Capacity { get { return _capacity; } }
 
 		public SwitchableObservableCollection() : base() { }
@@ -27,7 +27,7 @@ namespace Utilz
 		public void AddRange(IEnumerable<T> range)
 		{
 			// get out if no new items
-			if (range == null || range.Count() < 1) return;
+			if (range == null || !range.Any()) return;
 
 			// prepare data for firing the events
 			int newStartingIndex = Count;
@@ -54,7 +54,7 @@ namespace Utilz
 		public void ReplaceAll(IEnumerable<T> range)
 		{
 			// get out if no new items
-			if (range == null || range.Count() < 1)
+			if (range == null || !range.Any())
 			{
 				Clear();
 			}

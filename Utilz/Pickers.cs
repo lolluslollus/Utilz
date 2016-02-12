@@ -27,9 +27,11 @@ namespace Utilz
 				Task<StorageFolder> dirTask = null;
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
 				{
-					var openPicker = new FolderPicker();
-					openPicker.ViewMode = PickerViewMode.List;
-					openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+					var openPicker = new FolderPicker
+					{
+						ViewMode = PickerViewMode.List,
+						SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+					};
 
 					foreach (var ext in extensions)
 					{
@@ -62,9 +64,11 @@ namespace Utilz
 				Task<StorageFile> fileTask = null;
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
 				{
-					var openPicker = new FileOpenPicker();
-					openPicker.ViewMode = PickerViewMode.List;
-					openPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+					var openPicker = new FileOpenPicker
+					{
+						ViewMode = PickerViewMode.List,
+						SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+					};
 
 					foreach (var ext in extensions)
 					{
@@ -94,13 +98,12 @@ namespace Utilz
 				Task<StorageFile> fileTask = null;
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
 				{
-					var picker = new FileSavePicker();
-					picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+					var picker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.DocumentsLibrary};
 					if (!string.IsNullOrWhiteSpace(suggestedFileName)) picker.SuggestedFileName = suggestedFileName;
 
 					foreach (var ext in extensions)
 					{
-						var exts = new List<string>(); exts.Add(ext);
+						var exts = new List<string> {ext};
 						picker.FileTypeChoices.Add(ext + " file", exts);
 					}
 

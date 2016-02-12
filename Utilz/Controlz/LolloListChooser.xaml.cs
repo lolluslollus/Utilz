@@ -84,14 +84,7 @@ namespace Utilz.Controlz
             string newValue = e.NewValue as string;
             if (me != null)
             {
-                if (newValue != null)
-                {
-                    me.MyTextBlock.Text = newValue;
-                }
-                else
-                {
-                    me.MyTextBlock.Text = me.PlaceholderText;
-                }
+                me.MyTextBlock.Text = newValue ?? me.PlaceholderText;
             }
         }
 
@@ -159,7 +152,7 @@ namespace Utilz.Controlz
             LolloListChooser me = obj as LolloListChooser;
             if (me != null)
             {
-                if (e != null && e.NewValue != null && e.NewValue is TextAndTag)
+                if (e?.NewValue is TextAndTag)
                 {
                     me.MyTextBlock.Text = (e.NewValue as TextAndTag).Text;
                     for (int i = 0; i < me.ItemsSource.Count; i++)
@@ -271,7 +264,7 @@ namespace Utilz.Controlz
         #region event handlers
         private void OnMyTextBlock_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (this.ItemsSource != null && !IsPopupOpen)
+            if (ItemsSource != null && !IsPopupOpen)
             {
                 IsPopupOpen = true;
             }
@@ -287,8 +280,8 @@ namespace Utilz.Controlz
         private void OnItemBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             IsPopupOpen = false;
-            this.SelectedItem = MyListView.SelectedItem as TextAndTag;
-            this.SelectedIndex = MyListView.SelectedIndex;
+            SelectedItem = MyListView.SelectedItem as TextAndTag;
+            SelectedIndex = MyListView.SelectedIndex;
             RaiseItemSelected(sender, ((sender as FrameworkElement).DataContext as TextAndTag));
         }
 

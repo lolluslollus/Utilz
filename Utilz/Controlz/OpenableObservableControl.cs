@@ -75,7 +75,7 @@ namespace Utilz.Controlz
 
 
 		#region ctor
-		public OpenableObservableControl() : base()
+		protected OpenableObservableControl() : base()
 		{
 			Task upd = UpdateIsEnabledAsync();
 		}

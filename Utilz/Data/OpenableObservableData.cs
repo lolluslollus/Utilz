@@ -311,8 +311,7 @@ namespace Utilz.Data
 					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
 					if (_isOpen)
 					{
-						if (func()) result = BoolWhenOpen.Yes;
-						else result = BoolWhenOpen.No;
+						result = func() ? BoolWhenOpen.Yes : BoolWhenOpen.No;
 					}
 				}
 				catch (OperationCanceledException)

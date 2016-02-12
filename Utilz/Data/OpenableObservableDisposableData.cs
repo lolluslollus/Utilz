@@ -13,7 +13,7 @@ namespace Utilz.Data
 		protected volatile bool _isDisposed = false;
 		[IgnoreDataMember]
 		[Ignore]
-		public bool IsDisposed { get { return _isDisposed; } protected set { if (_isDisposed != value) { _isDisposed = value; } } }
+		public bool IsDisposed { get { return _isDisposed; } protected set { _isDisposed = value; } }
 		#endregion properties
 
 

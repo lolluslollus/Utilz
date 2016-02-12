@@ -1896,7 +1896,7 @@ namespace SQLite
 #if !USE_NEW_REFLECTION_API
 				var ignore = p.GetCustomAttributes (typeof(IgnoreAttribute), true).Length > 0;
 #else
-				var ignore = p.GetCustomAttributes(typeof(IgnoreAttribute), true).Count() > 0;
+				var ignore = p.GetCustomAttributes(typeof(IgnoreAttribute), true).Any();
 #endif
 				if (p.CanWrite && !ignore)
 				{
@@ -2191,7 +2191,7 @@ namespace SQLite
 #if !USE_NEW_REFLECTION_API
 			return attrs.Length > 0;
 #else
-			return attrs.Count() > 0;
+			return attrs.Any();
 #endif
 		}
 
@@ -2202,7 +2202,7 @@ namespace SQLite
 			if (attrs.Length > 0) {
 				return ((CollationAttribute)attrs [0]).Value;
 #else
-			if (attrs.Count() > 0)
+			if (attrs.Any())
 			{
 				return ((CollationAttribute)attrs.First()).Value;
 #endif
@@ -2219,7 +2219,7 @@ namespace SQLite
 #if !USE_NEW_REFLECTION_API
 			return attrs.Length > 0;
 #else
-			return attrs.Count() > 0;
+			return attrs.Any();
 #endif
 		}
 
@@ -2236,7 +2236,7 @@ namespace SQLite
 			if (attrs.Length > 0)
 				return ((MaxLengthAttribute)attrs [0]).Value;
 #else
-			if (attrs.Count() > 0)
+			if (attrs.Any())
 				return ((MaxLengthAttribute)attrs.First()).Value;
 #endif
 
@@ -2249,7 +2249,7 @@ namespace SQLite
 #if !USE_NEW_REFLECTION_API
 			return attrs.Length > 0;
 #else
-			return attrs.Count() > 0;
+			return attrs.Any();
 #endif
 		}
 	}
