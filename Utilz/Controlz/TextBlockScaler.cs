@@ -23,36 +23,35 @@ namespace Utilz.Controlz
 		private static void OnTextBlockChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
 			var instance = obj as TextBlockScaler;
-			if (instance != null && args != null && args.NewValue != args.OldValue)
+			if (instance == null || args == null || args.NewValue == args.OldValue) return;
+
+			var oldTb = args.OldValue as TextBlock;
+			if (oldTb != null)
 			{
-				var oldTb = args.OldValue as TextBlock;
-				if (oldTb != null)
-				{
-					if (instance._onTextChangedToken != 0) oldTb.UnregisterPropertyChangedCallback(TextBlock.TextProperty, instance._onTextChangedToken);
-					oldTb.SizeChanged -= instance.OnTb_SizeChanged;
-				}
+				if (instance._onTextChangedToken != 0) oldTb.UnregisterPropertyChangedCallback(TextBlock.TextProperty, instance._onTextChangedToken);
+				oldTb.SizeChanged -= instance.OnTb_SizeChanged;
+			}
 
-				var newTb = args.NewValue as TextBlock;
-				if (newTb != null)
-				{
-					newTb.Height = instance.Height;
-					newTb.MaxHeight = instance.MaxHeight;
-					newTb.MinHeight = instance.MinHeight;
-					newTb.Width = instance.Width;
-					newTb.MaxWidth = instance.Width;
-					newTb.MinWidth = instance.MinWidth;
+			var newTb = args.NewValue as TextBlock;
+			if (newTb != null)
+			{
+				newTb.Height = instance.Height;
+				newTb.MaxHeight = instance.MaxHeight;
+				newTb.MinHeight = instance.MinHeight;
+				newTb.Width = instance.Width;
+				newTb.MaxWidth = instance.Width;
+				newTb.MinWidth = instance.MinWidth;
 
-					instance._origFontSize = newTb.FontSize;
-					instance.Content = newTb;
+				instance._origFontSize = newTb.FontSize;
+				instance.Content = newTb;
 
-					instance._onTextChangedToken = newTb.RegisterPropertyChangedCallback(TextBlock.TextProperty, instance.OnTextChanged);
-					newTb.SizeChanged += instance.OnTb_SizeChanged;
-				}
-				else
-				{
-					instance._origFontSize = default(double);
-					instance.Content = null;
-				}
+				instance._onTextChangedToken = newTb.RegisterPropertyChangedCallback(TextBlock.TextProperty, instance.OnTextChanged);
+				newTb.SizeChanged += instance.OnTb_SizeChanged;
+			}
+			else
+			{
+				instance._origFontSize = default(double);
+				instance.Content = null;
 			}
 		}
 
@@ -70,13 +69,12 @@ namespace Utilz.Controlz
 
 		private void UpdateTB()
 		{
-			if (TextBlock.ActualHeight > 0 && TextBlock.ActualWidth > 0 && !string.IsNullOrEmpty(TextBlock.Text))
-			{
-				double testFontSize = Math.Sqrt((ActualHeight - TextBlock.Padding.Top - Padding.Top - TextBlock.Padding.Bottom - Padding.Bottom)
-					* (ActualWidth - TextBlock.Padding.Left - Padding.Left - TextBlock.Padding.Right - Padding.Right) / TextBlock.Text.Length)
-					* SAFETY_FACTOR;
-				TextBlock.FontSize = testFontSize < _origFontSize ? testFontSize : _origFontSize;
-			}
+			if (!(TextBlock.ActualHeight > 0.0) || !(TextBlock.ActualWidth > 0.0) || string.IsNullOrEmpty(TextBlock.Text)) return;
+
+			double testFontSize = Math.Sqrt((ActualHeight - TextBlock.Padding.Top - Padding.Top - TextBlock.Padding.Bottom - Padding.Bottom)
+			                                * (ActualWidth - TextBlock.Padding.Left - Padding.Left - TextBlock.Padding.Right - Padding.Right) / TextBlock.Text.Length)
+			                      * SAFETY_FACTOR;
+			TextBlock.FontSize = testFontSize < _origFontSize ? testFontSize : _origFontSize;
 		}
 	}
 }

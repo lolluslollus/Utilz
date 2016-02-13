@@ -42,13 +42,12 @@ namespace Utilz.Controlz
             DependencyProperty.Register("IsPopupOpen", typeof(bool), typeof(LolloListChooser), new PropertyMetadata(false, OnIsPopupOpen_PropertyChanged));
         private static void OnIsPopupOpen_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            LolloListChooser me = obj as LolloListChooser;
-            bool newValue = (bool)(e.NewValue);
-            if (me != null)
-            {
-                if (newValue) me.OpenPopupAfterIsPopupOpenChanged();
-                else me.ClosePopupAfterIsPopupOpenChanged();
-            }
+            var me = obj as LolloListChooser;            
+	        if (me == null) return;
+
+			bool newValue = (bool)(e.NewValue);
+			if (newValue) me.OpenPopupAfterIsPopupOpenChanged();
+	        else me.ClosePopupAfterIsPopupOpenChanged();
         }
 
         public string PlaceholderText
@@ -61,14 +60,13 @@ namespace Utilz.Controlz
         private static void OnPlaceholderText_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             LolloListChooser me = obj as LolloListChooser;
-            string newValue = e.NewValue as string;
-            if (me != null)
-            {
-                if (string.IsNullOrEmpty(me.Text))
-                {
-                    me.MyTextBlock.Text = newValue;
-                }
-            }
+            if (me == null) return;
+
+			string newValue = e.NewValue as string;
+			if (string.IsNullOrEmpty(me.Text))
+	        {
+		        me.MyTextBlock.Text = newValue ?? string.Empty;
+	        }
         }
 
         public string Text
@@ -120,7 +118,15 @@ namespace Utilz.Controlz
         public static readonly DependencyProperty TextItemStyleProperty =
             DependencyProperty.Register("TextItemStyle", typeof(Style), typeof(LolloListChooser), new PropertyMetadata(null));
 
-        public Collection<TextAndTag> ItemsSource
+		public Style ListHeaderStyle
+		{
+			get { return (Style)GetValue(ListHeaderStyleProperty); }
+			set { SetValue(ListHeaderStyleProperty, value); }
+		}
+		public static readonly DependencyProperty ListHeaderStyleProperty =
+			DependencyProperty.Register("ListHeaderStyle", typeof(Style), typeof(LolloListChooser), new PropertyMetadata(null));
+
+		public Collection<TextAndTag> ItemsSource
         {
             get { return (Collection<TextAndTag>)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
@@ -150,25 +156,24 @@ namespace Utilz.Controlz
         private static void OnSelectedItem_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             LolloListChooser me = obj as LolloListChooser;
-            if (me != null)
-            {
-                if (e?.NewValue is TextAndTag)
-                {
-                    me.MyTextBlock.Text = (e.NewValue as TextAndTag).Text;
-                    for (int i = 0; i < me.ItemsSource.Count; i++)
-                    {
-                        if (me.ItemsSource[i].Text == (e.NewValue as TextAndTag).Text)
-                        {
-                            me.SelectedIndex = i;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    me.MyTextBlock.Text = me.PlaceholderText;
-                }
-            }
+	        if (me == null) return;
+
+	        if (e?.NewValue is TextAndTag)
+	        {
+		        me.MyTextBlock.Text = (e.NewValue as TextAndTag).Text;
+		        for (int i = 0; i < me.ItemsSource.Count; i++)
+		        {
+			        if (me.ItemsSource[i].Text == (e.NewValue as TextAndTag).Text)
+			        {
+				        me.SelectedIndex = i;
+				        break;
+			        }
+		        }
+	        }
+	        else
+	        {
+		        me.MyTextBlock.Text = me.PlaceholderText;
+	        }
         }
         /// <summary>
         /// Gets the index of the selected element
@@ -194,11 +199,10 @@ namespace Utilz.Controlz
         #region popup
         protected override void OnHardwareOrSoftwareButtons_BackPressed_MayOverride(object sender, BackOrHardSoftKeyPressedEventArgs e)
         {
-            if (IsPopupOpen)
-            {
-                if (e != null) e.Handled = true;
-                IsPopupOpen = false;
-            }
+	        if (!IsPopupOpen) return;
+
+	        if (e != null) e.Handled = true;
+	        IsPopupOpen = false;
         }
         protected override void OnVisibleBoundsChangedMayOverride(ApplicationView sender, object args)
         {
@@ -282,35 +286,33 @@ namespace Utilz.Controlz
             IsPopupOpen = false;
             SelectedItem = MyListView.SelectedItem as TextAndTag;
             SelectedIndex = MyListView.SelectedIndex;
-            RaiseItemSelected(sender, ((sender as FrameworkElement).DataContext as TextAndTag));
+			ItemSelected?.Invoke(sender, (sender as FrameworkElement)?.DataContext as TextAndTag);
         }
 
         public event EventHandler<TextAndTag> ItemSelected;
-        private void RaiseItemSelected(object sender, TextAndTag e)
-        {
-			ItemSelected?.Invoke(sender, e);
-        }
 
         private volatile bool _isMyListViewEventHandlersActive = false;
         private void OnMyListViewLoaded(object sender, RoutedEventArgs e)
         {
-            if (!_isMyListViewEventHandlersActive)
-            {
-                MyListView.Items.VectorChanged += OnMyListViewItems_VectorChanged;
-                _isMyListViewEventHandlersActive = true;
-            }
+	        if (_isMyListViewEventHandlersActive || MyListView.Items == null) return;
+
+	        _isMyListViewEventHandlersActive = true;
+	        MyListView.Items.VectorChanged += OnMyListViewItems_VectorChanged;
         }
         private void OnMyListViewUnloaded(object sender, RoutedEventArgs e)
         {
-            MyListView.Items.VectorChanged -= OnMyListViewItems_VectorChanged;
-            _isMyListViewEventHandlersActive = false;
+	        if (MyListView.Items == null) return;
+
+	        MyListView.Items.VectorChanged -= OnMyListViewItems_VectorChanged;
+	        _isMyListViewEventHandlersActive = false;
         }
 
         private void OnMyListViewItems_VectorChanged(Windows.Foundation.Collections.IObservableVector<object> sender, Windows.Foundation.Collections.IVectorChangedEventArgs @event)
         {
-			Task updSelIdx = RunInUiThreadAsync(MyListView?.Dispatcher, delegate
-            {
-                if (MyListView.Items.Count > SelectedIndex)
+			//Task updSelIdx = RunInUiThreadAsync(MyListView?.Dispatcher, delegate
+			Task updSelIdx = RunInUiThreadAsync(delegate
+			{
+                if (MyListView.Items?.Count > SelectedIndex)
                 {
                     MyListView.SelectedIndex = SelectedIndex;
                     //MyListView.SelectRange(new Windows.UI.Xaml.Data.ItemIndexRange(SelectedIndex, 1)); // you can only call this if multiple selections are allowed

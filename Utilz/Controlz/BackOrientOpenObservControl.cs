@@ -48,11 +48,10 @@ namespace Utilz.Controlz
 		private void AddAppViewHandlers()
 		{
 			var av = _appView;
-			if (_isAppViewHandlersActive == false && av != null)
-			{
-				_isAppViewHandlersActive = true;
-				av.VisibleBoundsChanged += OnVisibleBoundsChangedMayOverride;
-			}
+			if (_isAppViewHandlersActive || av == null) return;
+
+			_isAppViewHandlersActive = true;
+			av.VisibleBoundsChanged += OnVisibleBoundsChangedMayOverride;
 		}
 
 		private void RemoveAppViewHandlers()
@@ -71,11 +70,10 @@ namespace Utilz.Controlz
 		private void AddBackHandlers()
 		{
 			var bpr = BackPressedRaiser;
-			if (_isBackHandlersActive == false && bpr != null)
-			{
-				_isBackHandlersActive = true;
-				bpr.BackOrHardSoftKeyPressed += OnHardwareOrSoftwareButtons_BackPressed_MayOverride;
-			}
+			if (_isBackHandlersActive || bpr == null) return;
+
+			_isBackHandlersActive = true;
+			bpr.BackOrHardSoftKeyPressed += OnHardwareOrSoftwareButtons_BackPressed_MayOverride;
 		}
 
 		private void RemoveBackHandlers()
@@ -101,6 +99,8 @@ namespace Utilz.Controlz
 		private static void OnBackPressedRaiserChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
 			var instance = obj as BackOrientOpenObservControl;
+			if (instance == null) return;
+
 			instance.RemoveBackHandlers(args.OldValue as IBackPressedRaiser);
 			instance.AddBackHandlers();
 		}

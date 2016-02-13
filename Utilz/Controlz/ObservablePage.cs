@@ -41,13 +41,22 @@ namespace Utilz.Controlz
 		#region UIThread
 		protected async Task RunInUiThreadAsync(DispatchedHandler action)
 		{
-			if (Dispatcher.HasThreadAccess)
+			try
 			{
-				action();
+				if (Dispatcher.HasThreadAccess)
+				{
+					action();
+				}
+				else
+				{
+					await Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+				}
 			}
-			else
+			catch (InvalidOperationException) // called from a background task: ignore
+			{ }
+			catch (Exception ex)
 			{
-				await Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+				Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
 			}
 		}
 		#endregion UIThread

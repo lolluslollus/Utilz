@@ -111,11 +111,10 @@ namespace Utilz.Data
 		protected void SetProperty<T>(ref T fldValue, T newValue, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
-			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
-			{
-				fldValue = newValue;
-				if (raise) RaisePropertyChanged_UI(propertyName);
-			}
+			if (newValue.Equals(oldValue) && onlyIfDifferent) return;
+
+			fldValue = newValue;
+			if (raise) RaisePropertyChanged_UI(propertyName);
 		}
 		#endregion get and set
 	}

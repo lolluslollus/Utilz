@@ -64,22 +64,21 @@ namespace Utilz.Data
 		protected void SetPropertyUpdatingDb<T>(ref T fldValue, T newValue, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
 		{
 			T oldValue = fldValue;
-			if (!newValue.Equals(oldValue) || !onlyIfDifferent)
-			{
-				fldValue = newValue;
-				if (raise) RaisePropertyChanged_UI(propertyName);
+			if (newValue.Equals(oldValue) && onlyIfDifferent) return;
 
-				Task db = RunFunctionIfOpenAsyncA_MT(async delegate
+			fldValue = newValue;
+			if (raise) RaisePropertyChanged_UI(propertyName);
+
+			Task db = RunFunctionIfOpenAsyncA_MT(async delegate
+			{
+				if (UpdateDbMustOverride() == false)
 				{
-					if (UpdateDbMustOverride() == false)
-					{
-						//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
-						//	GetType().GetField(attributeName)?.SetValue(this, oldValue);
-						//	RaisePropertyChanged_UI(propertyName);
-						await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
-					}
-				});
-			}
+					//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
+					//	GetType().GetField(attributeName)?.SetValue(this, oldValue);
+					//	RaisePropertyChanged_UI(propertyName);
+					await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
+				}
+			});
 		}
 
 		protected void SetPropertyLockingUpdatingDb<T>(ref T fldValue, T newValue, object locker, bool raise = true, bool onlyIfDifferent = true, [CallerMemberName] string propertyName = "")
@@ -95,21 +94,20 @@ namespace Utilz.Data
 				}
 			}
 			// separate to avoid deadlocks
-			if (isValueChanged)
-			{
-				if (raise) RaisePropertyChanged_UI(propertyName);
+			if (!isValueChanged) return;
 
-				Task db = RunFunctionIfOpenAsyncA_MT(async delegate
+			if (raise) RaisePropertyChanged_UI(propertyName);
+
+			Task db = RunFunctionIfOpenAsyncA_MT(async delegate
+			{
+				if (UpdateDbMustOverride() == false)
 				{
-					if (UpdateDbMustOverride() == false)
-					{
-						//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
-						//	GetType().GetField(attributeName)?.SetValue(this, oldValue);
-						//	RaisePropertyChanged_UI(propertyName);
-						await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
-					}
-				});
-			}
+					//	string attributeName = '_' + propertyName[0].ToString().ToLower() + propertyName.Substring(1); // only works if naming conventions are respected
+					//	GetType().GetField(attributeName)?.SetValue(this, oldValue);
+					//	RaisePropertyChanged_UI(propertyName);
+					await Logger.AddAsync(GetType().ToString() + "." + propertyName + " could not be set", Logger.ForegroundLogFilename).ConfigureAwait(false);
+				}
+			});
 		}
 
 		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters.
@@ -175,13 +173,12 @@ namespace Utilz.Data
 		protected abstract bool CheckMeMustOverride();
 		public static bool Check(DbBoundObservableData item)
 		{
-			if (item == null) return false;
-			else return item.CheckMeMustOverride();
+			return item != null && item.CheckMeMustOverride();
 		}
+
 		public static bool Check(IEnumerable<DbBoundObservableData> items)
 		{
-			if (items == null) return false;
-			return items.All(item => item.CheckMeMustOverride());
+			return items != null && items.All(item => item.CheckMeMustOverride());
 		}
 
 		protected abstract bool UpdateDbMustOverride();

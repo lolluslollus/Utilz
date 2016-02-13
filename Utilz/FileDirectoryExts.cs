@@ -47,11 +47,10 @@ namespace Utilz
 			if (file == null) return 0;
 
 			var fileProperties = await file.GetBasicPropertiesAsync().AsTask().ConfigureAwait(false);
-			if (fileProperties != null) return fileProperties.Size;
-			else return 0;
+			return fileProperties != null ? fileProperties.Size : 0;
 		}
 
-		private static async Task<IReadOnlyList<StorageFile>> GetFilesInFolderAsync(StorageFolder folder)
+		private static async Task<IReadOnlyList<StorageFile>> GetFilesInFolderAsync(IStorageFolder folder)
 		{
 			List<StorageFile> output = new List<StorageFile>();
 			var files = await folder.GetFilesAsync().AsTask().ConfigureAwait(false);
@@ -129,7 +128,7 @@ namespace Utilz
 			internal FileDirectoryExts() { }
 			private int _currentDepth = 0;
 
-			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(StorageFolder from, StorageFolder to, CancellationToken cancToken, int maxDepth = 0)
+			internal async Task<Data.OpenableObservableData.BoolWhenOpen> CopyDirContents2Async(IStorageFolder from, IStorageFolder to, CancellationToken cancToken, int maxDepth = 0)
 			{
 				try
 				{

@@ -11,7 +11,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid >
+	<Grid>
         <Border BorderThickness="0" 
             BorderBrush="{ThemeResource ButtonBorderThemeBrush}"
             Tapped="OnMyTextBlock_Tapped"
@@ -44,7 +44,9 @@
                         <RowDefinition Height="20"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="1" Text="{Binding ElementName=me, Path=ListHeaderText}" Style="{StaticResource ListItemTextStyle}"/>
+                    <TextBlock Grid.Row="1" 
+						Text="{Binding ElementName=me, Path=ListHeaderText}" 
+						Style="{Binding ElementName=me, Path=ListHeaderStyle}"/>
                     <ScrollViewer Grid.Row="3"
                         HorizontalScrollMode="Disabled" VerticalScrollMode="Enabled"
                         HorizontalScrollBarVisibility="Hidden"

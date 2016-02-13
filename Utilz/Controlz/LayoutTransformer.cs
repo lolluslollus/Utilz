@@ -186,68 +186,63 @@ namespace Utilz.Controlz
         /// </summary>
         /// <param name="transform">Transform(Group) to walk.</param>
         /// <returns>Computed Matrix.</returns>
-        private Matrix GetTransformMatrix(Transform transform)
+        private static Matrix GetTransformMatrix(Transform transform)
         {
-            if (null != transform)
-            {
-                // WPF equivalent of this entire method:
-                // return transform.Value;
+	        if (null == transform) return Matrix.Identity;
 
-                // Process the TransformGroup
-                TransformGroup transformGroup = transform as TransformGroup;
-                if (null != transformGroup)
-                {
-                    Matrix groupMatrix = Matrix.Identity;
-                    foreach (Transform child in transformGroup.Children)
-                    {
-                        groupMatrix = MatrixMultiply(groupMatrix, GetTransformMatrix(child));
-                    }
-                    return groupMatrix;
-                }
+	        // WPF equivalent of this entire method:
+	        // return transform.Value;
 
-                // Process the RotateTransform
-                RotateTransform rotateTransform = transform as RotateTransform;
-                if (null != rotateTransform)
-                {
-                    double angle = rotateTransform.Angle;
-                    double angleRadians = (2 * Math.PI * angle) / 360;
-                    double sine = Math.Sin(angleRadians);
-                    double cosine = Math.Cos(angleRadians);
-                    return new Matrix(cosine, sine, -sine, cosine, 0, 0);
-                }
+	        // Process the TransformGroup
+	        var transformGroup = transform as TransformGroup;
+	        if (null != transformGroup)
+	        {
+		        Matrix groupMatrix = Matrix.Identity;
+		        foreach (Transform child in transformGroup.Children)
+		        {
+			        groupMatrix = MatrixMultiply(groupMatrix, GetTransformMatrix(child));
+		        }
+		        return groupMatrix;
+	        }
 
-                // Process the ScaleTransform
-                ScaleTransform scaleTransform = transform as ScaleTransform;
-                if (null != scaleTransform)
-                {
-                    double scaleX = scaleTransform.ScaleX;
-                    double scaleY = scaleTransform.ScaleY;
-                    return new Matrix(scaleX, 0, 0, scaleY, 0, 0);
-                }
+	        // Process the RotateTransform
+	        RotateTransform rotateTransform = transform as RotateTransform;
+	        if (null != rotateTransform)
+	        {
+		        double angle = rotateTransform.Angle;
+		        double angleRadians = (2 * Math.PI * angle) / 360;
+		        double sine = Math.Sin(angleRadians);
+		        double cosine = Math.Cos(angleRadians);
+		        return new Matrix(cosine, sine, -sine, cosine, 0, 0);
+	        }
 
-                // Process the SkewTransform
-                SkewTransform skewTransform = transform as SkewTransform;
-                if (null != skewTransform)
-                {
-                    double angleX = skewTransform.AngleX;
-                    double angleY = skewTransform.AngleY;
-                    double angleXRadians = (2 * Math.PI * angleX) / 360;
-                    double angleYRadians = (2 * Math.PI * angleY) / 360;
-                    return new Matrix(1, angleYRadians, angleXRadians, 1, 0, 0);
-                }
+	        // Process the ScaleTransform
+	        ScaleTransform scaleTransform = transform as ScaleTransform;
+	        if (null != scaleTransform)
+	        {
+		        double scaleX = scaleTransform.ScaleX;
+		        double scaleY = scaleTransform.ScaleY;
+		        return new Matrix(scaleX, 0, 0, scaleY, 0, 0);
+	        }
 
-                // Process the MatrixTransform
-                MatrixTransform matrixTransform = transform as MatrixTransform;
-                if (null != matrixTransform)
-                {
-                    return matrixTransform.Matrix;
-                }
+	        // Process the SkewTransform
+	        SkewTransform skewTransform = transform as SkewTransform;
+	        if (null != skewTransform)
+	        {
+		        double angleX = skewTransform.AngleX;
+		        double angleY = skewTransform.AngleY;
+		        double angleXRadians = (2 * Math.PI * angleX) / 360;
+		        double angleYRadians = (2 * Math.PI * angleY) / 360;
+		        return new Matrix(1, angleYRadians, angleXRadians, 1, 0, 0);
+	        }
 
-                // TranslateTransform has no effect in LayoutTransform
-            }
+	        // Process the MatrixTransform
+	        MatrixTransform matrixTransform = transform as MatrixTransform;
+	        return matrixTransform?.Matrix ?? Matrix.Identity;
 
-            // Fall back to no-op transformation
-            return Matrix.Identity;
+	        // TranslateTransform has no effect in LayoutTransform
+
+	        // Fall back to no-op transformation
         }
 
         /// <summary>
@@ -411,8 +406,8 @@ namespace Utilz.Controlz
             // Compute slope of both constraint lines
             double slopeFromWidth = -(maxHeightFromWidth / maxWidthFromWidth);
             double slopeFromHeight = -(maxHeightFromHeight / maxWidthFromHeight);
-
-            if ((0 == arrangeBounds.Width) || (0 == arrangeBounds.Height))
+			// LOLLO TODO check comparisons of floating point numbers
+			if ((0 == arrangeBounds.Width) || (0 == arrangeBounds.Height))
             {
                 // Check for empty bounds
                 computedSize = new Size(arrangeBounds.Width, arrangeBounds.Height);

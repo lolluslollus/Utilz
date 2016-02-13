@@ -15,7 +15,7 @@ namespace Utilz
 	{
 		//logger http://code.msdn.microsoft.com/wpapps/A-logging-solution-for-c407d880
 
-		public enum Severity { Info, Error };
+		public enum Severity { Info, Error }
 
 		private static readonly SemaphoreSlimSafeRelease _semaphore = new SemaphoreSlimSafeRelease(1, 1); // , "LOLLOLoggerSemaphore");
 		private const long MAX_SIZE_BYTES = 16000;
@@ -63,19 +63,17 @@ namespace Utilz
 		}
 		private static async Task<string> Read2Async(string fileName)
 		{
+			if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
+
+			StorageFile file = await _logsFolder.GetFileAsync(fileName).AsTask().ConfigureAwait(false);
+			if (file == null) return string.Empty;
+
 			string result = string.Empty;
-			if (!string.IsNullOrWhiteSpace(fileName))
+			using (IInputStream inStream = await file.OpenSequentialReadAsync().AsTask().ConfigureAwait(false))
 			{
-				StorageFile file = await _logsFolder.GetFileAsync(fileName).AsTask().ConfigureAwait(false);
-				if (file != null)
+				using (StreamReader streamReader = new StreamReader(inStream.AsStreamForRead()))
 				{
-					using (IInputStream inStream = await file.OpenSequentialReadAsync().AsTask().ConfigureAwait(false))
-					{
-						using (StreamReader streamReader = new StreamReader(inStream.AsStreamForRead()))
-						{
-							result = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-						}
-					}
+					result = await streamReader.ReadToEndAsync().ConfigureAwait(false);
 				}
 			}
 			return result;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -15,13 +16,12 @@ namespace Utilz
 		public static string ReadAllReg() //LOLLO this is only for testing or diagnosing
 		{
 			var settings = ApplicationData.Current.LocalSettings;
-			string output = string.Empty;
-			foreach (var item in settings.Values)
-			{
-				// Debug.WriteLine(item.Key + " = " + item.Value.ToString());
-				output += (item.Key + " = " + item.Value.ToString() + Environment.NewLine);
-			}
-			return output;
+			return settings.Values.Aggregate(string.Empty, (current, item) => current + (item.Key + " = " + item.Value.ToString() + Environment.NewLine));
+			//foreach (var item in settings.Values)
+			//{
+			//	output += (item.Key + " = " + item.Value.ToString() + Environment.NewLine);
+			//}
+			//return output;
 		}
 
 		public static bool TrySetValue(string regKey, string value)

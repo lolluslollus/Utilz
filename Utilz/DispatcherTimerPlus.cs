@@ -38,11 +38,10 @@ namespace Utilz
 		private void AddHandlers()
 		{
 			var timer = _dispatcherTimer;
-			if (!_isHandlersActive && timer != null)
-			{
-				_isHandlersActive = true;
-				timer.Tick += OnAnimationTimer_Tick;
-			}
+			if (_isHandlersActive || timer == null) return;
+
+			_isHandlersActive = true;
+			timer.Tick += OnAnimationTimer_Tick;
 		}
 		private void RemoveHandlers()
 		{

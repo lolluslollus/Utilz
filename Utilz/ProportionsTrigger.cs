@@ -77,7 +77,7 @@ namespace Utilz
             _lastVisibleBounds = _appView.VisibleBounds;
         }
 
-		private async Task RunInUiThreadAsync(CoreDispatcher dispatcher, DispatchedHandler action)
+		private static async Task RunInUiThreadAsync(CoreDispatcher dispatcher, DispatchedHandler action)
 		{
 			if (dispatcher.HasThreadAccess)
 			{

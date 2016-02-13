@@ -168,13 +168,12 @@ namespace LolloChartMobile
 		private bool IsHandlersActive = false;
 		private void AddHandlers()
 		{
-			if (IsHandlersActive == false)
-			{
-				_appView.VisibleBoundsChanged += OnAppView_VisibleBoundsChanged;
-				IsEnabledChanged += OnIsEnabledChanged;
-				SizeChanged += OnSizeChanged;
-				IsHandlersActive = true;
-			}
+			if (IsHandlersActive) return;
+
+			IsHandlersActive = true;
+			_appView.VisibleBoundsChanged += OnAppView_VisibleBoundsChanged;
+			IsEnabledChanged += OnIsEnabledChanged;
+			SizeChanged += OnSizeChanged;
 		}
 
 		private void RemoveHandlers()
@@ -191,7 +190,7 @@ namespace LolloChartMobile
 			_appView = ApplicationView.GetForCurrentView();
 			_prevOrientation = _appView.Orientation;
 
-			DataContext = this;
+			//DataContext = this;
 			SetLineStyles();
 		}
 
@@ -603,7 +602,7 @@ namespace LolloChartMobile
 		}
 		internal virtual void ReInit(ScaleType scaleType, double[] points, double minimum, double maximum)
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return; // LOLLO added this
+			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return;
 			if (scaleType != ScaleType || points != DataPoints || minimum != Minimum || maximum != Maximum)
 			{
 				ScaleType = scaleType;
@@ -695,7 +694,7 @@ namespace LolloChartMobile
 		}
 		internal virtual void ReInit(ScaleType scaleType, double[] points, string dataPointsFormat)
 		{
-			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return; // LOLLO added this
+			if (Container.ActualHeight == 0.0 || Container.ActualWidth == 0.0 || points == null) return;
 			if (scaleType != ScaleType || points != DataPoints || dataPointsFormat != DataPointsFormat)
 			{
 				ScaleType = scaleType;
@@ -949,7 +948,6 @@ namespace LolloChartMobile
 		{
 			double shrinkFactor = sourceArraySize > 0 ? Convert.ToDouble(targetArraySize) / Convert.ToDouble(sourceArraySize) : 1.0;
 
-			int currentShrunkIndex = -1;
 			int lastCheckedShrunkIndex = -3;
 			double min0 = default(double);
 			double min1 = default(double);
@@ -957,7 +955,7 @@ namespace LolloChartMobile
 			double max1 = default(double);
 			for (int i = 0; i < sourceArraySize; i++)
 			{
-				currentShrunkIndex = Convert.ToInt32(Math.Floor(i * shrinkFactor));
+				int currentShrunkIndex = Convert.ToInt32(Math.Floor(i * shrinkFactor));
 
 				if (currentShrunkIndex == lastCheckedShrunkIndex || currentShrunkIndex == (lastCheckedShrunkIndex + 1))
 				{
@@ -1182,7 +1180,7 @@ namespace LolloChartMobile
 			return ScaleLinear(sourceValue0_log, sourceValueN_log, targetValue0, targetValueN, output, column);
 		}
 	}
-	public enum ScaleType { Linear, Logarithmic };
+	public enum ScaleType { Linear, Logarithmic }
 	internal enum ChartObjectTag { XAxis, YAxis, XY1DataSeries, XY2DataSeries, XY3DataSeries, XY4DataSeries, XPrimaryGridlines, XSecondaryGridlines, XGridLabels, YPrimaryGridlines, YSecondaryGridlines, Y1GridLabels, Y2GridLabels }
 	#endregion services
 }

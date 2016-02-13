@@ -39,29 +39,66 @@ namespace Utilz.Controlz
 
 
 		#region UIThread
+		protected async Task RunInUiThreadIdleAsync(DispatchedHandler action)
+		{
+			try
+			{
+				if (Dispatcher.HasThreadAccess)
+				{
+					action();
+				}
+				else
+				{
+					await Dispatcher.RunIdleAsync(a => action()).AsTask().ConfigureAwait(false);
+				}
+			}
+			catch (InvalidOperationException) // called from a background task: ignore
+			{ }
+			catch (Exception ex)
+			{
+				Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+			}
+		}
 		protected async Task RunInUiThreadAsync(DispatchedHandler action)
 		{
-			if (Dispatcher.HasThreadAccess)
+			try
 			{
-				action();
+				if (Dispatcher.HasThreadAccess)
+				{
+					action();
+				}
+				else
+				{
+					await Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+				}
 			}
-			else
+			catch (InvalidOperationException) // called from a background task: ignore
+			{ }
+			catch (Exception ex)
 			{
-				await Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
-			}
-		}
-
-		protected async Task RunInUiThreadAsync(CoreDispatcher dispatcher, DispatchedHandler action)
-		{
-			if (dispatcher?.HasThreadAccess == true)
-			{
-				action();
-			}
-			else
-			{
-				await dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+				Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
 			}
 		}
+		//protected async Task RunInUiThreadAsync(CoreDispatcher dispatcher, DispatchedHandler action)
+		//{
+		//	try
+		//	{
+		//		if (dispatcher?.HasThreadAccess == true)
+		//		{
+		//			action();
+		//		}
+		//		else if (dispatcher != null)
+		//		{
+		//			await dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+		//		}
+		//	}
+		//	catch (InvalidOperationException) // called from a background task: ignore
+		//	{ }
+		//	catch (Exception ex)
+		//	{
+		//		Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+		//	}
+		//}
 		#endregion UIThread
 	}
 }

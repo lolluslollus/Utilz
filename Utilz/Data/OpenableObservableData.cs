@@ -49,48 +49,47 @@ namespace Utilz.Data
 		#region open close
 		public async Task<bool> OpenAsync()
 		{
-			if (!_isOpen)
+			if (_isOpen) return false;
+
+			if (!SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore)) _isOpenSemaphore = new SemaphoreSlimSafeRelease(1, 1);
+			try
 			{
-				if (!SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore)) _isOpenSemaphore = new SemaphoreSlimSafeRelease(1, 1);
-				try
+				await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
+				if (!_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
-					if (!_isOpen)
+					lock (_ctsLocker)
 					{
-						lock (_ctsLocker)
-						{
-							_cts?.Dispose();
-							_cts = new SafeCancellationTokenSource();
-							_cancToken = _cts.Token;
-						}
-
-						await OpenMayOverrideAsync().ConfigureAwait(false);
-
-						IsOpen = true;
-
-						//try
-						//{
-						//	var runAsSoonAsOpen = _runAsSoonAsOpen;
-						//	if (runAsSoonAsOpen != null)
-						//	{
-						//		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen, CancToken);
-						//	}
-						//}
-						//catch { }
-						//finally { _runAsSoonAsOpen = null; }
-
-						return true;
+						_cts?.Dispose();
+						_cts = new SafeCancellationTokenSource();
+						_cancToken = _cts.Token;
 					}
+
+					await OpenMayOverrideAsync().ConfigureAwait(false);
+
+					IsOpen = true;
+
+					//try
+					//{
+					//	var runAsSoonAsOpen = _runAsSoonAsOpen;
+					//	if (runAsSoonAsOpen != null)
+					//	{
+					//		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen, CancToken);
+					//	}
+					//}
+					//catch { }
+					//finally { _runAsSoonAsOpen = null; }
+
+					return true;
 				}
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
@@ -102,41 +101,40 @@ namespace Utilz.Data
 
 		public async Task<bool> CloseAsync()
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			lock (_ctsLocker)
 			{
-				lock (_ctsLocker)
-				{
-					_cts?.CancelSafe(true);
-				}
+				_cts?.CancelSafe(true);
+			}
 
-				try
+			try
+			{
+				await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
+				if (_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
-					if (_isOpen)
+					lock (_ctsLocker)
 					{
-						lock (_ctsLocker)
-						{
-							_cts?.Dispose();
-							_cts = null;
-							_cancToken = new CancellationToken(true); // CancellationToken is not nullable and not disposable
-						}
-
-						IsOpen = false;
-						await CloseMayOverrideAsync().ConfigureAwait(false);
-
-						return true;
+						_cts?.Dispose();
+						_cts = null;
+						_cancToken = new CancellationToken(true); // CancellationToken is not nullable and not disposable
 					}
+
+					IsOpen = false;
+					await CloseMayOverrideAsync().ConfigureAwait(false);
+
+					return true;
 				}
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryDispose(_isOpenSemaphore);
-					_isOpenSemaphore = null;
-				}
+			}
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryDispose(_isOpenSemaphore);
+				_isOpenSemaphore = null;
 			}
 			return false;
 		}
@@ -151,218 +149,210 @@ namespace Utilz.Data
 		#region while open
 		protected async Task<bool> RunFunctionIfOpenAsyncA(Action func)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
-					{
-						func();
-						return true;
-					}
+					func();
+					return true;
 				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 		protected async Task<bool> RunFunctionIfOpenAsyncB(Func<bool> func)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
-				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen) return func();
-				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen) return func();
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 		protected async Task<bool> RunFunctionIfOpenAsyncT(Func<Task> funcAsync)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
-					{
-						await funcAsync().ConfigureAwait(false);
-						return true;
-					}
+					await funcAsync().ConfigureAwait(false);
+					return true;
 				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 		protected async Task<bool> RunFunctionIfOpenAsyncTB(Func<Task<bool>> funcAsync)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
-				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen) return await funcAsync().ConfigureAwait(false);
-				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen) return await funcAsync().ConfigureAwait(false);
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 
 		protected async Task<bool> RunFunctionIfOpenAsyncA_MT(Action func)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen && func != null)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen && func != null)
-					{
-						await Task.Run(func, CancToken).ConfigureAwait(false);
-						return true;
-					}
+					await Task.Run(func, CancToken).ConfigureAwait(false);
+					return true;
 				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 		protected async Task<bool> RunFunctionIfOpenAsyncT_MT(Func<Task> funcAsync)
 		{
-			if (_isOpen)
+			if (!_isOpen) return false;
+
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen && funcAsync != null)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen && funcAsync != null)
-					{
-						await Task.Run(funcAsync, CancToken).ConfigureAwait(false);
-						return true;
-					}
+					await Task.Run(funcAsync, CancToken).ConfigureAwait(false);
+					return true;
 				}
-				catch (OperationCanceledException) { }
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			catch (OperationCanceledException) { }
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return false;
 		}
 
-		public enum BoolWhenOpen { Yes, No, ObjectClosed, Error };
+		public enum BoolWhenOpen { Yes, No, ObjectClosed, Error }
 
 		protected async Task<BoolWhenOpen> RunFunctionIfOpenThreeStateAsyncB(Func<bool> func)
 		{
+			if (!_isOpen) return BoolWhenOpen.ObjectClosed;
+
 			BoolWhenOpen result = BoolWhenOpen.ObjectClosed;
-			if (_isOpen)
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
-					{
-						result = func() ? BoolWhenOpen.Yes : BoolWhenOpen.No;
-					}
+					result = func() ? BoolWhenOpen.Yes : BoolWhenOpen.No;
 				}
-				catch (OperationCanceledException)
+			}
+			catch (OperationCanceledException)
+			{
+				result = BoolWhenOpen.ObjectClosed;
+			}
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
 				{
-					result = BoolWhenOpen.ObjectClosed;
+					result = BoolWhenOpen.Error;
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
 				}
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-					{
-						result = BoolWhenOpen.Error;
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-					}
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 			return result;
 		}
 
 		protected async Task<BoolWhenOpen> RunFunctionIfOpenThreeStateAsyncT(Func<Task> funcAsync)
 		{
-			if (_isOpen)
+			if (!_isOpen) return BoolWhenOpen.ObjectClosed;
+
+			try
 			{
-				try
+				await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
+				if (_isOpen)
 				{
-					await _isOpenSemaphore.WaitAsync(CancToken); //.ConfigureAwait(false);
-					if (_isOpen)
-					{
-						await funcAsync().ConfigureAwait(false);
-						return BoolWhenOpen.Yes;
-					}
+					await funcAsync().ConfigureAwait(false);
+					return BoolWhenOpen.Yes;
 				}
-				catch (OperationCanceledException)
+			}
+			catch (OperationCanceledException)
+			{
+				return BoolWhenOpen.ObjectClosed;
+			}
+			catch (Exception ex)
+			{
+				if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
 				{
-					return BoolWhenOpen.ObjectClosed;
+					await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
+					return BoolWhenOpen.Error;
 				}
-				catch (Exception ex)
-				{
-					if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-					{
-						await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-						return BoolWhenOpen.Error;
-					}
-				}
-				finally
-				{
-					SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-				}
+			}
+			finally
+			{
+				SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
 			}
 
 			return BoolWhenOpen.ObjectClosed;
