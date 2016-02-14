@@ -93,7 +93,7 @@ namespace Utilz
 					delTasks.Add(Task.Run(() => item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask()));
 					//delTasks.Add(item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask());
 				}
-				if (delTasks.Count > 0) await Task.WhenAll(delTasks).ConfigureAwait(false);
+				if (delTasks.Any()) await Task.WhenAll(delTasks).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -114,7 +114,7 @@ namespace Utilz
 					delTasks.Add(Task.Run(() => item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask(cancToken), cancToken));
 					//delTasks.Add(item.DeleteAsync(StorageDeleteOption.PermanentDelete).AsTask());
 				}
-				if (delTasks.Count > 0) await Task.WhenAll(delTasks).ConfigureAwait(false);
+				if (delTasks.Any()) await Task.WhenAll(delTasks).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -143,7 +143,7 @@ namespace Utilz
 						//copyTasks.Add(file.CopyAsync(to, file.Name, NameCollisionOption.ReplaceExisting).AsTask());
 						// await Logger.AddAsync("File copied: " + file.Name, Logger.FileErrorLogFilename, Logger.Severity.Info).ConfigureAwait(false);
 					}
-					if (copyTasks.Count > 0) await Task.WhenAll(copyTasks).ConfigureAwait(false);
+					if (copyTasks.Any()) await Task.WhenAll(copyTasks).ConfigureAwait(false);
 
 					//var plr = Parallel.ForEach(filesDepth0, (file) =>
 					//{

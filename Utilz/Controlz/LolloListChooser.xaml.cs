@@ -220,7 +220,7 @@ namespace Utilz.Controlz
         {
             UpdatePopupSizeAndPlacement();
             MyPopup.IsOpen = true; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
-            //if (MyListView.SelectedIndex == -1 && MyListView.Items.Count > 0)
+            //if (MyListView.SelectedIndex == -1 && MyListView.Items.Any())
             //{
             //    MyListView.SelectedIndex = SelectedIndex;
             //}
