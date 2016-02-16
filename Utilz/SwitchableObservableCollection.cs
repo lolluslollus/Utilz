@@ -46,7 +46,7 @@ namespace Utilz
 			OnPropertyChanged(new PropertyChangedEventArgs("Count"));
 			OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
 			// this is tricky: call Reset first to make sure the controls will respond properly and not only add one item
-			// LOLLO TODO check this, I took it out so the list viewers don't lose the position.
+			// LOLLO NOTE I took out the following so the list viewers don't lose the position.
 			//OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add, changedItems: newItems, startingIndex: newStartingIndex));
 		}

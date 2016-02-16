@@ -23,7 +23,7 @@ namespace Utilz
 
 		protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
 		{
-			bool hta = CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess; // LOLLO TODO remove when done testing
+			// bool hta = CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess; // remove when done testing
 			if (_isObserving) CollectionChanged?.Invoke(this, args); // base.OnCollectionChanged(e); NO!
 		}
 	}
