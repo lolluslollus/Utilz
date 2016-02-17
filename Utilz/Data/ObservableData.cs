@@ -55,6 +55,26 @@ namespace Utilz.Data
 
 
 		#region UIThread
+		protected async Task RunInUiThreadIdleAsync(DispatchedHandler action)
+		{
+			try
+			{
+				if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+				{
+					action();
+				}
+				else
+				{
+					await CoreApplication.MainView.CoreWindow.Dispatcher.RunIdleAsync(a => action()).AsTask().ConfigureAwait(false);
+				}
+			}
+			catch (InvalidOperationException) // called from a background task: ignore
+			{ }
+			catch (Exception ex)
+			{
+				Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+			}
+		}
 		protected async Task RunInUiThreadAsync(DispatchedHandler action)
 		{
 			try

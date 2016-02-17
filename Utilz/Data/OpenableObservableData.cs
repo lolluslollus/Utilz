@@ -21,15 +21,6 @@ namespace Utilz.Data
 
 		private readonly object _ctsLocker = new object();
 		private SafeCancellationTokenSource _cts = null;
-		//[IgnoreDataMember]
-		//[Ignore]
-		//protected SafeCancellationTokenSource Cts
-		//{
-		//	get
-		//	{
-		//		lock (_ctsLocker) { return _cts; }
-		//	}
-		//}
 
 		private CancellationToken _cancToken;
 		[IgnoreDataMember]
