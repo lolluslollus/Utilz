@@ -6,7 +6,7 @@ using Windows.UI.Xaml;
 
 namespace Utilz.Controlz
 {
-	public abstract class BackOrientOpenObservControl : OpenableObservableControl, IOpenable
+	public abstract class BackOrientOpenObservControl : OpenableObservableControl
 	{
 		#region lifecycle
 		protected BackOrientOpenObservControl() : base()

@@ -37,12 +37,12 @@ namespace Utilz
 		//		return desiredFile;
 		//	}	
 
-		public static Task CopyDirContentsAsync(this StorageFolder from, StorageFolder toDirectory, CancellationToken cancToken, int maxDepth = 0)
+		public static Task CopyDirContentsAsync(this IStorageFolder from, IStorageFolder toDirectory, CancellationToken cancToken, int maxDepth = 0)
 		{
 			return new FileDirectoryExts().CopyDirContents2Async(from, toDirectory, cancToken, maxDepth);
 		}
 
-		public static async Task<ulong> GetFileSizeAsync(this StorageFile file)
+		public static async Task<ulong> GetFileSizeAsync(this IStorageFile file)
 		{
 			if (file == null) return 0;
 
@@ -80,7 +80,7 @@ namespace Utilz
 		/// </summary>
 		/// <param name="dir"></param>
 		/// <returns></returns>
-		public static async Task DeleteDirContentsAsync(this StorageFolder dir)
+		public static async Task DeleteDirContentsAsync(this IStorageFolder dir)
 		{
 			try
 			{
@@ -101,7 +101,7 @@ namespace Utilz
 			}
 		}
 
-		public static async Task DeleteDirContentsAsync(this StorageFolder dir, CancellationToken cancToken)
+		public static async Task DeleteDirContentsAsync(this IStorageFolder dir, CancellationToken cancToken)
 		{
 			try
 			{
