@@ -39,7 +39,7 @@ namespace Utilz.Controlz
 				newTb.MaxHeight = instance.MaxHeight;
 				newTb.MinHeight = instance.MinHeight;
 				newTb.Width = instance.Width;
-				newTb.MaxWidth = instance.Width;
+				newTb.MaxWidth = double.IsNaN(instance.Width) ? double.PositiveInfinity : instance.Width;
 				newTb.MinWidth = instance.MinWidth;
 
 				instance._origFontSize = newTb.FontSize;
