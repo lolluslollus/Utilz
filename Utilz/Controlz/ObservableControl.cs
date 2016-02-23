@@ -15,12 +15,13 @@ namespace Utilz.Controlz
 		{
 			PropertyChanged = null;
 		}
-		protected void RaisePropertyChanged([CallerMemberName] string propertyName = "")
+		private void RaisePropertyChanged([CallerMemberName] string propertyName = "")
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 		protected void RaisePropertyChanged_UI([CallerMemberName] string propertyName = "")
 		{
+			if (PropertyChanged == null) return;
 			try
 			{
 				Task raise = RunInUiThreadAsync(delegate { RaisePropertyChanged(propertyName); });

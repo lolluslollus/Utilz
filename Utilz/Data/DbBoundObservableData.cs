@@ -24,7 +24,7 @@ namespace Utilz.Data
 			get { return _id; }
 			set
 			{
-				string newValue = value ?? DEFAULT_ID; if (_id != newValue) { _id = newValue; RaisePropertyChanged_UI(); /*Task upd = UpdateDbAsync();*/ }
+				string newValue = value ?? DEFAULT_ID; if (_id != newValue) { _id = newValue; }
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace Utilz.Data
 			get { return _parentId; }
 			set
 			{
-				SetPropertyUpdatingDb(ref _parentId, value ?? DEFAULT_ID);
+				SetPropertyUpdatingDb(ref _parentId, value ?? DEFAULT_ID, false);
 				// if (_parentId != newValue) { _parentId = newValue; RaisePropertyChanged_UI(); /*Task upd = UpdateDbAsync();*/ }
 			}
 		}

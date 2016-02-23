@@ -30,6 +30,7 @@ namespace Utilz.Data
 		/// <param name="propertyName"></param>
 		protected void RaisePropertyChanged_UI([CallerMemberName] string propertyName = "")
 		{
+			if (PropertyChanged == null) return;
 			Task raise = RunInUiThreadAsync(delegate
 			{
 				RaisePropertyChanged(propertyName);
@@ -37,6 +38,7 @@ namespace Utilz.Data
 		}
 		protected void RaisePropertyChangedUrgent_UI([CallerMemberName] string propertyName = "")
 		{
+			if (PropertyChanged == null) return;
 			try
 			{
 				Task raise = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
