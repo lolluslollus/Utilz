@@ -75,8 +75,8 @@ namespace Utilz
 						await streamWriter.FlushAsync().ConfigureAwait(false);
 						memoryStream.Seek(0, SeekOrigin.Begin);
 						DataContractSerializer serializer = new DataContractSerializer(typeof(T));
-						var tileSource = (T)(serializer.ReadObject(memoryStream));
-						return tileSource;
+						var result = (T)(serializer.ReadObject(memoryStream));
+						return result;
 					}
 				}
 			}
