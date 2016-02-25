@@ -166,7 +166,7 @@ namespace Utilz
 			}
 			return result;
 		}
-
+		// LOLLO TODO check if these setters really need to set the MRU. It can screw things, particularly when the file is internal to the app!
 		public static void SetLastPickedFolder(StorageFolder directory)
 		{
 			try
