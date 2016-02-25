@@ -49,6 +49,7 @@ namespace Utilz
 			finally
 			{
 				SetLastPickedFolder(directory);
+				SetLastPickedFolderMRU(directory);
 			}
 			return directory;
 
@@ -86,6 +87,7 @@ namespace Utilz
 			finally
 			{
 				SetLastPickedOpenFile(file);
+				SetLastPickedOpenFileMRU(file);
 			}
 			return file;
 		}
@@ -119,6 +121,7 @@ namespace Utilz
 			finally
 			{
 				SetLastPickedSaveFile(file);
+				SetLastPickedSaveFileMRU(file);
 			}
 			return file;
 		}
@@ -167,6 +170,7 @@ namespace Utilz
 			return result;
 		}
 		// LOLLO TODO check if these setters really need to set the MRU. It can screw things, particularly when the file is internal to the app!
+		// in particular, see if this makes trouble with the hiking mate.
 		public static void SetLastPickedFolder(StorageFolder directory)
 		{
 			try
@@ -174,12 +178,10 @@ namespace Utilz
 				if (directory != null)
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
 				}
 				else
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_FOLDER_TOKEN);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_FOLDER_TOKEN);
 				}
 			}
 			catch { }
@@ -192,12 +194,10 @@ namespace Utilz
 				if (file != null)
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
 				}
 				else
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_OPEN_FILE_TOKEN);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_OPEN_FILE_TOKEN);
 				}
 			}
 			catch { }
@@ -209,12 +209,56 @@ namespace Utilz
 				if (file != null)
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
 				}
 				else
 				{
 					Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Remove(PICKED_SAVE_FILE_TOKEN);
-					//Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_SAVE_FILE_TOKEN);
+				}
+			}
+			catch { }
+		}
+		public static void SetLastPickedFolderMRU(StorageFolder directory)
+		{
+			try
+			{
+				if (directory != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_FOLDER_TOKEN, directory);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_FOLDER_TOKEN);
+				}
+			}
+			catch { }
+		}
+
+		public static void SetLastPickedOpenFileMRU(StorageFile file)
+		{
+			try
+			{
+				if (file != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_OPEN_FILE_TOKEN, file);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_OPEN_FILE_TOKEN);
+				}
+			}
+			catch { }
+		}
+		public static void SetLastPickedSaveFileMRU(StorageFile file)
+		{
+			try
+			{
+				if (file != null)
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.AddOrReplace(PICKED_SAVE_FILE_TOKEN, file);
+				}
+				else
+				{
+					Windows.Storage.AccessCache.StorageApplicationPermissions.MostRecentlyUsedList.Remove(PICKED_SAVE_FILE_TOKEN);
 				}
 			}
 			catch { }
