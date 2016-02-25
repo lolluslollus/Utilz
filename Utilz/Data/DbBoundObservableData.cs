@@ -42,7 +42,6 @@ namespace Utilz.Data
 		}
 		// LOLLO the following are various experiments with SetProperty
 		// 
-		// LOLLO TODO Atomicity bugs maybe? Also try inserting a big delay and see what happens. A semaphore may fix it.
 		// see http://www.blackwasp.co.uk/Volatile.aspx for good volatile stuff.
 		// and https://blogs.msdn.microsoft.com/ericlippert/2011/06/16/atomicity-volatility-and-immutability-are-different-part-three/
 		// and http://www.albahari.com/threading/part2.aspx
@@ -110,7 +109,7 @@ namespace Utilz.Data
 			});
 		}
 
-		// LOLLO TODO you can also try the following, or simply use return Volatile.Read in the property getters.
+		// You can also try the following, or simply use return Volatile.Read in the property getters.
 		// However, they seem slower than the volatile keyword on the private field by a factor of 3 to 5.
 		//protected T GetProperty<T>(ref T fldValue) where T : class
 		//{
