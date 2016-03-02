@@ -135,7 +135,7 @@ namespace Utilz.Controlz
 
 
 		#region open close
-		public async Task<bool> OpenAsync()
+		public async Task<bool> OpenAsync(object args = null)
 		{
 			if (!_isOpen)
 			{
@@ -152,7 +152,7 @@ namespace Utilz.Controlz
 							_cancToken = _cts.Token;
 						}
 
-						await OpenMayOverrideAsync().ConfigureAwait(false);
+						await OpenMayOverrideAsync(args).ConfigureAwait(false);
 
 						IsOpen = true;
 						IsEnabledAllowed = true;
@@ -176,7 +176,7 @@ namespace Utilz.Controlz
 			return false;
 		}
 
-		protected virtual Task OpenMayOverrideAsync()
+		protected virtual Task OpenMayOverrideAsync(object args = null)
 		{
 			return Task.CompletedTask; // avoid warning
 		}
