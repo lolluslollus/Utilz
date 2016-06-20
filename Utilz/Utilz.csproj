@@ -117,6 +117,8 @@
     <Compile Include="Controlz\OpenableObservablePage.cs" />
     <Compile Include="Controlz\TextBlockScaler.cs" />
     <Compile Include="Controlz\UniversalWrapPanel.cs" />
+    <Compile Include="Controlz\WrapPanel\OrientedSize.cs" />
+    <Compile Include="Controlz\WrapPanel\WrapPanel.cs" />
     <Compile Include="Data\DbBoundObservableData.cs" />
     <Compile Include="Data\ObservableData.cs" />
     <Compile Include="Data\OpenableObservableData.cs" />
