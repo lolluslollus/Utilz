@@ -934,8 +934,7 @@ namespace LolloChartMobile
 
 			if (targetArraySize < sourceArraySize)
 			{
-				double[,] shrunkDataPoints = new double[targetArraySize, 2];
-				GetShrunkDataPoints(sourceArraySize, targetArraySize, shrunkDataPoints);
+				var shrunkDataPoints = GetShrunkDataPoints(sourceArraySize, targetArraySize);
 				DrawInternal(shrunkDataPoints);
 			}
 			else
@@ -944,7 +943,8 @@ namespace LolloChartMobile
 			}
 		}
 
-		private void GetShrunkDataPoints(int sourceArraySize, int targetArraySize, double[,] shrunkDataPoints)
+		// LOLLO NOTE this method is broken. With certain window sizes, the altitude profiles are not drawn at all. We only keep it for reference while testing.
+		private void GetShrunkDataPointsBroken(int sourceArraySize, int targetArraySize, double[,] shrunkDataPoints)
 		{
 			double shrinkFactor = sourceArraySize > 0 ? Convert.ToDouble(targetArraySize) / Convert.ToDouble(sourceArraySize) : 1.0;
 
@@ -979,6 +979,49 @@ namespace LolloChartMobile
 				}
 				if (currentShrunkIndex % 2 == 0) lastCheckedShrunkIndex = currentShrunkIndex;
 			}
+		}
+		private double[,] GetShrunkDataPoints(int sourceArraySize, int targetArraySize)
+		{
+			if (sourceArraySize < 1) return DataPoints;
+			double[,] shrunkDataPoints = new double[targetArraySize, 2];
+			double shrinkFactor = Convert.ToDouble(targetArraySize) / Convert.ToDouble(sourceArraySize);
+
+			int lastCheckedShrunkIndex = -3;
+			double min0 = double.PositiveInfinity;
+			double min1 = double.PositiveInfinity;
+			double max0 = double.NegativeInfinity;
+			double max1 = double.NegativeInfinity;
+			for (int sourceIndex = 0; sourceIndex < sourceArraySize; sourceIndex++)
+			{
+				int shrunkIndex = Convert.ToInt32(Math.Floor(sourceIndex * shrinkFactor));
+				if (shrunkIndex == lastCheckedShrunkIndex || shrunkIndex == (lastCheckedShrunkIndex + 1))
+				{
+					min0 = Math.Min(min0, DataPoints[sourceIndex, 0]);
+					min1 = Math.Min(min1, DataPoints[sourceIndex, 1]);
+					max0 = Math.Max(max0, DataPoints[sourceIndex, 0]);
+					max1 = Math.Max(max1, DataPoints[sourceIndex, 1]);
+				}
+				else
+				{
+					min0 = DataPoints[sourceIndex, 0];
+					min1 = DataPoints[sourceIndex, 1];
+					max0 = DataPoints[sourceIndex, 0];
+					max1 = DataPoints[sourceIndex, 1];
+				}
+
+				int nextShrunkIndex = Convert.ToInt32(Math.Floor((sourceIndex + 1) * shrinkFactor));
+				if ((nextShrunkIndex != shrunkIndex && nextShrunkIndex == (lastCheckedShrunkIndex + 2)) || sourceIndex == sourceArraySize - 1) // last of the batch
+				{
+					shrunkDataPoints[shrunkIndex - 1, 0] = min0;
+					shrunkDataPoints[shrunkIndex - 1, 1] = min1;
+					shrunkDataPoints[shrunkIndex, 0] = max0;
+					shrunkDataPoints[shrunkIndex, 1] = max1;
+				}
+
+				if (shrunkIndex % 2 == 0) lastCheckedShrunkIndex = shrunkIndex;
+			}
+
+			return shrunkDataPoints;
 		}
 
 		protected void DrawCrossInternal()
