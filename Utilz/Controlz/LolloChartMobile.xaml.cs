@@ -934,7 +934,7 @@ namespace LolloChartMobile
 
 			if (targetArraySize < sourceArraySize)
 			{
-				var shrunkDataPoints = GetShrunkDataPoints(sourceArraySize, targetArraySize);
+				var shrunkDataPoints = GetShrunkDataPoints(targetArraySize);
 				DrawInternal(shrunkDataPoints);
 			}
 			else
@@ -980,11 +980,13 @@ namespace LolloChartMobile
 				if (currentShrunkIndex % 2 == 0) lastCheckedShrunkIndex = currentShrunkIndex;
 			}
 		}
-		private double[,] GetShrunkDataPoints(int sourceArraySize, int targetArraySize)
+		// LOLLO TODO test this, especially with empty or very short series
+		private double[,] GetShrunkDataPoints(int shrunkArraySize)
 		{
-			if (sourceArraySize < 1) return DataPoints;
-			double[,] shrunkDataPoints = new double[targetArraySize, 2];
-			double shrinkFactor = Convert.ToDouble(targetArraySize) / Convert.ToDouble(sourceArraySize);
+			int sourceArraySize = DataPoints.GetUpperBound(0) + 1;
+			if (sourceArraySize < 2) return DataPoints; // I need at least two points
+			double[,] shrunkDataPoints = new double[shrunkArraySize, 2];
+			double shrinkFactor = Convert.ToDouble(shrunkArraySize) / Convert.ToDouble(sourceArraySize);
 
 			int lastCheckedShrunkIndex = -3;
 			double min0 = double.PositiveInfinity;
@@ -1012,8 +1014,11 @@ namespace LolloChartMobile
 				int nextShrunkIndex = Convert.ToInt32(Math.Floor((sourceIndex + 1) * shrinkFactor));
 				if ((nextShrunkIndex != shrunkIndex && nextShrunkIndex == (lastCheckedShrunkIndex + 2)) || sourceIndex == sourceArraySize - 1) // last of the batch
 				{
-					shrunkDataPoints[shrunkIndex - 1, 0] = min0;
-					shrunkDataPoints[shrunkIndex - 1, 1] = min1;
+					if (shrunkIndex > 0)
+					{
+						shrunkDataPoints[shrunkIndex - 1, 0] = min0;
+						shrunkDataPoints[shrunkIndex - 1, 1] = min1;
+					}
 					shrunkDataPoints[shrunkIndex, 0] = max0;
 					shrunkDataPoints[shrunkIndex, 1] = max1;
 				}
