@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controlz\LayoutTransformer.cs" />
+    <Compile Include="Controlz\InteractiveChart.xaml.cs" />
     <Compile Include="Controlz\LolloChartMobile.xaml.cs" />
     <Compile Include="Controlz\LolloListChooser.xaml.cs" />
     <Compile Include="Controlz\ObservableControl.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Controlz\UniversalWrapPanel.cs" />
     <Compile Include="Controlz\WrapPanel\OrientedSize.cs" />
     <Compile Include="Controlz\WrapPanel\WrapPanel.cs" />
+    <Compile Include="Converters\Converters.cs" />
     <Compile Include="Data\DbBoundObservableData.cs" />
     <Compile Include="Data\ObservableData.cs" />
     <Compile Include="Data\OpenableObservableData.cs" />
@@ -158,6 +160,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controlz\LayoutTransformer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controlz\InteractiveChart.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
