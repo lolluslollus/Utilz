@@ -1028,7 +1028,7 @@ namespace InteractiveChart
 				{
 					try
 					{
-						if (DataPoints[i].Item2!=null) MyTBs[i].Text = DataPoints[i].Item2;
+						if (DataPoints[i].Item2 != null) MyTBs[i].Text = DataPoints[i].Item2;
 						else MyTBs[i].Text = DataPoints[i].Item1.ToString(DataPointsFormat, CultureInfo.CurrentUICulture);
 					}
 					catch (FormatException)
