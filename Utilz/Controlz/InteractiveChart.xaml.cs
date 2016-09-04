@@ -327,7 +327,7 @@ namespace InteractiveChart
 			GridChartArea.Opacity = .2;
 		}
 
-		private void OnGridChartArea_ManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
+		private void OnGridChartArea_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
 		{
 			Task respond = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
 			{
@@ -356,7 +356,7 @@ namespace InteractiveChart
 					{
 						e.Handled = true;
 						Debug.WriteLine("shift to lower X by " + translation.X);
-						PanBack();
+						PanBack(Math.Abs(translation.X) < ActualWidth);
 					}
 				}
 				else if (translation.X < 0.0)
@@ -365,7 +365,7 @@ namespace InteractiveChart
 					{
 						e.Handled = true;
 						Debug.WriteLine("shift to higher X by " + translation.X);
-						PanForward();
+						PanForward(Math.Abs(translation.X) < ActualWidth);
 					}
 				}
 			}).AsTask();
@@ -373,38 +373,38 @@ namespace InteractiveChart
 
 		private bool IsBackDoable() { return _currentBounds.I0 > _widestSensibleBounds.I0; }
 		private void OnPanBackClicked(object sender, RoutedEventArgs e) { PanBack(); }
-		private void PanBack()
+		private void PanBack(bool halfWayOnly = false)
 		{
 			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
 			if (!IsBackDoable()) return;
 
-			int howManyPoints = (_currentBounds.I1 - _currentBounds.I0 + 1);
-			if (howManyPoints <= 0) return;
+			int howManyPointsToDraw = _currentBounds.I1 - _currentBounds.I0 + 1;
+			int howManyPointsToPan = halfWayOnly ? howManyPointsToDraw / 2 : howManyPointsToDraw;
+			if (howManyPointsToPan <= 0) return;
 
 			var newBounds = new Bounds();
-			newBounds.I0 = Math.Max(_currentBounds.I0 - howManyPoints, _widestSensibleBounds.I0);
-			newBounds.I1 = Math.Min(newBounds.I0 + howManyPoints - 1, _widestSensibleBounds.I1);
-
-			if (newBounds.I0 > newBounds.I1 - 1) return;
+			newBounds.I0 = Math.Max(_currentBounds.I0 - howManyPointsToPan, _widestSensibleBounds.I0);
+			newBounds.I1 = Math.Min(newBounds.I0 + howManyPointsToDraw - 1, _widestSensibleBounds.I1);
+			if (newBounds.I0 >= newBounds.I1) return;
 
 			Task draw = ReInitPropsAndDraw(newBounds);
 		}
 
 		private bool IsPanForwardDoable() { return _currentBounds.I1 < _widestSensibleBounds.I1; }
 		private void OnPanForwardClicked(object sender, RoutedEventArgs e) { PanForward(); }
-		private void PanForward()
+		private void PanForward(bool halfWayOnly = false)
 		{
 			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
 			if (!IsPanForwardDoable()) return;
 
-			int howManyPoints = (_currentBounds.I1 - _currentBounds.I0 + 1);
-			if (howManyPoints <= 0) return;
+			int howManyPointsToDraw = _currentBounds.I1 - _currentBounds.I0 + 1;
+			int howManyPointsToPan = halfWayOnly ? howManyPointsToDraw / 2 : howManyPointsToDraw;
+			if (howManyPointsToPan <= 0) return;
 
 			var newBounds = new Bounds();
-			newBounds.I1 = Math.Min(_currentBounds.I1 + howManyPoints, _widestSensibleBounds.I1);
-			newBounds.I0 = Math.Max(newBounds.I1 - howManyPoints + 1, _widestSensibleBounds.I0);
-
-			if (newBounds.I0 > newBounds.I1 - 1) return;
+			newBounds.I1 = Math.Min(_currentBounds.I1 + howManyPointsToPan, _widestSensibleBounds.I1);
+			newBounds.I0 = Math.Max(newBounds.I1 - howManyPointsToDraw + 1, _widestSensibleBounds.I0);
+			if (newBounds.I0 >= newBounds.I1) return;
 
 			Task draw = ReInitPropsAndDraw(newBounds);
 		}
