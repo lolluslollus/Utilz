@@ -341,14 +341,14 @@ namespace InteractiveChart
 					e.Handled = true;
 					if (Math.Abs(scale) < 0.1) scale = 0.1;
 					Debug.WriteLine("zoom out by " + scale);
-					ZoomOut(1.0 / scale, e.Position.X);
+					ZoomOutAsync(1.0 / scale, e.Position.X);
 				}
 				else if (scale > 1.0)
 				{
 					e.Handled = true;
 					if (Math.Abs(scale) > 10.0) scale = 10.0;
 					Debug.WriteLine("zoom in by " + scale);
-					ZoomIn(scale, e.Position.X);
+					ZoomInAsync(scale, e.Position.X);
 				}
 				else if (translation.X > 0.0)
 				{
@@ -356,7 +356,7 @@ namespace InteractiveChart
 					{
 						e.Handled = true;
 						Debug.WriteLine("shift to lower X by " + translation.X);
-						PanBack(Math.Abs(translation.X) < ActualWidth);
+						PanBackAsync(Math.Abs(translation.X) < ActualWidth);
 					}
 				}
 				else if (translation.X < 0.0)
@@ -365,48 +365,48 @@ namespace InteractiveChart
 					{
 						e.Handled = true;
 						Debug.WriteLine("shift to higher X by " + translation.X);
-						PanForward(Math.Abs(translation.X) < ActualWidth);
+						PanForwardAsync(Math.Abs(translation.X) < ActualWidth);
 					}
 				}
 			}).AsTask();
 		}
 
 		private bool IsBackDoable() { return _currentBounds.I0 > _widestSensibleBounds.I0; }
-		private void OnPanBackClicked(object sender, RoutedEventArgs e) { PanBack(); }
-		private void PanBack(bool halfWayOnly = false)
+		private void OnPanBackClicked(object sender, RoutedEventArgs e) { PanBackAsync(); }
+		public Task PanBackAsync(bool halfWayOnly = false)
 		{
-			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
-			if (!IsBackDoable()) return;
+			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return Task.CompletedTask;
+			if (!IsBackDoable()) return Task.CompletedTask;
 
 			int howManyPointsToDraw = _currentBounds.I1 - _currentBounds.I0 + 1;
 			int howManyPointsToPan = halfWayOnly ? howManyPointsToDraw / 2 : howManyPointsToDraw;
-			if (howManyPointsToPan <= 0) return;
+			if (howManyPointsToPan <= 0) return Task.CompletedTask;
 
 			var newBounds = new Bounds();
 			newBounds.I0 = Math.Max(_currentBounds.I0 - howManyPointsToPan, _widestSensibleBounds.I0);
 			newBounds.I1 = Math.Min(newBounds.I0 + howManyPointsToDraw - 1, _widestSensibleBounds.I1);
-			if (newBounds.I0 >= newBounds.I1) return;
+			if (newBounds.I0 >= newBounds.I1) return Task.CompletedTask;
 
-			Task draw = ReInitPropsAndDraw(newBounds);
+			return ReInitPropsAndDraw(newBounds);
 		}
 
 		private bool IsPanForwardDoable() { return _currentBounds.I1 < _widestSensibleBounds.I1; }
-		private void OnPanForwardClicked(object sender, RoutedEventArgs e) { PanForward(); }
-		private void PanForward(bool halfWayOnly = false)
+		private void OnPanForwardClicked(object sender, RoutedEventArgs e) { PanForwardAsync(); }
+		public Task PanForwardAsync(bool halfWayOnly = false)
 		{
-			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
-			if (!IsPanForwardDoable()) return;
+			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return Task.CompletedTask;
+			if (!IsPanForwardDoable()) return Task.CompletedTask;
 
 			int howManyPointsToDraw = _currentBounds.I1 - _currentBounds.I0 + 1;
 			int howManyPointsToPan = halfWayOnly ? howManyPointsToDraw / 2 : howManyPointsToDraw;
-			if (howManyPointsToPan <= 0) return;
+			if (howManyPointsToPan <= 0) return Task.CompletedTask;
 
 			var newBounds = new Bounds();
 			newBounds.I1 = Math.Min(_currentBounds.I1 + howManyPointsToPan, _widestSensibleBounds.I1);
 			newBounds.I0 = Math.Max(newBounds.I1 - howManyPointsToDraw + 1, _widestSensibleBounds.I0);
-			if (newBounds.I0 >= newBounds.I1) return;
+			if (newBounds.I0 >= newBounds.I1) return Task.CompletedTask;
 
-			Task draw = ReInitPropsAndDraw(newBounds);
+			return ReInitPropsAndDraw(newBounds);
 		}
 
 		private bool IsZoomInDoable()
@@ -415,14 +415,14 @@ namespace InteractiveChart
 			int howManyPointsCanBeDrawn = Convert.ToInt32(GridChartArea.ActualWidth * 2); // LOLLO TODO check the * 2
 			return howManyPointsCanBeDrawn < howManyPointsMustBeDrawn;
 		}
-		private void OnZoomInClicked(object sender, RoutedEventArgs e) { ZoomIn(); }
-		private void ZoomIn(double factor = 2.0, double positionX = -1.0)
+		private void OnZoomInClicked(object sender, RoutedEventArgs e) { ZoomInAsync(); }
+		private Task ZoomInAsync(double factor = 2.0, double positionX = -1.0)
 		{
-			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
-			if (!IsZoomInDoable()) return;
+			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return Task.CompletedTask;
+			if (!IsZoomInDoable()) return Task.CompletedTask;
 
 			double howManyPoints = (_currentBounds.I1 - _currentBounds.I0 + 1) / factor;
-			if (howManyPoints < 2.0) return;
+			if (howManyPoints < 2.0) return Task.CompletedTask;
 
 			int currentCentrePoint = 0;
 			if (positionX >= 0.0) currentCentrePoint = _currentBounds.I0 + Convert.ToInt32(Convert.ToDouble(_currentBounds.I1 - _currentBounds.I0) * positionX / ActualWidth);
@@ -432,20 +432,20 @@ namespace InteractiveChart
 			newBounds.I1 = Math.Min(currentCentrePoint + Convert.ToInt32(howManyPoints / 2.0), _widestSensibleBounds.I1);
 			newBounds.I0 = Math.Max(currentCentrePoint - Convert.ToInt32(howManyPoints / 2.0), _widestSensibleBounds.I0);
 
-			if (newBounds.I0 > newBounds.I1 - 1) return;
+			if (newBounds.I0 > newBounds.I1 - 1) return Task.CompletedTask;
 
-			Task draw = ReInitPropsAndDraw(newBounds);
+			return ReInitPropsAndDraw(newBounds);
 		}
 
 		private bool IsZoomOutDoable() { return !(_currentBounds.I1 >= _widestSensibleBounds.I1 && _currentBounds.I0 <= _widestSensibleBounds.I0); }
-		private void OnZoomOutClicked(object sender, RoutedEventArgs e) { ZoomOut(); }
-		private void ZoomOut(double factor = 2.0, double positionX = -1.0)
+		private void OnZoomOutClicked(object sender, RoutedEventArgs e) { ZoomOutAsync(); }
+		private Task ZoomOutAsync(double factor = 2.0, double positionX = -1.0)
 		{
-			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return;
-			if (!IsZoomOutDoable()) return;
+			if (GridChartArea.ActualWidth <= 0.0001 || ActualWidth <= 0.0 || _currentBounds == null || _widestSensibleBounds == null) return Task.CompletedTask;
+			if (!IsZoomOutDoable()) return Task.CompletedTask;
 
 			double howManyPoints = (_currentBounds.I1 - _currentBounds.I0 + 1) * factor;
-			if (howManyPoints < 2.0) return;
+			if (howManyPoints < 2.0) return Task.CompletedTask;
 
 			int currentCentrePoint = 0;
 			if (positionX >= 0.0) currentCentrePoint = _currentBounds.I0 + Convert.ToInt32(Convert.ToDouble(_currentBounds.I1 - _currentBounds.I0) * positionX / ActualWidth);
@@ -455,9 +455,9 @@ namespace InteractiveChart
 			newBounds.I1 = Math.Min(currentCentrePoint + Convert.ToInt32(howManyPoints / 2.0), _widestSensibleBounds.I1);
 			newBounds.I0 = Math.Max(currentCentrePoint - Convert.ToInt32(howManyPoints / 2.0), _widestSensibleBounds.I0);
 
-			if (newBounds.I0 > newBounds.I1 - 1) return;
+			if (newBounds.I0 > newBounds.I1 - 1) return Task.CompletedTask;
 
-			Task draw = ReInitPropsAndDraw(newBounds);
+			return ReInitPropsAndDraw(newBounds);
 		}
 		#endregion event handlers
 
@@ -680,24 +680,33 @@ namespace InteractiveChart
 			return result;
 		}
 
-		public void CrossPoint(XYDataSeries whichDataSeries, int pointX, double pointY)
+		public enum WhichBoundCrossed { None, Left, Right }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="whichDataSeries"></param>
+		/// <param name="pointX"></param>
+		/// <param name="pointY"></param>
+		/// <returns>WhichBoundCrossed (tells if a boundary was crossed)</returns>
+		public WhichBoundCrossed CrossPoint(XYDataSeries whichDataSeries, int pointX, double pointY)
 		{
 			if (whichDataSeries == XY1DataSeries)
 			{
-				_XY1DataSeries_Internal.DrawCross(pointX, pointY);
+				return _XY1DataSeries_Internal.DrawCross(pointX, pointY);
 			}
 			else if (whichDataSeries == XY2DataSeries)
 			{
-				_XY2DataSeries_Internal.DrawCross(pointX, pointY);
+				return _XY2DataSeries_Internal.DrawCross(pointX, pointY);
 			}
 			else if (whichDataSeries == XY3DataSeries)
 			{
-				_XY3DataSeries_Internal.DrawCross(pointX, pointY);
+				return _XY3DataSeries_Internal.DrawCross(pointX, pointY);
 			}
 			else if (whichDataSeries == XY4DataSeries)
 			{
-				_XY4DataSeries_Internal.DrawCross(pointX, pointY);
+				return _XY4DataSeries_Internal.DrawCross(pointX, pointY);
 			}
+			return WhichBoundCrossed.None;
 		}
 
 		public void UncrossPoint(XYDataSeries whichDataSeries)
@@ -1273,9 +1282,10 @@ namespace InteractiveChart
 			}
 		}
 
-		internal void DrawCross(int pointX, double pointY)
+		internal LolloChart.WhichBoundCrossed DrawCross(int pointX, double pointY)
 		{
 			//if (whichPoint >= 0 && whichPoint < MyPolyline.Points.Count) // no more valid, I may have shrunk the points
+			var whichBoundCrossed = LolloChart.WhichBoundCrossed.None;
 			if (pointX >= 0 && pointX <= DataPoints.GetUpperBound(0))
 			{
 				CrossPointX = pointX;
@@ -1283,10 +1293,14 @@ namespace InteractiveChart
 			}
 			else
 			{
+				if (pointX >= 0) whichBoundCrossed = LolloChart.WhichBoundCrossed.Right;
+				else whichBoundCrossed = LolloChart.WhichBoundCrossed.Left;
 				CrossPointX = -1;
 				CrossPointY = default(double);
 			}
 			DrawCrossInternal();
+			if (whichBoundCrossed != LolloChart.WhichBoundCrossed.None) Debug.WriteLine("---------- whichBoundCrossed = " + whichBoundCrossed);
+			return whichBoundCrossed;
 		}
 
 		internal void RemoveCross()
