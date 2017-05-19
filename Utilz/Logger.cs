@@ -23,7 +23,7 @@ namespace Utilz
 
 		static Logger()
 		{
-			_logsFolder = ApplicationData.Current.LocalFolder.CreateFolderAsync(LogFolderName, CreationCollisionOption.OpenIfExists).AsTask().Result;
+			_logsFolder = ApplicationData.Current.LocalCacheFolder.CreateFolderAsync(LogFolderName, CreationCollisionOption.OpenIfExists).AsTask().Result;
 		}
 
 		private static volatile StorageFolder _logsFolder = null;
@@ -205,7 +205,7 @@ namespace Utilz
 				{
 					await _semaphore.WaitAsync().ConfigureAwait(false);
 					//await _logsFolder.DeleteAsync().AsTask().ConfigureAwait(false);
-					_logsFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(LogFolderName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false);
+					_logsFolder = await ApplicationData.Current.LocalCacheFolder.CreateFolderAsync(LogFolderName, CreationCollisionOption.ReplaceExisting).AsTask().ConfigureAwait(false);
 				}
 				catch (Exception exc)
 				{

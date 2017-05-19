@@ -62,11 +62,11 @@ namespace Utilz
 			}
 			return output;
 		}
-		public static async Task<string> GetAllFilesInLocalFolderAsync()
+		public static async Task<string> GetAllFilesInLocalCacheFolderAsync()
 		{
 			string output = string.Empty;
 			// Debug.WriteLine("start reading local folder contents");
-			var filez = await GetFilesInFolderAsync(ApplicationData.Current.LocalFolder).ConfigureAwait(false);
+			var filez = await GetFilesInFolderAsync(ApplicationData.Current.LocalCacheFolder).ConfigureAwait(false);
 			//return filez.Aggregate(output, (current, item) => current + (item.Path + item.Name + Environment.NewLine));
 			foreach (var item in filez)
 			{

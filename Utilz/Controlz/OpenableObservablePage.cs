@@ -105,12 +105,16 @@ namespace Utilz.Controlz
 		private async void OnSuspending(object sender, SuspendingEventArgs e)
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
-
-			_isOpenWhenSuspending = _isOnMe;
-			if (_isOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
-			await CloseAsync().ConfigureAwait(false);
-
-			deferral.Complete();
+			try
+			{
+				_isOpenWhenSuspending = _isOnMe;
+				if (_isOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
+				await CloseAsync().ConfigureAwait(false);
+			}
+			finally
+			{
+				deferral.Complete();
+			}
 		}
 
 		private async void OnResuming(object sender, object e)

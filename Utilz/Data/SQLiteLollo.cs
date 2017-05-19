@@ -1745,7 +1745,7 @@ namespace SQLite
 		public bool StoreDateTimeAsTicks { get; private set; }
 
 #if NETFX_CORE
-		static readonly string MetroStyleDataPath = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+		static readonly string MetroStyleDataPath = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
 #endif
 
 		public SQLiteConnectionString(string databasePath, bool storeDateTimeAsTicks)
