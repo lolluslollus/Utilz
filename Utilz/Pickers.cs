@@ -15,7 +15,7 @@ namespace Utilz
 		private const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";
 		private const string PICKED_OPEN_FILE_TOKEN = "PickedOpenFileToken";
 
-		public static async Task<StorageFolder> PickDirectoryAsync(string[] extensions)
+		public static async Task<StorageFolder> PickDirectoryAsync(string[] extensions, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
 		{
 			//bool unsnapped = ((ApplicationView.Value != ApplicationViewState.Snapped) || ApplicationView.TryUnsnap());
 			//if (unsnapped)
@@ -30,7 +30,7 @@ namespace Utilz
 					var openPicker = new FolderPicker
 					{
 						ViewMode = PickerViewMode.List,
-						SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+						SuggestedStartLocation = startLocation
 					};
 
 					foreach (var ext in extensions)
@@ -57,7 +57,7 @@ namespace Utilz
 			//return false;
 		}
 
-		public static async Task<StorageFile> PickOpenFileAsync(string[] extensions)
+		public static async Task<StorageFile> PickOpenFileAsync(string[] extensions, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
 		{
 			StorageFile file = null;
 			try
@@ -68,7 +68,7 @@ namespace Utilz
 					var openPicker = new FileOpenPicker
 					{
 						ViewMode = PickerViewMode.List,
-						SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+						SuggestedStartLocation = startLocation
 					};
 
 					foreach (var ext in extensions)
@@ -92,7 +92,7 @@ namespace Utilz
 			return file;
 		}
 
-		public static async Task<StorageFile> PickSaveFileAsync(string[] extensions, string suggestedFileName = "")
+		public static async Task<StorageFile> PickSaveFileAsync(string[] extensions, string suggestedFileName = "", PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
 		{
 			StorageFile file = null;
 			try
@@ -100,7 +100,7 @@ namespace Utilz
 				Task<StorageFile> fileTask = null;
 				await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, delegate
 				{
-					var picker = new FileSavePicker { SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
+					var picker = new FileSavePicker { SuggestedStartLocation = startLocation };
 					if (!string.IsNullOrWhiteSpace(suggestedFileName)) picker.SuggestedFileName = suggestedFileName;
 
 					foreach (var ext in extensions)
