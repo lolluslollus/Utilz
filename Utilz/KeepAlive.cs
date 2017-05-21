@@ -9,6 +9,7 @@ namespace Utilz
 		private const int MAX_COUNT = 10000; // 2147483647L;
 		private static int _displayRequestRefCount = 0;
 		private static readonly object _countLocker = new object();
+		private static bool _lastValue = false;
 
 		/// <summary>
 		/// Always call this from the UI thread
@@ -21,8 +22,12 @@ namespace Utilz
 			{
 				lock (_countLocker)
 				{
-					if (isMustKeepAlive) SetTrue();
-					else SetFalse();
+					if (isMustKeepAlive != _lastValue)
+					{
+						_lastValue = isMustKeepAlive;
+						if (isMustKeepAlive) SetTrue();
+						else SetFalse();
+					}
 				}
 			}
 			catch (Exception ex)
@@ -62,6 +67,7 @@ namespace Utilz
 				lock (_countLocker)
 				{
 					while (_displayRequestRefCount > 0) SetFalse();
+					_lastValue = false;
 				}
 			}
 			catch (Exception ex)
