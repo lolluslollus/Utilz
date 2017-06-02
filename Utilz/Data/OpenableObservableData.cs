@@ -90,7 +90,7 @@ namespace Utilz.Data
 			return Task.CompletedTask;
 		}
 
-		public async Task<bool> CloseAsync()
+		public async Task<bool> CloseAsync(object args = null)
 		{
 			if (!_isOpen) return false;
 
@@ -112,7 +112,7 @@ namespace Utilz.Data
 					}
 
 					IsOpen = false;
-					await CloseMayOverrideAsync().ConfigureAwait(false);
+					await CloseMayOverrideAsync(args).ConfigureAwait(false);
 
 					return true;
 				}
@@ -130,7 +130,7 @@ namespace Utilz.Data
 			return false;
 		}
 
-		protected virtual Task CloseMayOverrideAsync()
+		protected virtual Task CloseMayOverrideAsync(object args = null)
 		{
 			return Task.CompletedTask;
 		}
@@ -349,12 +349,5 @@ namespace Utilz.Data
 			return BoolWhenOpen.ObjectClosed;
 		}
 		#endregion while open
-	}
-
-	public interface IOpenable
-	{
-		Task<bool> OpenAsync(object args = null);
-		Task<bool> CloseAsync();
-		bool IsOpen { get; }
 	}
 }

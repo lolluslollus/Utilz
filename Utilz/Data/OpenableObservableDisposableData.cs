@@ -25,7 +25,7 @@ namespace Utilz.Data
 		protected virtual void Dispose(bool isDisposing)
 		{
 			_isDisposed = true;
-			CloseAsync().Wait();
+			CloseAsync(LifecycleEvents.Disposing).Wait();
 			ClearListeners();
 		}
 		#endregion IDisposable

@@ -26,6 +26,7 @@ namespace Utilz
 
 		public static bool TrySetValue(string regKey, string value)
 		{
+            if (string.IsNullOrWhiteSpace(regKey)) return false;
 			try
 			{
 				// Debug.WriteLine("writing value " + value + " into reg key " + regKey);

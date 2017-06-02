@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IOpenable.cs" />
     <Compile Include="Controlz\LayoutTransformer.cs" />
     <Compile Include="Controlz\InteractiveChart.xaml.cs" />
     <Compile Include="Controlz\LolloChartMobile.xaml.cs" />

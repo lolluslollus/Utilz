@@ -126,7 +126,7 @@ namespace Utilz.Controlz
 			return Task.CompletedTask;
 		}
 
-		public async Task<bool> CloseAsync()
+		public async Task<bool> CloseAsync(object args = null)
 		{
 			if (!_isOpen) return false;
 
@@ -150,7 +150,7 @@ namespace Utilz.Controlz
 					IsEnabledAllowed = false;
 					IsOpen = false;
 
-					await CloseMayOverrideAsync().ConfigureAwait(false);
+					await CloseMayOverrideAsync(args).ConfigureAwait(false);
 					return true;
 				}
 			}
@@ -167,7 +167,7 @@ namespace Utilz.Controlz
 			return false;
 		}
 
-		protected virtual Task CloseMayOverrideAsync()
+		protected virtual Task CloseMayOverrideAsync(object args = null)
 		{
 			return Task.CompletedTask;
 		}

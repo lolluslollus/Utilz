@@ -30,7 +30,6 @@ namespace Utilz.Controlz
         public static readonly DependencyProperty LastNavigatedPageRegKeyProperty =
             DependencyProperty.Register("LastNavigatedPageRegKey", typeof(string), typeof(OpenableObservablePage), new PropertyMetadata(""));
 
-        private bool _isOpenWhenSuspending = false;
         private bool _isOnMe = false;
 
         protected volatile SemaphoreSlimSafeRelease _isOpenSemaphore = null;
@@ -105,15 +104,14 @@ namespace Utilz.Controlz
         #endregion ctor
 
 
-        #region event handlers
+        #region event handlers        
         private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             try
             {
-                _isOpenWhenSuspending = _isOnMe;
                 if (_isOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
-                await CloseAsync().ConfigureAwait(false);
+                await CloseAsync(LifecycleEvents.Suspending).ConfigureAwait(false);
             }
             finally
             {
@@ -121,23 +119,24 @@ namespace Utilz.Controlz
             }
         }
 
-        private async void OnResuming(object sender, object e)
+        private void OnResuming(object sender, object e)
         {
-            if (_isOpenWhenSuspending) await OpenAsync().ConfigureAwait(false);
+            if (!_isOnMe) return;
+            Task open = OpenAsync(LifecycleEvents.Resuming);
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             _isOnMe = true;
-            await OpenAsync().ConfigureAwait(false);
+            Task open = OpenAsync(LifecycleEvents.NavigatedTo);
         }
 
-        protected override async void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             base.OnNavigatingFrom(e);
             _isOnMe = false;
-            await CloseAsync().ConfigureAwait(false);
+            Task close = CloseAsync(LifecycleEvents.NavigatingFrom);
         }
         #endregion event handlers
 
@@ -188,7 +187,7 @@ namespace Utilz.Controlz
             return Task.CompletedTask; // avoid warning
         }
 
-        public async Task<bool> CloseAsync()
+        public async Task<bool> CloseAsync(object args = null)
         {
             if (!_isOpen) return await RunFunctionIfOpenAsyncA(delegate { IsEnabledAllowed = false; }).ConfigureAwait(false);
 
@@ -214,7 +213,7 @@ namespace Utilz.Controlz
                     IsEnabledAllowed = false;
                     IsOpen = false;
 
-                    await CloseMayOverrideAsync().ConfigureAwait(false);
+                    await CloseMayOverrideAsync(args).ConfigureAwait(false);
                     return true;
                 }
             }
@@ -231,7 +230,7 @@ namespace Utilz.Controlz
             return false;
         }
 
-        protected virtual Task CloseMayOverrideAsync()
+        protected virtual Task CloseMayOverrideAsync(object args = null)
         {
             return Task.CompletedTask;
         }
@@ -391,11 +390,11 @@ namespace Utilz.Controlz
             });
         }
 
-        private void OnHardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        protected virtual void OnHardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
             if (!e.Handled) e.Handled = GoBackMayOverride();
         }
-        private void OnTabletSoftwareButton_BackPressed(object sender, BackRequestedEventArgs e)
+        protected virtual void OnTabletSoftwareButton_BackPressed(object sender, BackRequestedEventArgs e)
         {
             if (!e.Handled) e.Handled = GoBackMayOverride();
         }
