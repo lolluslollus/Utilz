@@ -1081,6 +1081,7 @@ namespace InteractiveChart
 			if (Dashed.Count == 0) { Dashed.Add(2); Dashed.Add(2); }
 
 			MyPolyline.Style = lineStyle;
+            MyPolyline.StrokeMiterLimit = 0.0;
 			MyPolyline.StrokeThickness = LolloChart.DataSeriesThickness;
 			switch (sda)
 			{
@@ -1113,7 +1114,7 @@ namespace InteractiveChart
 #endif
 			double[,] drawPoints = GetDrawPoints(dataPointsToBeDrawn);
 #if DEBUG
-			sw0.Stop();
+            sw0.Stop();
 			Debug.WriteLine("XYDataSeries_Internal took " + sw0.ElapsedMilliseconds + " msec to calc the polyline data");
 			sw0.Restart();
 #endif
@@ -1177,7 +1178,7 @@ namespace InteractiveChart
 			{
 				drawPoints = Scaler.ScaleLogarithmic(Y0, YN, 0, Container.ActualHeight, drawPoints, 1);
 			}
-			for (int i = 0; i <= drawPoints.GetUpperBound(0); i++) //the Panel coordinates start from the top left, while the Y axis starts from the bottom left
+            for (int i = 0; i <= drawPoints.GetUpperBound(0); i++) //the Panel coordinates start from the top left, while the Y axis starts from the bottom left
 			{
 				drawPoints[i, 1] = Container.ActualHeight - drawPoints[i, 1];
 			}
@@ -1193,7 +1194,7 @@ namespace InteractiveChart
 			if (targetArraySize < sourceArraySize)
 			{
 				var shrunkDataPoints = GetShrunkDataPoints(sourceArraySize, targetArraySize);
-				DrawInternal(shrunkDataPoints);
+                DrawInternal(shrunkDataPoints);
 			}
 			else
 			{
