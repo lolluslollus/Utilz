@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Utilz
 {
-    public enum LifecycleEvents { Disposing, NavigatedTo, NavigatingFrom, Resuming, Suspending }
+    public enum NavigationParameters { Launched, FileActivated }
+    public enum LifecycleEvents { Disposing, NavigatedToAfterFileActivated, NavigatedToAfterLaunch, NavigatingFrom, Resuming, Suspending }
 
     public interface IOpenable
     {

@@ -129,7 +129,8 @@ namespace Utilz.Controlz
         {
             base.OnNavigatedTo(e);
             _isOnMe = true;
-            Task open = OpenAsync(LifecycleEvents.NavigatedTo);
+            bool isAfterFileActivated = e.Parameter != null && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
+            Task open = isAfterFileActivated ? OpenAsync(LifecycleEvents.NavigatedToAfterFileActivated) : OpenAsync(LifecycleEvents.NavigatedToAfterLaunch);
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
