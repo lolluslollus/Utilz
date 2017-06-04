@@ -14,7 +14,11 @@ namespace Utilz.Data
 	{
 		#region INotifyPropertyChanged
 		public event PropertyChangedEventHandler PropertyChanged;
-		protected void ClearListeners()
+        protected bool IsAnyoneListening()
+        {
+            return PropertyChanged != null;
+        }
+        protected void ClearListeners()
 		{
 			PropertyChanged = null;
 		}

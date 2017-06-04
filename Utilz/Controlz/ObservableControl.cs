@@ -11,6 +11,10 @@ namespace Utilz.Controlz
 	{
 		#region INotifyPropertyChanged
 		public event PropertyChangedEventHandler PropertyChanged;
+        protected bool IsAnyoneListening()
+        {
+            return PropertyChanged != null;
+        }
 		protected void ClearListeners() // we can use this inside a Dispose
 		{
 			PropertyChanged = null;
