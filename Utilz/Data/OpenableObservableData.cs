@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Utilz.Data
 {
     [DataContract]
-    public abstract class OpenableObservableData : ObservableData
+    public abstract class OpenableObservableData : ObservableData, IOpenable
     {
         #region properties
         private readonly object _isOpenSemaphoreLocker = new object();
