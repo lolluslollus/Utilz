@@ -135,8 +135,8 @@ namespace Utilz.Controlz
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            base.OnNavigatedTo(e);
             IsOnMe = true;
+            base.OnNavigatedTo(e);
             bool isAfterFileActivated = e.Parameter != null && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
             Task open = isAfterFileActivated ? OpenAsync(LifecycleEvents.NavigatedToAfterFileActivated) : OpenAsync(LifecycleEvents.NavigatedToAfterLaunch);
         }
