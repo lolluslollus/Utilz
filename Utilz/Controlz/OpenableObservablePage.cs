@@ -18,6 +18,8 @@ namespace Utilz.Controlz
     /// </summary>
     public abstract class OpenableObservablePage : ObservablePage, IOpenable
     {
+        public enum NavigationParameters { Launched, FileActivated }
+
         #region properties
         /// <summary>
         /// A registry key to store data when the page is suspended
@@ -95,10 +97,14 @@ namespace Utilz.Controlz
         #region ctor
         protected OpenableObservablePage() : base()
         {
-            Application.Current.Resuming -= OnResuming;
-            Application.Current.Suspending -= OnSuspending;
-            Application.Current.Resuming += OnResuming;
-            Application.Current.Suspending += OnSuspending;
+            var app = Application.Current as ISuspenderResumer;
+            if (app != null)
+            {
+                app.ResumeStarted -= OnResuming;
+                app.ResumeStarted += OnResuming;
+                app.SuspendStarted -= OnSuspending;
+                app.SuspendStarted += OnSuspending;
+            }
             Task upd = UpdateIsEnabledAsync();
         }
         #endregion ctor
@@ -119,10 +125,10 @@ namespace Utilz.Controlz
             }
         }
 
-        private void OnResuming(object sender, object e)
+        private async void OnResuming(object sender, object e)
         {
             if (!_isOnMe) return;
-            Task open = OpenAsync(LifecycleEvents.Resuming);
+            await OpenAsync(LifecycleEvents.Resuming).ConfigureAwait(false);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
