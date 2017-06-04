@@ -32,7 +32,9 @@ namespace Utilz.Controlz
         public static readonly DependencyProperty LastNavigatedPageRegKeyProperty =
             DependencyProperty.Register("LastNavigatedPageRegKey", typeof(string), typeof(OpenableObservablePage), new PropertyMetadata(""));
 
+        private static readonly object _isOnMeLocker = new object();
         private bool _isOnMe = false;
+        protected bool IsOnMe { get { lock (_isOnMeLocker) { return _isOnMe; } } private set { lock (_isOnMeLocker) { _isOnMe = value; } } }
 
         protected volatile SemaphoreSlimSafeRelease _isOpenSemaphore = null;
 
@@ -116,7 +118,7 @@ namespace Utilz.Controlz
             var deferral = e.SuspendingOperation.GetDeferral();
             try
             {
-                if (_isOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
+                if (IsOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
                 await CloseAsync(LifecycleEvents.Suspending).ConfigureAwait(false);
             }
             finally
@@ -127,22 +129,22 @@ namespace Utilz.Controlz
 
         private async void OnResuming(object sender, object e)
         {
-            if (!_isOnMe) return;
+            if (!IsOnMe) return;
             await OpenAsync(LifecycleEvents.Resuming).ConfigureAwait(false);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            _isOnMe = true;
+            IsOnMe = true;
             bool isAfterFileActivated = e.Parameter != null && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
             Task open = isAfterFileActivated ? OpenAsync(LifecycleEvents.NavigatedToAfterFileActivated) : OpenAsync(LifecycleEvents.NavigatedToAfterLaunch);
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
+            IsOnMe = false;
             base.OnNavigatingFrom(e);
-            _isOnMe = false;
             Task close = CloseAsync(LifecycleEvents.NavigatingFrom);
         }
         #endregion event handlers
