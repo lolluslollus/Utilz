@@ -32,10 +32,11 @@ namespace Utilz.Controlz
         public static readonly DependencyProperty LastNavigatedPageRegKeyProperty =
             DependencyProperty.Register("LastNavigatedPageRegKey", typeof(string), typeof(OpenableObservablePage), new PropertyMetadata(""));
 
-        private static readonly object _isOnMeLocker = new object();
+        private readonly object _isOnMeLocker = new object();
         private bool _isOnMe = false;
         protected bool IsOnMe { get { lock (_isOnMeLocker) { return _isOnMe; } } private set { lock (_isOnMeLocker) { _isOnMe = value; } } }
 
+        private readonly object _isOpenSemaphoreLocker = new object();
         protected volatile SemaphoreSlimSafeRelease _isOpenSemaphore = null;
 
         protected volatile bool _isOpen = false;
@@ -155,7 +156,10 @@ namespace Utilz.Controlz
         {
             if (_isOpen) return await RunFunctionIfOpenAsyncA(delegate { IsEnabledAllowed = true; }).ConfigureAwait(false);
 
-            if (!SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore)) _isOpenSemaphore = new SemaphoreSlimSafeRelease(1, 1);
+            lock (_isOpenSemaphoreLocker)
+            {
+                if (!SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore)) _isOpenSemaphore = new SemaphoreSlimSafeRelease(1, 1);
+            }
             try
             {
                 await _isOpenSemaphore.WaitAsync().ConfigureAwait(false);
@@ -233,8 +237,11 @@ namespace Utilz.Controlz
             }
             finally
             {
-                SemaphoreSlimSafeRelease.TryDispose(_isOpenSemaphore);
-                _isOpenSemaphore = null;
+                lock (_isOpenSemaphoreLocker)
+                {
+                    SemaphoreSlimSafeRelease.TryDispose(_isOpenSemaphore);
+                    _isOpenSemaphore = null;
+                }
             }
             return false;
         }
@@ -245,33 +252,7 @@ namespace Utilz.Controlz
         }
         #endregion open close
 
-
         #region while open
-        //private async Task<bool> SetIsEnabledAsync(bool enable)
-        //{
-        //    if (!_isOpen || IsEnabled == enable) return false;
-
-        //    try
-        //    {
-        //        await _isOpenSemaphore.WaitAsync(); //.ConfigureAwait(false);
-        //        if (_isOpen && IsEnabled != enable)
-        //        {
-        //            IsEnabledAllowed = enable;
-        //            return true;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (SemaphoreSlimSafeRelease.IsAlive(_isOpenSemaphore))
-        //            await Logger.AddAsync(GetType().Name + ex.ToString(), Logger.ForegroundLogFilename);
-        //    }
-        //    finally
-        //    {
-        //        SemaphoreSlimSafeRelease.TryRelease(_isOpenSemaphore);
-        //    }
-        //    return false;
-        //}
-
         protected async Task<bool> RunFunctionIfOpenAsyncA(Action func)
         {
             if (!_isOpen) return false;
@@ -365,7 +346,6 @@ namespace Utilz.Controlz
             return false;
         }
         #endregion while open
-
 
         #region back
         private volatile bool _isBackHandlersRegistered = false;

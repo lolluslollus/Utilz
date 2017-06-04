@@ -129,7 +129,6 @@
     <Compile Include="Data\SQLiteLollo.cs" />
     <Compile Include="DispatcherTimerPlus.cs" />
     <Compile Include="FileDirectoryExts.cs" />
-    <Compile Include="GetLocBackgroundTaskSemaphoreManager.cs" />
     <Compile Include="KeepAlive.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LolloMath.cs" />
