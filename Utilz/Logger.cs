@@ -65,7 +65,7 @@ namespace Utilz
 		{
 			if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
 
-			StorageFile file = await _logsFolder.GetFileAsync(fileName).AsTask().ConfigureAwait(false);
+			StorageFile file = await _logsFolder.TryGetItemAsync(fileName).AsTask().ConfigureAwait(false) as StorageFile;
 			if (file == null) return string.Empty;
 
 			string result = string.Empty;
