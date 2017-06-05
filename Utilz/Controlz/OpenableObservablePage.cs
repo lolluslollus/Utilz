@@ -119,7 +119,7 @@ namespace Utilz.Controlz
             var deferral = e.SuspendingOperation.GetDeferral();
             try
             {
-                if (IsOnMe) await RunInUiThreadAsync(delegate { RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name); }).ConfigureAwait(false);
+                if (IsOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
                 await CloseAsync(LifecycleEvents.Suspending).ConfigureAwait(false);
             }
             finally
