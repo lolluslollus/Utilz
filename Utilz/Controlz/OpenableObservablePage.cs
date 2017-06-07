@@ -179,7 +179,7 @@ namespace Utilz.Controlz
 
                     await RegisterBackEventHandlersAsync().ConfigureAwait(false);
 
-                    Logger.Add_TPL($"OpenableObservablePage.OpenAsync: {GetType().Name} is now open", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
+                    //Logger.Add_TPL($"OpenableObservablePage.OpenAsync: {GetType().Name} is now open", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
                     return true;
                 }
             }

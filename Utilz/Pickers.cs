@@ -147,8 +147,6 @@ namespace Utilz
             try
             {
                 result = await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(PICKED_OPEN_FILE_TOKEN).AsTask().ConfigureAwait(false);
-                //if (result != null) Logger.Add_TPL("Pickers got file " + result.Name + " from FAL", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
-                //else Logger.Add_TPL("Pickers got no file from FAL", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
             }
             catch
             {
@@ -171,7 +169,6 @@ namespace Utilz
             return result;
         }
         // LOLLO TODO check if these setters really need to set the MRU. It can screw things, particularly when the file is internal to the app!
-        // in particular, see if this makes trouble with the hiking mate.
         public static void SetLastPickedFolder(StorageFolder directory)
         {
             try
