@@ -74,13 +74,30 @@ namespace Utilz
 			}
 			return output;
 		}
+        public static async Task<string> GetAllFilesInLocalCacheFolderAsync(string subDirectoryName)
+        {
+            if (string.IsNullOrWhiteSpace(subDirectoryName)) return string.Empty;
 
-		/// <summary>
-		/// no canc token here? LOLLO TODO check it
-		/// </summary>
-		/// <param name="dir"></param>
-		/// <returns></returns>
-		public static async Task DeleteDirContentsAsync(this IStorageFolder dir)
+            var subDir = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync(subDirectoryName).AsTask().ConfigureAwait(false) as StorageFolder;
+            if (subDir == null) return string.Empty;
+
+            string output = string.Empty;
+            // Debug.WriteLine("start reading local folder contents");
+            var filez = await GetFilesInFolderAsync(subDir).ConfigureAwait(false);
+            //return filez.Aggregate(output, (current, item) => current + (item.Path + item.Name + Environment.NewLine));
+            foreach (var item in filez)
+            {
+                output += (item.Path + item.Name + Environment.NewLine);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// no canc token here? LOLLO TODO check it
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
+        public static async Task DeleteDirContentsAsync(this IStorageFolder dir)
 		{
 			try
 			{
