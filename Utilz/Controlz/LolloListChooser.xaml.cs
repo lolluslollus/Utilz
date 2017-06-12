@@ -185,10 +185,18 @@ namespace Utilz.Controlz
 		}
 		public static readonly DependencyProperty SelectedIndexProperty =
 			DependencyProperty.Register("SelectedIndex", typeof(int), typeof(LolloListChooser), new PropertyMetadata(-1));
-		#endregion properties
 
-		#region construct and dispose
-		public LolloListChooser()
+        public bool IsMultiSelectCheckBoxEnabled
+        {
+            get { return (bool)GetValue(IsMultiSelectCheckBoxEnabledProperty); }
+            set { SetValue(IsMultiSelectCheckBoxEnabledProperty, value); }
+        }
+        public static readonly DependencyProperty IsMultiSelectCheckBoxEnabledProperty =
+            DependencyProperty.Register("IsMultiSelectCheckBoxEnabled", typeof(bool), typeof(LolloListChooser), new PropertyMetadata(false));
+        #endregion properties
+
+        #region construct and dispose
+        public LolloListChooser()
 			: base()
 		{
 			InitializeComponent();

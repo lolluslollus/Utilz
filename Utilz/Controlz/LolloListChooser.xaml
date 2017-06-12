@@ -55,7 +55,8 @@
                         Background="{ThemeResource FlyoutBackgroundThemeBrush}">
                         <!--SelectionChanged="OnMyListView_SelectionChanged"-->
                         <ListView
-                            x:Name="MyListView" 
+                            x:Name="MyListView"
+                            IsMultiSelectCheckBoxEnabled="{Binding ElementName=me, Path=IsMultiSelectCheckBoxEnabled}"
                             ItemsSource="{Binding ElementName=me, Path=ItemsSource}"
                             Background="{ThemeResource FlyoutBackgroundThemeBrush}"
                             Loaded="OnMyListViewLoaded"
