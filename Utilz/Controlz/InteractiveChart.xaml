@@ -44,7 +44,7 @@
 				Text="{x:Bind Title, Mode=OneWay}"
 				Style="{x:Bind TitleStyle, Mode=OneWay}"
 				TextWrapping="Wrap" VerticalAlignment="Center" TextAlignment="Center"/>
-			<!--Visibility="{x:Bind IsTouchDevicePresent, Converter={StaticResource BooleanToCollapsedConverter}, Mode=OneWay}"-->
+			<!--Visibility="{x:Bind IsProperTouchDevice, Converter={StaticResource BooleanToCollapsedConverter}, Mode=OneWay}"-->
 			<Grid Grid.Row="1">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="1*"/>
