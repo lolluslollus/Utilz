@@ -119,6 +119,62 @@ namespace Utilz.Data
                 Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
             }
         }
+        protected async Task RunInUiThreadAsyncT(Func<Task> action)
+        {
+            if (action == null) return;
+            try
+            {
+                Task task = Task.CompletedTask;
+                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+                {
+                    task = action();
+                }
+                else
+                {
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        CoreDispatcherPriority.Low,
+                        () => task = action()
+                    ).AsTask().ConfigureAwait(false);
+                }
+                await action().ConfigureAwait(false);
+            }
+            catch (InvalidOperationException) // called from a background task: ignore
+            { }
+            catch (Exception ex)
+            {
+                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+            }
+        }
+        protected async Task<TResult> RunInUiThreadAsyncTT<TResult>(Func<Task<TResult>> action)
+        {
+            if (action == null) return default(TResult);
+            try
+            {
+                Task<TResult> task = null;
+                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
+                {
+                    task = action();
+                }
+                else
+                {
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        CoreDispatcherPriority.Low,
+                        () => task = action()
+                    ).AsTask().ConfigureAwait(false);
+                }
+                var result = await action().ConfigureAwait(false);
+                return result;
+            }
+            catch (InvalidOperationException) // called from a background task: ignore
+            {
+                return default(TResult);
+            }
+            catch (Exception ex)
+            {
+                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+                return default(TResult);
+            }
+        }
         #endregion UIThread
 
 
