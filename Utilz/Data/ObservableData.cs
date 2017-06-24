@@ -165,13 +165,13 @@ namespace Utilz.Data
                 var result = await action().ConfigureAwait(false);
                 return result;
             }
-            catch (InvalidOperationException) // called from a background task: ignore
+            catch (InvalidOperationException exc) // called from a background task: ignore
             {
                 return default(TResult);
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+                Logger.Add_TPL(exc.ToString(), Logger.PersistentDataLogFilename);
                 return default(TResult);
             }
         }
