@@ -12,9 +12,9 @@ namespace Utilz
 {
     public static class Pickers
     {
-        private const string PICKED_FOLDER_TOKEN = "PickedFolderToken";
-        private const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";
-        private const string PICKED_OPEN_FILE_TOKEN = "PickedOpenFileToken";
+        public const string PICKED_FOLDER_TOKEN = "PickedFolderToken";
+        public const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";
+        public const string PICKED_OPEN_FILE_TOKEN = "PickedOpenFileToken";
 
         public static async Task<StorageFolder> PickDirectoryAsync(string[] extensions, string token = PICKED_FOLDER_TOKEN, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
         {
