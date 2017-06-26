@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Utilz.Data;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -10,7 +12,7 @@ using Windows.UI.Core;
 
 namespace Utilz
 {
-    public static class Pickers
+    public class Pickers : UIThreadAware
     {
         public const string PICKED_FOLDER_TOKEN = "PickedFolderToken";
         public const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";
@@ -127,41 +129,60 @@ namespace Utilz
             return file;
         }
 
-        public static async Task<StorageFolder> GetLastPickedFolderAsync(string token = PICKED_FOLDER_TOKEN)
+        /// <summary>
+        /// Retrieves the folder associated with the given token, returns null if not available
+        /// </summary>
+        /// <param name="token">a token to retrieve a folder, it can be its path</param>
+        /// <param name="cancToken">a cancellation token</param>
+        /// <returns>StorageFolder</returns>
+        public static async Task<StorageFolder> GetLastPickedFolderAsync(string token, CancellationToken cancToken)
         {
             try
             {
                 var escapedToken = Uri.EscapeDataString(token);
-                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFolderAsync(escapedToken).AsTask().ConfigureAwait(false);
+                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFolderAsync(escapedToken).AsTask(cancToken).ConfigureAwait(false);
             }
+            catch (OperationCanceledException) { return null; }
             catch (Exception ex)
             {
                 await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
                 return null;
             }
         }
-
-        public static async Task<StorageFile> GetLastPickedOpenFileAsync(string token = PICKED_OPEN_FILE_TOKEN)
+        /// <summary>
+        /// Retrieves the file associated with the given token, returns null if not available
+        /// </summary>
+        /// <param name="token">a token to retrieve a file, it can be its path</param>
+        /// <param name="cancToken">a cancellation token</param>
+        /// <returns>StorageFile</returns>
+        public static async Task<StorageFile> GetLastPickedOpenFileAsync(string token, CancellationToken cancToken)
         {
             try
             {
                 var escapedToken = Uri.EscapeDataString(token);
-                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(escapedToken).AsTask().ConfigureAwait(false);
+                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(escapedToken).AsTask(cancToken).ConfigureAwait(false);
             }
+            catch (OperationCanceledException) { return null; }
             catch (Exception ex)
             {
                 await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
                 return null;
             }
         }
-
-        public static async Task<StorageFile> GetLastPickedSaveFileAsync(string token = PICKED_SAVE_FILE_TOKEN)
+        /// <summary>
+        /// Retrieves the file associated with the given token, returns null if not available
+        /// </summary>
+        /// <param name="token">a token to retrieve a file, it can be its path</param>
+        /// <param name="cancToken">a cancellation token</param>
+        /// <returns>StorageFile</returns>
+        public static async Task<StorageFile> GetLastPickedSaveFileAsync(string token, CancellationToken cancToken)
         {
             try
             {
                 var escapedToken = Uri.EscapeDataString(token);
-                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(escapedToken).AsTask().ConfigureAwait(false);
+                return await Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.GetFileAsync(escapedToken).AsTask(cancToken).ConfigureAwait(false);
             }
+            catch (OperationCanceledException) { return null; }
             catch (Exception ex)
             {
                 await Logger.AddAsync(ex.ToString(), Logger.FileErrorLogFilename);
@@ -275,27 +296,6 @@ namespace Utilz
                 }
             }
             catch { }
-        }
-
-        private static async Task RunInUiThreadAsync(DispatchedHandler action)
-        {
-            try
-            {
-                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-                {
-                    action();
-                }
-                else
-                {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
-                }
-            }
-            catch (InvalidOperationException) // called from a background task: ignore
-            { }
-            catch (Exception ex)
-            {
-                Logger.Add_TPL(ex.ToString(), Logger.FileErrorLogFilename);
-            }
         }
     }
 }

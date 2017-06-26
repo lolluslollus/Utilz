@@ -63,17 +63,6 @@ namespace Utilz.Data
 
                     IsOpen = true;
 
-                    //try
-                    //{
-                    //	var runAsSoonAsOpen = _runAsSoonAsOpen;
-                    //	if (runAsSoonAsOpen != null)
-                    //	{
-                    //		Task asSoonAsOpen = Task.Run(runAsSoonAsOpen, CancToken);
-                    //	}
-                    //}
-                    //catch { }
-                    //finally { _runAsSoonAsOpen = null; }
-
                     return true;
                 }
             }

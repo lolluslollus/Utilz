@@ -10,7 +10,91 @@ using Windows.UI.Core;
 namespace Utilz.Data
 {
     [DataContract]
-    public abstract class ObservableData : INotifyPropertyChanged
+    public abstract class UIThreadAware
+    {
+        protected static bool? GetHasThreadAccess()
+        {
+            try
+            {
+                return CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        protected static async Task RunInUiThreadIdleAsync(DispatchedHandler action)
+        {
+            bool? hasThreadAccess = GetHasThreadAccess();
+            if (hasThreadAccess == true)
+            {
+                action();
+            }
+            else if (hasThreadAccess == false)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunIdleAsync(a => action()).AsTask().ConfigureAwait(false);
+            }
+        }
+        protected static async Task RunInUiThreadAsync(DispatchedHandler action)
+        {
+            bool? hasThreadAccess = GetHasThreadAccess();
+            if (hasThreadAccess == true)
+            {
+                action();
+            }
+            else if (hasThreadAccess == false)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
+            }
+        }
+        protected static async Task RunInUiThreadAsyncT(Func<Task> action)
+        {
+            if (action == null) return;
+
+            Task task = Task.CompletedTask;
+
+            bool? hasThreadAccess = GetHasThreadAccess();
+            if (hasThreadAccess == true)
+            {
+                task = action();
+            }
+            else if (hasThreadAccess == false)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    CoreDispatcherPriority.Low,
+                    () => task = action()
+                ).AsTask().ConfigureAwait(false);
+            }
+            else return;
+
+            await task.ConfigureAwait(false);
+        }
+        protected static async Task<TResult> RunInUiThreadAsyncTT<TResult>(Func<Task<TResult>> func)
+        {
+            if (func == null) return default(TResult);
+
+            Task<TResult> task = null;
+
+            bool? hasThreadAccess = GetHasThreadAccess();
+            if (hasThreadAccess == true)
+            {
+                task = func();
+            }
+            else if (hasThreadAccess == false)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    CoreDispatcherPriority.Low,
+                    () => task = func()
+                ).AsTask().ConfigureAwait(false);
+            }
+            else return default(TResult);
+
+            return await task.ConfigureAwait(false);
+        }
+    }
+
+    [DataContract]
+    public abstract class ObservableData : UIThreadAware, INotifyPropertyChanged
     {
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,124 +142,24 @@ namespace Utilz.Data
                 RaisePropertyChanged(propertyName);
             });
         }
-        protected void RaisePropertyChangedUrgent_UI([CallerMemberName] string propertyName = "")
-        {
-            if (PropertyChanged == null) return;
-            try
-            {
-                Task raise = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
-                {
-                    RaisePropertyChanged(propertyName);
-                }).AsTask();
-            }
-            catch (InvalidOperationException) // called from a background task: ignore
-            { }
-            catch (Exception ex)
-            {
-                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-            }
-        }
+        //protected void RaisePropertyChangedUrgent_UI([CallerMemberName] string propertyName = "")
+        //{
+        //    if (PropertyChanged == null) return;
+        //    try
+        //    {
+        //        Task raise = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, delegate
+        //        {
+        //            RaisePropertyChanged(propertyName);
+        //        }).AsTask();
+        //    }
+        //    catch (InvalidOperationException) // called from a background task: ignore
+        //    { }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
+        //    }
+        //}
         #endregion INotifyPropertyChanged
-
-
-        #region UIThread
-        protected async Task RunInUiThreadIdleAsync(DispatchedHandler action)
-        {
-            try
-            {
-                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-                {
-                    action();
-                }
-                else
-                {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunIdleAsync(a => action()).AsTask().ConfigureAwait(false);
-                }
-            }
-            catch (InvalidOperationException) // called from a background task: ignore
-            { }
-            catch (Exception ex)
-            {
-                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-            }
-        }
-        protected async Task RunInUiThreadAsync(DispatchedHandler action)
-        {
-            try
-            {
-                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-                {
-                    action();
-                }
-                else
-                {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, action).AsTask().ConfigureAwait(false);
-                }
-            }
-            catch (InvalidOperationException) // called from a background task: ignore
-            { }
-            catch (Exception ex)
-            {
-                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-            }
-        }
-        protected async Task RunInUiThreadAsyncT(Func<Task> action)
-        {
-            if (action == null) return;
-            try
-            {
-                Task task = Task.CompletedTask;
-                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-                {
-                    task = action();
-                }
-                else
-                {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                        CoreDispatcherPriority.Low,
-                        () => task = action()
-                    ).AsTask().ConfigureAwait(false);
-                }
-                await action().ConfigureAwait(false);
-            }
-            catch (InvalidOperationException) // called from a background task: ignore
-            { }
-            catch (Exception ex)
-            {
-                Logger.Add_TPL(ex.ToString(), Logger.PersistentDataLogFilename);
-            }
-        }
-        protected async Task<TResult> RunInUiThreadAsyncTT<TResult>(Func<Task<TResult>> action)
-        {
-            if (action == null) return default(TResult);
-            try
-            {
-                Task<TResult> task = null;
-                if (CoreApplication.MainView.CoreWindow.Dispatcher.HasThreadAccess)
-                {
-                    task = action();
-                }
-                else
-                {
-                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                        CoreDispatcherPriority.Low,
-                        () => task = action()
-                    ).AsTask().ConfigureAwait(false);
-                }
-                var result = await action().ConfigureAwait(false);
-                return result;
-            }
-            catch (InvalidOperationException exc) // called from a background task: ignore
-            {
-                return default(TResult);
-            }
-            catch (Exception exc)
-            {
-                Logger.Add_TPL(exc.ToString(), Logger.PersistentDataLogFilename);
-                return default(TResult);
-            }
-        }
-        #endregion UIThread
 
 
         #region get and set
