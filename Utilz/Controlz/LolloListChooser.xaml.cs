@@ -330,28 +330,28 @@ namespace Utilz.Controlz
 		#endregion event handlers
 	}
 
-	public sealed class TextAndTag
-	{
-		private string _text = "";
-		public string Text { get { return _text; } set { _text = value; } }
+	//public sealed class TextAndTag
+	//{
+	//	private string _text = "";
+	//	public string Text { get { return _text; } set { _text = value; } }
 
-		private object _tag = null;
-		public object Tag { get { return _tag; } set { _tag = value; } }
+	//	private object _tag = null;
+	//	public object Tag { get { return _tag; } set { _tag = value; } }
 
-		public TextAndTag(string text, object tag)
-		{
-			_text = text;
-			_tag = tag;
-		}
-		public static Collection<TextAndTag> CreateCollection(string[] texts, Array tags)
-		{
-			if (texts == null || tags == null || texts.Length != tags.Length) throw new ArgumentException("Texts and tags must not be null and must have the same length");
-			Collection<TextAndTag> output = new Collection<TextAndTag>();
-			for (int i = 0; i < texts.Length; i++)
-			{
-				output.Add(new TextAndTag(texts[i], tags.GetValue(new int[1] { i })));
-			}
-			return output;
-		}
-	}
+	//	public TextAndTag(string text, object tag)
+	//	{
+	//		_text = text;
+	//		_tag = tag;
+	//	}
+	//	public static Collection<TextAndTag> CreateCollection(string[] texts, Array tags)
+	//	{
+	//		if (texts == null || tags == null || texts.Length != tags.Length) throw new ArgumentException("Texts and tags must not be null and must have the same length");
+	//		Collection<TextAndTag> output = new Collection<TextAndTag>();
+	//		for (int i = 0; i < texts.Length; i++)
+	//		{
+	//			output.Add(new TextAndTag(texts[i], tags.GetValue(new int[1] { i })));
+	//		}
+	//		return output;
+	//	}
+	//}
 }
