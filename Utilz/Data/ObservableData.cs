@@ -19,20 +19,20 @@ namespace Utilz.Data
             var pc = PropertyChanged;
             if (pc == null) return false;
 
-            // LOLLO TODO comment out this test code after testing, it may slow down the app unnecessarily.
-            try
-            {
-                string invokers = string.Empty;
-                var invocationList = pc.GetInvocationList();
-                foreach (var item in invocationList)
-                {
-                    invokers += item.Target.GetType().Name;
-                    invokers += Environment.NewLine;
-                }
-                string invocationListLength = invocationList != null ? invocationList.Length.ToString() : "CANNOT SAY";
-                Logger.Add_TPL($"ObservableData.IsAnyoneListening found {invocationListLength} listeners: {invokers}", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
-            }
-            catch { }
+            // LOLLO NOTE this test code may slow down the app unnecessarily, but it's useful for testing
+            //try
+            //{
+            //    string invokers = string.Empty;
+            //    var invocationList = pc.GetInvocationList();
+            //    foreach (var item in invocationList)
+            //    {
+            //        invokers += item.Target.GetType().Name;
+            //        invokers += Environment.NewLine;
+            //    }
+            //    string invocationListLength = invocationList != null ? invocationList.Length.ToString() : "CANNOT SAY";
+            //    Logger.Add_TPL($"ObservableData.IsAnyoneListening found {invocationListLength} listeners: {invokers}", Logger.AppEventsLogFilename, Logger.Severity.Info, false);
+            //}
+            //catch { }
 
             return pc != null;
         }
