@@ -142,6 +142,7 @@ namespace WinRTXamlToolkit.Controls
 		/// </summary>
 		/// <param name="d">WrapPanel that changed its Orientation.</param>
 		/// <param name="e">Event arguments.</param>
+        /// <exception cref="ArgumentException"/>
 		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Almost always set from the CLR property.")]
 		private static void OnOrientationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -190,6 +191,7 @@ namespace WinRTXamlToolkit.Controls
 		/// WrapPanel that changed its ItemHeight or ItemWidth.
 		/// </param>
 		/// <param name="e">Event arguments.</param>
+        /// <exception cref="ArgumentException"/>
 		[SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Almost always set from the CLR property.")]
 		private static void OnItemHeightOrWidthPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{

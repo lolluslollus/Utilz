@@ -246,10 +246,11 @@ namespace Utilz.Controlz
         }
 
         /// <summary>
-        /// Provides the behavior for the "Measure" pass of layout.
+        /// Provides the behavior for the "Measure" pass of layout. It can throw an exception.
         /// </summary>
         /// <param name="availableSize">The available size that this element can give to child elements.</param>
         /// <returns>The size that this element determines it needs during layout, based on its calculations of child element sizes.</returns>
+        /// <exception cref="Exception"/>
         protected override Size MeasureOverride(Size availableSize)
         {
             try
