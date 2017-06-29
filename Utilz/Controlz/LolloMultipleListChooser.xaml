@@ -22,7 +22,11 @@
             Tapped="OnMyTextBlock_Tapped"
             Background="Transparent"
             Visibility="{Binding ElementName=me, Path=SelectorVisibility}">
-            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <TextBlock x:Name="ClosedDescriptorTextBlock"
                     Style="{Binding ElementName=me, Path=TextBlockStyle}"
                     TextWrapping="Wrap"
@@ -30,7 +34,7 @@
                     Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"/>
-                <uctl:AppBarButtonReallyCompact
+                <uctl:AppBarButtonReallyCompact Grid.Column="1"
                     IsCompact="True" 
                     Icon="Edit"
                     Margin="10,0,0,0"
@@ -39,12 +43,13 @@
                     Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
-            </StackPanel>
+            </Grid>
         </Border>
         <Canvas>
             <Popup x:Name="MyPopup" IsOpen="False" 
                 Canvas.ZIndex="999"
-                Closed="OnMyPopup_Closed">
+                Closed="OnMyPopup_Closed"
+                IsLightDismissEnabled="{x:Bind IsMultiSelectCheckBoxEnabled, Mode=OneWay}">
                 <Grid x:Name="MyPoupGrid" Background="{ThemeResource FlyoutBackgroundThemeBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
@@ -56,15 +61,15 @@
 						Text="{Binding ElementName=me, Path=ListHeaderText}" 
 						Style="{Binding ElementName=me, Path=ListHeaderStyle}"/>
                     <ListView Grid.Row="3"
-                            x:Name="MyListView"
-                            Background="{ThemeResource FlyoutBackgroundThemeBrush}"
-                            CanReorderItems="False"
-                            IsItemClickEnabled="True"
-                            IsMultiSelectCheckBoxEnabled="False"
-                            ItemClick="OnMyListView_ItemClick"
-                            Loaded="OnMyListViewLoaded"
-                            SelectionMode="None"
-                            Unloaded="OnMyListViewUnloaded">
+                        x:Name="MyListView"
+                        Background="{ThemeResource FlyoutBackgroundThemeBrush}"
+                        CanReorderItems="False"
+                        IsItemClickEnabled="True"
+                        IsMultiSelectCheckBoxEnabled="False"
+                        ItemClick="OnMyListView_ItemClick"
+                        Loaded="OnMyListViewLoaded"
+                        SelectionMode="None"
+                        Unloaded="OnMyListViewUnloaded">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <ItemsStackPanel Orientation="Vertical"/>
