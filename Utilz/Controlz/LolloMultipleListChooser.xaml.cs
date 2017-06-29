@@ -31,7 +31,31 @@ namespace Utilz.Controlz
             set { SetValue(PopupContainerProperty, value); }
         }
         public static readonly DependencyProperty PopupContainerProperty =
-            DependencyProperty.Register("PopupContainer", typeof(FrameworkElement), typeof(LolloMultipleListChooser), new PropertyMetadata(Window.Current.Content));
+            DependencyProperty.Register("PopupContainer", typeof(FrameworkElement), typeof(LolloMultipleListChooser), new PropertyMetadata(Window.Current.Content, OnPopupContainer_PropertyChanged));
+        private static void OnPopupContainer_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            var me = obj as LolloMultipleListChooser;
+            if (me == null) return;
+
+            var oldValue = e.OldValue as FrameworkElement;
+            if (oldValue != null)
+            {
+                oldValue.SizeChanged -= me.OnPopupContainer_SizeChanged;
+            }
+            var newValue = e.NewValue as FrameworkElement;
+            if (newValue != null)
+            {
+                newValue.SizeChanged += me.OnPopupContainer_SizeChanged;
+            }
+        }
+
+        private void OnPopupContainer_SizeChanged(object sender, SizeChangedEventArgs args)
+        {
+            //if (args.NewSize.Height == args.PreviousSize.Height && args.NewSize.Width == args.PreviousSize.Width) return; // useless
+            Debug.WriteLine($"OnPopupCOntainer_SizeChanged; new height = {args.NewSize.Height}; new width = {args.NewSize.Width}");
+            if (!IsPopupOpen) return;
+            UpdateMyOpenPopup();
+        }
 
         public Visibility SelectorVisibility
         {
@@ -186,9 +210,7 @@ namespace Utilz.Controlz
         }
         private void UpdateDescriptor()
         {
-            if (SelectedItems == null) return;
-
-            int howManySelectedItems = SelectedItems.Count;
+            int howManySelectedItems = SelectedItems?.Count ?? 0;
             if (howManySelectedItems == 0) ClosedDescriptorTextBlock.Text = PlaceholderText;
             else if (howManySelectedItems == 1) ClosedDescriptorTextBlock.Text = SelectedItems[0].Text;
             else ClosedDescriptorTextBlock.Text = $"{howManySelectedItems} items";
@@ -203,19 +225,7 @@ namespace Utilz.Controlz
             if (e != null) e.Handled = true;
             IsPopupOpen = false;
         }
-        protected override void OnVisibleBoundsChangedMayOverride(ApplicationView sender, object args)
-        {
-            // LOLLO TODO see if you can keep the popup open.
-            // You may need to use a flyout and maybe inherit it.
-            //if (IsPopupOpen) UpdateMyOpenPopup();
-            //else UpdateMyClosedPopup();
-            //return;
-            if (IsPopupOpen)
-            {
-                IsPopupOpen = false;
-                // UpdatePopupSizeAndPlacement(); // this screws up, let's just close the popup for now
-            }
-        }
+
         /// <summary>
         /// Only call this in the IsPopupOpen change handler.
         /// Otherwise, change the dependency property IsPopupOpen.
@@ -243,23 +253,9 @@ namespace Utilz.Controlz
                                    //    MyListView.SelectedIndex = SelectedIndex;
                                    //}
 
-            // focus on a popu child textbox, if any
+            // focus on a popup child textbox, if any
             ((MyPopup.Child as Panel)?.Children?.FirstOrDefault() as Control)?.Focus(FocusState.Keyboard);
         }
-
-        //private void UpdatePopupSizeAndPlacement()
-        //{
-        //    Rect availableBoundsWithinChrome = AppView.VisibleBounds;
-
-        //    MyPoupGrid.Height = availableBoundsWithinChrome.Height;
-        //    MyPoupGrid.Width = availableBoundsWithinChrome.Width;
-
-        //    var transform = this.TransformToVisual(Window.Current.Content);
-        //    //var relativePoint = transform.TransformPoint(new Point(-availableBoundsWithinChrome.X, -availableBoundsWithinChrome.Y));
-        //     var relativePoint = transform.TransformPoint(new Point(0.0, 0.0));
-        //    Canvas.SetLeft(MyPopup, -relativePoint.X);
-        //    Canvas.SetTop(MyPopup, -relativePoint.Y);
-        //}
 
         /// <summary>
         /// Only call this in the IsPopupOpen change handler.
@@ -277,14 +273,16 @@ namespace Utilz.Controlz
         #endregion popup
 
         #region event handlers
-        private void OnMyTextBlock_Tapped(object sender, TappedRoutedEventArgs e)
+        private void OnSelector_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (ItemsSource != null && !IsPopupOpen)
             {
                 IsPopupOpen = true;
             }
         }
-
+        /// <summary>
+        /// Fires after <see cref="OnMyListView_ItemClick"/>
+        /// </summary>
         private void OnItemBorder_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (IsMultiSelectCheckBoxEnabled) return;

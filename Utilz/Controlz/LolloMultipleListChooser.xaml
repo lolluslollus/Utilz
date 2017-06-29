@@ -19,7 +19,7 @@
     <Grid>
         <Border BorderThickness="0" 
             BorderBrush="{ThemeResource ButtonBorderThemeBrush}"
-            Tapped="OnMyTextBlock_Tapped"
+            Tapped="OnSelector_Tapped"
             Background="Transparent"
             Visibility="{Binding ElementName=me, Path=SelectorVisibility}">
             <Grid VerticalAlignment="Center">
