@@ -6,10 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilz.Data;
 using Windows.Foundation;
+using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
@@ -145,6 +145,14 @@ namespace Utilz.Controlz
         }
         public static readonly DependencyProperty IsMultiSelectCheckBoxEnabledProperty =
             DependencyProperty.Register("IsMultiSelectCheckBoxEnabled", typeof(bool), typeof(LolloMultipleListChooser), new PropertyMetadata(false));
+
+        public Brush ListBackground
+        {
+            get { return (Brush)GetValue(ListBackgroundProperty); }
+            set { SetValue(ListBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty ListBackgroundProperty =
+            DependencyProperty.Register("ListBackground", typeof(Brush), typeof(LolloMultipleListChooser), new PropertyMetadata((Brush)Application.Current.Resources["FlyoutBackgroundThemeBrush"]));
         #endregion properties
 
         #region events
@@ -216,7 +224,7 @@ namespace Utilz.Controlz
         {
             // update theme
             var currentPage = (Window.Current.Content as Frame)?.Content as Page;
-            if (currentPage!=null) MyPopup.RequestedTheme = currentPage.RequestedTheme;
+            if (currentPage != null) MyPopup.RequestedTheme = currentPage.RequestedTheme;
 
             // update size
             MyPoupGrid.Height = PopupContainer.ActualHeight;
@@ -407,7 +415,8 @@ namespace Utilz.Controlz
     public class IsSelectedToBackgroundConverter : IValueConverter
     {
         public static readonly SolidColorBrush SelectedBrush = ((SolidColorBrush)(Application.Current.Resources["SystemControlHighlightListAccentLowBrush"]));
-        public static readonly SolidColorBrush UnselectedBrush = ((SolidColorBrush)(Application.Current.Resources["FlyoutBackgroundThemeBrush"]));
+        //public static readonly SolidColorBrush UnselectedBrush = ((SolidColorBrush)(Application.Current.Resources["FlyoutBackgroundThemeBrush"]));
+        public static readonly SolidColorBrush UnselectedBrush = new SolidColorBrush(Colors.Transparent);
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {

@@ -44,11 +44,11 @@
             </Grid>
         </Border>
         <Canvas>
-            <Popup x:Name="MyPopup" IsOpen="False" 
+            <Popup x:Name="MyPopup" IsOpen="False"
                 Canvas.ZIndex="999"
                 Closed="OnMyPopup_Closed"
                 IsLightDismissEnabled="True">
-                <Grid x:Name="MyPoupGrid" Background="{ThemeResource FlyoutBackgroundThemeBrush}">
+                <Grid x:Name="MyPoupGrid" Background="{x:Bind ListBackground, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="Auto"/>
@@ -59,8 +59,7 @@
 						Text="{Binding ElementName=me, Path=ListHeaderText}" 
 						Style="{Binding ElementName=me, Path=ListHeaderStyle}"/>
                     <ListView Grid.Row="3"
-                        x:Name="MyListView"
-                        Background="{ThemeResource FlyoutBackgroundThemeBrush}"
+                        x:Name="MyListView"                        
                         CanReorderItems="False"
                         IsItemClickEnabled="True"
                         IsMultiSelectCheckBoxEnabled="False"
@@ -105,7 +104,7 @@
 										    TextWrapping="Wrap"
                                             Style="{Binding ElementName=me, Path=TextItemStyle}"
                                             Margin="10"/>
-                                </Grid>
+                                    </Grid>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
