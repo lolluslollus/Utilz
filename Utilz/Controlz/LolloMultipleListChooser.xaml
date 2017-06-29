@@ -31,7 +31,6 @@
                     Style="{Binding ElementName=me, Path=TextBlockStyle}"
                     TextWrapping="Wrap"
                     IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
-                    Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"/>
                 <uctl:AppBarButtonReallyCompact Grid.Column="1"
@@ -40,7 +39,6 @@
                     Margin="10,0,0,0"
                     Style="{Binding ElementName=me, Path=AppBarButtonStyle}"
                     IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
-                    Tapped="OnMyTextBlock_Tapped"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"/>
             </Grid>

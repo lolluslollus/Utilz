@@ -9,6 +9,7 @@ using Windows.Foundation;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
@@ -53,8 +54,8 @@ namespace Utilz.Controlz
             if (me == null) return;
 
             bool newValue = (bool)(e.NewValue);
-            if (newValue) me.OpenPopupAfterIsPopupOpenChanged();
-            else me.ClosePopupAfterIsPopupOpenChanged();
+            if (newValue) me.UpdateMyOpenPopup();
+            else me.UpdateMyClosedPopup();
         }
 
         public string PlaceholderText
@@ -196,6 +197,11 @@ namespace Utilz.Controlz
         }
         protected override void OnVisibleBoundsChangedMayOverride(ApplicationView sender, object args)
         {
+            // LOLLO TODO see if you can keep the popup open.
+            // You may need to use a flyout and maybe inherit it.
+            //if (IsPopupOpen) UpdateMyOpenPopup();
+            //else UpdateMyClosedPopup();
+            //return;
             if (IsPopupOpen)
             {
                 IsPopupOpen = false;
@@ -206,14 +212,31 @@ namespace Utilz.Controlz
         /// Only call this in the IsPopupOpen change handler.
         /// Otherwise, change the dependency property IsPopupOpen.
         /// </summary>
-        private void OpenPopupAfterIsPopupOpenChanged()
+        private void UpdateMyOpenPopup()
         {
-            UpdatePopupSizeAndPlacement();
+            // update theme
+            var currentPage = (Window.Current.Content as Frame)?.Content as Page;
+            if (currentPage!=null) MyPopup.RequestedTheme = currentPage.RequestedTheme;
+
+            // update size
+            MyPoupGrid.Height = PopupContainer.ActualHeight;
+            MyPoupGrid.Width = PopupContainer.ActualWidth;
+
+            // update placement
+            var transform = TransformToVisual(PopupContainer);
+            var relativePoint = transform.TransformPoint(new Point(0.0, 0.0));
+            Canvas.SetLeft(MyPopup, -relativePoint.X);
+            Canvas.SetTop(MyPopup, -relativePoint.Y);
+
+            // open
             MyPopup.IsOpen = true; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
                                    //if (MyListView.SelectedIndex == -1 && MyListView.Items.Any())
                                    //{
                                    //    MyListView.SelectedIndex = SelectedIndex;
                                    //}
+
+            // focus on a popu child textbox, if any
+            ((MyPopup.Child as Panel)?.Children?.FirstOrDefault() as Control)?.Focus(FocusState.Keyboard);
         }
 
         //private void UpdatePopupSizeAndPlacement()
@@ -229,22 +252,12 @@ namespace Utilz.Controlz
         //    Canvas.SetLeft(MyPopup, -relativePoint.X);
         //    Canvas.SetTop(MyPopup, -relativePoint.Y);
         //}
-        private void UpdatePopupSizeAndPlacement()
-        {
-            MyPoupGrid.Height = PopupContainer.ActualHeight;
-            MyPoupGrid.Width = PopupContainer.ActualWidth;
-
-            var transform = TransformToVisual(PopupContainer);
-            var relativePoint = transform.TransformPoint(new Point(0.0, 0.0));
-            Canvas.SetLeft(MyPopup, -relativePoint.X);
-            Canvas.SetTop(MyPopup, -relativePoint.Y);
-        }
 
         /// <summary>
         /// Only call this in the IsPopupOpen change handler.
         /// Otherwise, change the dependency property IsPopupOpen.
         /// </summary>
-        private void ClosePopupAfterIsPopupOpenChanged()
+        private void UpdateMyClosedPopup()
         {
             MyPopup.IsOpen = false; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
         }
