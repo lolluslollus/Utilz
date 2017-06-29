@@ -49,7 +49,7 @@
             <Popup x:Name="MyPopup" IsOpen="False" 
                 Canvas.ZIndex="999"
                 Closed="OnMyPopup_Closed"
-                IsLightDismissEnabled="{x:Bind IsMultiSelectCheckBoxEnabled, Mode=OneWay}">
+                IsLightDismissEnabled="True">
                 <Grid x:Name="MyPoupGrid" Background="{ThemeResource FlyoutBackgroundThemeBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
