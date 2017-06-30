@@ -108,9 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controlz\AppBarButtonReallyCompact.cs" />
-    <Compile Include="Controlz\LolloPopup.xaml.cs">
-      <DependentUpon>LolloPopup.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controlz\LolloMultipleListChooser.xaml.cs">
       <DependentUpon>LolloMultipleListChooser.xaml</DependentUpon>
     </Compile>
@@ -180,10 +177,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controlz\LolloListChooser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controlz\LolloPopup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
