@@ -357,4 +357,17 @@ namespace Utilz.Controlz
             throw new Exception("this is a one-way binding, it should never come here");
         }
     }
+    public class BoolToNullablBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (!(value is bool) || !((bool)value)) return false;
+            return true;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (!(value is bool) || !((bool)value)) return false;
+            return true;
+        }
+    }
 }

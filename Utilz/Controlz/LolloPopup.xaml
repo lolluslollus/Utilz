@@ -14,12 +14,17 @@
         <Popup x:Name="MyPopup" IsOpen="False"
             Canvas.ZIndex="999"
             Closed="OnMyPopup_Closed"
-            IsLightDismissEnabled="False">
-        </Popup>
-        <Canvas x:Name="FullScreenCanvas" Visibility="Collapsed" Canvas.ZIndex="1" Background="Red" Opacity=".3"
+            IsLightDismissEnabled="False"
+               PointerCanceled="OnPointerCanceled"
+               PointerCaptureLost="OnPointerCaptureLost"
+               PointerEntered="OnPointerEntered"
+               PointerExited="OnPointerExited"
+               PointerReleased="OnPointerReleased"/>
+
+        <!--<Canvas x:Name="FullScreenCanvas" Visibility="Collapsed" Canvas.ZIndex="1" Background="Red" Opacity=".3"
                 Tapped="OnFullScreenCanvas_Tapped"
                 GotFocus="OnFullScreenCanvas_GotFocus"
                 PointerReleased="OnFullScreenCanvas_PointerReleased"
-                PointerCaptureLost="OnFullScreenCanvas_PointerCaptureLost"/>
+                PointerCaptureLost="OnFullScreenCanvas_PointerCaptureLost"/>-->
     </Canvas>
 </uctl:BackOrientOpenObservControl>

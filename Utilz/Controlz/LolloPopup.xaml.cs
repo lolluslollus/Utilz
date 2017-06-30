@@ -124,25 +124,49 @@ namespace Utilz.Controlz
             IsPopupOpen = false;
         }
 
-        private void OnFullScreenCanvas_Tapped(object sender, TappedRoutedEventArgs e)
+        private void OnPointerCanceled(object sender, PointerRoutedEventArgs e)
         {
 
         }
 
-        private void OnFullScreenCanvas_GotFocus(object sender, RoutedEventArgs e)
+        private void OnPointerCaptureLost(object sender, PointerRoutedEventArgs e)
         {
 
         }
 
-        private void OnFullScreenCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
+        private void OnPointerEntered(object sender, PointerRoutedEventArgs e)
         {
 
         }
 
-        private void OnFullScreenCanvas_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+        private void OnPointerExited(object sender, PointerRoutedEventArgs e)
         {
 
         }
+
+        private void OnPointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+
+        }
+        //private void OnFullScreenCanvas_Tapped(object sender, TappedRoutedEventArgs e)
+        //{
+
+        //}
+
+        //private void OnFullScreenCanvas_GotFocus(object sender, RoutedEventArgs e)
+        //{
+
+        //}
+
+        //private void OnFullScreenCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
+        //{
+
+        //}
+
+        //private void OnFullScreenCanvas_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+        //{
+
+        //}
         #endregion event handlers
 
         #region update
@@ -152,17 +176,19 @@ namespace Utilz.Controlz
         /// </summary>
         private void UpdateMyOpenPopup()
         {
-            // update full screen canvas 
-            // update size
-            FullScreenCanvas.Height = AppView.VisibleBounds.Height;
-            FullScreenCanvas.Width = AppView.VisibleBounds.Width;
-            // update placement
-            var fullScreenCanvasTransform = TransformToVisual(Window.Current.Content);
-            var fullScreenCanvasRelativePoint = fullScreenCanvasTransform.TransformPoint(new Point(0.0, 0.0));
-            Canvas.SetLeft(FullScreenCanvas, -fullScreenCanvasRelativePoint.X);
-            Canvas.SetTop(FullScreenCanvas, -fullScreenCanvasRelativePoint.Y);
-            // visible
-            FullScreenCanvas.Visibility = Visibility.Visible;
+            //// update full screen canvas 
+            //// update size
+            //FullScreenCanvas.Height = AppView.VisibleBounds.Height;
+            //FullScreenCanvas.Width = AppView.VisibleBounds.Width;
+            //// update placement
+            ////var window = Window.Current.Content as FrameworkElement;
+
+            //var fullScreenCanvasTransform = TransformToVisual(Window.Current.Content);
+            //var fullScreenCanvasRelativePoint = fullScreenCanvasTransform.TransformPoint(new Point(0.0, 0.0));
+            //Canvas.SetLeft(FullScreenCanvas, -fullScreenCanvasRelativePoint.X);
+            //Canvas.SetTop(FullScreenCanvas, -fullScreenCanvasRelativePoint.Y);
+            //// visible
+            //FullScreenCanvas.Visibility = Visibility.Visible;
 
             // update my popup
             // update theme
@@ -193,7 +219,7 @@ namespace Utilz.Controlz
         /// </summary>
         private void UpdateMyClosedPopup()
         {
-            FullScreenCanvas.Visibility = Visibility.Collapsed;
+            //FullScreenCanvas.Visibility = Visibility.Collapsed;
             MyPopup.IsOpen = false; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
         }
         #endregion update
