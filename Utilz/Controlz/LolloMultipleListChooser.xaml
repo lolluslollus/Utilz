@@ -43,22 +43,22 @@
                     HorizontalAlignment="Right"/>
             </Grid>
         </Border>
-        <Canvas>
-            <Popup x:Name="MyPopup" IsOpen="False"
+        <uctl:LolloPopup x:Name="MyPopup" IsPopupOpen="{x:Bind IsPopupOpen, Mode=OneWay}"
                 Canvas.ZIndex="999"
-                Closed="OnMyPopup_Closed"
-                IsLightDismissEnabled="True">
-                <Grid x:Name="MyPoupGrid" Background="{x:Bind ListBackground, Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="1" 
+                BackPressedRaiser="{x:Bind BackPressedRaiser}"
+                PopupContainer="{x:Bind PopupContainer, Mode=OneWay}">
+            <uctl:LolloPopup.PopupChild>
+            <Grid x:Name="MyPoupGrid" Background="{x:Bind ListBackground, Mode=OneWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="1" 
 						Text="{Binding ElementName=me, Path=ListHeaderText}" 
 						Style="{Binding ElementName=me, Path=ListHeaderStyle}"/>
-                    <ListView Grid.Row="3"
+                <ListView Grid.Row="3"
                         x:Name="MyListView"                        
                         CanReorderItems="False"
                         IsItemClickEnabled="True"
@@ -67,50 +67,50 @@
                         Loaded="OnMyListViewLoaded"
                         SelectionMode="None"
                         Unloaded="OnMyListViewUnloaded">
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsStackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid BorderThickness="0"
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid BorderThickness="0"
                                         Background="{Binding IsSelected, Mode=OneWay, Converter={StaticResource IsSelectedToBackgroundConverter}}"
                                         IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                                         Tapped="OnItemBorder_Tapped"
                                         Visibility="{Binding ElementName=me, Path=IsMultiSelectCheckBoxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibleConverter}}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1*" MinWidth="30"/>
-                                            <ColumnDefinition Width="10*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <CheckBox
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*" MinWidth="30"/>
+                                        <ColumnDefinition Width="10*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox
                                             IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                             Click="OnCheckBox_Click"
                                             Margin="10,0,0,0"/>
-                                        <TextBlock Grid.Column="1"
+                                    <TextBlock Grid.Column="1"
                                             Text="{Binding TextAndTag.Text, Mode=OneWay}"
 										    TextWrapping="Wrap"
                                             Style="{Binding ElementName=me, Path=TextItemStyle}"
                                             Margin="10"/>
-                                    </Grid>
-                                    <Grid BorderThickness="0"
+                                </Grid>
+                                <Grid BorderThickness="0"
                                         Background="{Binding IsSelected, Mode=OneWay, Converter={StaticResource IsSelectedToBackgroundConverter}}"
                                         IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                                         Tapped="OnItemBorder_Tapped"
                                         Visibility="{Binding ElementName=me, Path=IsMultiSelectCheckBoxEnabled, Mode=OneWay, Converter={StaticResource BooleanToCollapsedConverter}}">
-                                        <TextBlock
+                                    <TextBlock
                                             Text="{Binding TextAndTag.Text, Mode=OneWay}"
 										    TextWrapping="Wrap"
                                             Style="{Binding ElementName=me, Path=TextItemStyle}"
                                             Margin="10"/>
-                                    </Grid>
                                 </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-            </Popup>
-        </Canvas>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            </uctl:LolloPopup.PopupChild>
+        </uctl:LolloPopup>
     </Grid>
 </uctl:BackOrientOpenObservControl>

@@ -31,31 +31,7 @@ namespace Utilz.Controlz
             set { SetValue(PopupContainerProperty, value); }
         }
         public static readonly DependencyProperty PopupContainerProperty =
-            DependencyProperty.Register("PopupContainer", typeof(FrameworkElement), typeof(LolloMultipleListChooser), new PropertyMetadata(Window.Current.Content, OnPopupContainer_PropertyChanged));
-        private static void OnPopupContainer_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var me = obj as LolloMultipleListChooser;
-            if (me == null) return;
-
-            var oldValue = e.OldValue as FrameworkElement;
-            if (oldValue != null)
-            {
-                oldValue.SizeChanged -= me.OnPopupContainer_SizeChanged;
-            }
-            var newValue = e.NewValue as FrameworkElement;
-            if (newValue != null)
-            {
-                newValue.SizeChanged += me.OnPopupContainer_SizeChanged;
-            }
-        }
-
-        private void OnPopupContainer_SizeChanged(object sender, SizeChangedEventArgs args)
-        {
-            //if (args.NewSize.Height == args.PreviousSize.Height && args.NewSize.Width == args.PreviousSize.Width) return; // useless
-            Debug.WriteLine($"OnPopupCOntainer_SizeChanged; new height = {args.NewSize.Height}; new width = {args.NewSize.Width}");
-            if (!IsPopupOpen) return;
-            UpdateMyOpenPopup();
-        }
+            DependencyProperty.Register("PopupContainer", typeof(FrameworkElement), typeof(LolloMultipleListChooser), new PropertyMetadata(Window.Current.Content));
 
         public Visibility SelectorVisibility
         {
@@ -71,16 +47,7 @@ namespace Utilz.Controlz
             set { SetValue(IsPopupOpenProperty, value); }
         }
         public static readonly DependencyProperty IsPopupOpenProperty =
-            DependencyProperty.Register("IsPopupOpen", typeof(bool), typeof(LolloMultipleListChooser), new PropertyMetadata(false, OnIsPopupOpen_PropertyChanged));
-        private static void OnIsPopupOpen_PropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var me = obj as LolloMultipleListChooser;
-            if (me == null) return;
-
-            bool newValue = (bool)(e.NewValue);
-            if (newValue) me.UpdateMyOpenPopup();
-            else me.UpdateMyClosedPopup();
-        }
+            DependencyProperty.Register("IsPopupOpen", typeof(bool), typeof(LolloMultipleListChooser), new PropertyMetadata(false));
 
         public string PlaceholderText
         {
@@ -218,58 +185,18 @@ namespace Utilz.Controlz
         #endregion updaters
 
         #region popup
-        protected override void OnHardwareOrSoftwareButtons_BackPressed_MayOverride(object sender, BackOrHardSoftKeyPressedEventArgs e)
-        {
-            if (!IsPopupOpen) return;
+        //protected override void OnHardwareOrSoftwareButtons_BackPressed_MayOverride(object sender, BackOrHardSoftKeyPressedEventArgs e)
+        //{
+        //    if (!IsPopupOpen) return;
 
-            if (e != null) e.Handled = true;
-            IsPopupOpen = false;
-        }
+        //    if (e != null) e.Handled = true;
+        //    IsPopupOpen = false;
+        //}
 
-        /// <summary>
-        /// Only call this in the IsPopupOpen change handler.
-        /// Otherwise, change the dependency property IsPopupOpen.
-        /// </summary>
-        private void UpdateMyOpenPopup()
-        {
-            // update theme
-            var currentPage = (Window.Current.Content as Frame)?.Content as Page;
-            if (currentPage != null) MyPopup.RequestedTheme = currentPage.RequestedTheme;
-
-            // update size
-            MyPoupGrid.Height = PopupContainer.ActualHeight;
-            MyPoupGrid.Width = PopupContainer.ActualWidth;
-
-            // update placement
-            var transform = TransformToVisual(PopupContainer);
-            var relativePoint = transform.TransformPoint(new Point(0.0, 0.0));
-            Canvas.SetLeft(MyPopup, -relativePoint.X);
-            Canvas.SetTop(MyPopup, -relativePoint.Y);
-
-            // open
-            MyPopup.IsOpen = true; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
-                                   //if (MyListView.SelectedIndex == -1 && MyListView.Items.Any())
-                                   //{
-                                   //    MyListView.SelectedIndex = SelectedIndex;
-                                   //}
-
-            // focus on a popup child textbox, if any
-            ((MyPopup.Child as Panel)?.Children?.FirstOrDefault() as Control)?.Focus(FocusState.Keyboard);
-        }
-
-        /// <summary>
-        /// Only call this in the IsPopupOpen change handler.
-        /// Otherwise, change the dependency property IsPopupOpen.
-        /// </summary>
-        private void UpdateMyClosedPopup()
-        {
-            MyPopup.IsOpen = false; // only change this property in the IsPopupOpen change handler. Otherwise, change the dependency property IsPopupOpen.
-        }
-
-        private void OnMyPopup_Closed(object sender, object e)
-        {
-            IsPopupOpen = false;
-        }
+        //private void OnMyPopup_Closed(object sender, object e)
+        //{
+        //    IsPopupOpen = false;
+        //}
         #endregion popup
 
         #region event handlers
@@ -292,7 +219,11 @@ namespace Utilz.Controlz
         private volatile bool _isMyListViewEventHandlersActive = false;
         private void OnMyListViewLoaded(object sender, RoutedEventArgs e)
         {
-            MyListView.ItemsSource = ItemsSource.Select(nv => new SelectedAndTextAndTag() { IsSelected = false, TextAndTag = nv }).ToList();
+            var itemsSource = ItemsSource;
+            if (itemsSource != null)
+            {
+                MyListView.ItemsSource = itemsSource.Select(nv => new SelectedAndTextAndTag() { IsSelected = false, TextAndTag = nv }).ToList();
+            }
             UpdateDescriptor();
             UpdateSelection();
 
