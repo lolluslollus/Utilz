@@ -292,7 +292,10 @@ namespace Utilz.Controlz
         private volatile bool _isMyListViewEventHandlersActive = false;
         private void OnMyListViewLoaded(object sender, RoutedEventArgs e)
         {
-            MyListView.ItemsSource = ItemsSource.Select(nv => new SelectedAndTextAndTag() { IsSelected = false, TextAndTag = nv }).ToList();
+            var itemsSource = ItemsSource;
+            if (itemsSource == null) MyListView.ItemsSource = null;
+            else MyListView.ItemsSource = itemsSource.Select(nv => new SelectedAndTextAndTag() { IsSelected = false, TextAndTag = nv }).ToList();
+
             UpdateDescriptor();
             UpdateSelection();
 
