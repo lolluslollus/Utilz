@@ -1,0 +1,101 @@
+﻿<Page
+    x:Class="Sandbox.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Sandbox"
+    xmlns:mctl="using:Utilz.Controlz"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Button Click="OnILikeItClick">
+            <TextBlock Text="I like it"/>
+        </Button>
+        <mctl:UniversalWrapPanel Grid.Row="1" Orientation="Horizontal" VerticalContentAlignment="Bottom">
+            <TextBlock Text="Test text"/>
+            <Button Width="200">
+                <TextBlock Text="test button 1"/>
+            </Button>
+            <Button Width="200" Margin="10" Background="Red" BorderBrush="Red" BorderThickness="5">
+                <TextBlock Text="test button w big margin"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button 3"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button 4"/>
+            </Button>
+        </mctl:UniversalWrapPanel>
+        <mctl:UniversalWrapPanel Grid.Row="2" Orientation="Horizontal" VerticalContentAlignment="Center">
+            <TextBlock Text="Test text"/>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+        </mctl:UniversalWrapPanel>
+        <mctl:UniversalWrapPanel Grid.Row="3" Orientation="Horizontal" VerticalContentAlignment="Top">
+            <TextBlock Text="Test text"/>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+        </mctl:UniversalWrapPanel>
+        <mctl:UniversalWrapPanel Grid.Row="4" Orientation="Horizontal">
+            <TextBlock Text="Test text"/>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+            <Button Width="200">
+                <TextBlock Text="test button"/>
+            </Button>
+        </mctl:UniversalWrapPanel>
+    </Grid>
+</Page>

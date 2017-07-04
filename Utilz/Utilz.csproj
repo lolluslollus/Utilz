@@ -108,6 +108,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controlz\AppBarButtonReallyCompact.cs" />
+    <Compile Include="Controlz\CommunityToolkitWrapPanel.cs" />
+    <Compile Include="Controlz\CommunityToolkitWrapPanelData.cs" />
     <Compile Include="Controlz\LolloMultipleListChooser.xaml.cs">
       <DependentUpon>LolloMultipleListChooser.xaml</DependentUpon>
     </Compile>
