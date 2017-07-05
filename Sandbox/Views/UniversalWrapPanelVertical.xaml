@@ -11,7 +11,7 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
@@ -30,82 +30,82 @@
         <Grid Grid.Row="1" Grid.Column="0" Background="Blue"/>
         <mctl:UniversalWrapPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalContentAlignment="Right">
             <TextBlock Text="Test right"/>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 1"/>
             </Button>
-            <Button Width="200" Margin="10" Background="Red" BorderBrush="Red" BorderThickness="5">
+            <Button Width="200" Height="200" Margin="10" Background="Red" BorderBrush="Red" BorderThickness="5">
                 <TextBlock Text="test button 2 (margin)"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 3"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 4"/>
             </Button>
         </mctl:UniversalWrapPanel>
         <Grid Grid.Row="1" Grid.Column="2" Background="Blue"/>
         <mctl:UniversalWrapPanel Grid.Row="1" Grid.Column="3" Orientation="Vertical" HorizontalContentAlignment="Center">
             <TextBlock Text="Test centre"/>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 1"/>
             </Button>
-            <Button Width="200" Margin="10">
+            <Button Width="200" Height="200" Margin="10">
                 <TextBlock Text="test button 2 (margin)"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 3"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 4"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 5"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 6"/>
             </Button>
         </mctl:UniversalWrapPanel>
         <Grid Grid.Row="1" Grid.Column="4" Background="Blue"/>
         <mctl:UniversalWrapPanel Grid.Row="1" Grid.Column="5" Orientation="Vertical" HorizontalContentAlignment="Left">
             <TextBlock Text="Test left"/>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 1"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 2"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 3"/>
             </Button>
-            <Button Width="200" Margin="10">
+            <Button Width="200" Height="200" Margin="10">
                 <TextBlock Text="test button 4 (margin)"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 5"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button 6"/>
             </Button>
         </mctl:UniversalWrapPanel>
         <Grid Grid.Row="1" Grid.Column="6" Background="Blue"/>
         <mctl:UniversalWrapPanel Grid.Row="1" Grid.Column="7" Orientation="Vertical">
             <TextBlock Text="Test default"/>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
-            <Button Width="200">
+            <Button Width="200" Height="200">
                 <TextBlock Text="test button"/>
             </Button>
         </mctl:UniversalWrapPanel>
