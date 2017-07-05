@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace Sandbox
+namespace Sandbox.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -26,10 +26,15 @@ namespace Sandbox
         {
             this.InitializeComponent();
         }
-
-        private void OnILikeItClick(object sender, RoutedEventArgs e)
+        private void GotoUniversalWrapPanelHorizontal(object sender, RoutedEventArgs e)
         {
-
+            var rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(UniversalWrapPanelHorizontal));
+        }
+        private void GotoUniversalWrapPanelVertical(object sender, RoutedEventArgs e)
+        {
+            var rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(UniversalWrapPanelVertical));
         }
     }
 }

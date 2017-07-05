@@ -10,6 +10,7 @@ namespace Utilz.Controlz
 {
     public sealed class UniversalWrapPanel : Panel
     {
+        #region properties
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
@@ -17,7 +18,15 @@ namespace Utilz.Controlz
         }
         public static readonly DependencyProperty OrientationProperty =
           DependencyProperty.Register("Orientation",
-          typeof(Orientation), typeof(UniversalWrapPanel), null);
+          typeof(Orientation), typeof(UniversalWrapPanel), new PropertyMetadata(Orientation.Horizontal));
+
+        public HorizontalAlignment HorizontalContentAlignment
+        {
+            get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
+            set { SetValue(HorizontalContentAlignmentProperty, value); }
+        }
+        public static readonly DependencyProperty HorizontalContentAlignmentProperty =
+            DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(UniversalWrapPanel), new PropertyMetadata(HorizontalAlignment.Left));
 
         public VerticalAlignment VerticalContentAlignment
         {
@@ -26,13 +35,9 @@ namespace Utilz.Controlz
         }
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
             DependencyProperty.Register("VerticalContentAlignment", typeof(VerticalAlignment), typeof(UniversalWrapPanel), new PropertyMetadata(VerticalAlignment.Top));
+        #endregion properties
 
-
-        public UniversalWrapPanel()
-        {
-            // default orientation
-            Orientation = Orientation.Vertical;
-        }
+        public UniversalWrapPanel() { }
 
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -40,62 +45,55 @@ namespace Utilz.Controlz
 
             if (Orientation == Orientation.Horizontal)
             {
+                int i = 0;
                 double largestHeightInRow = 0.0;
-                double maxWidth = 0.0;
+                double maxRowWidth = 0.0;
 
-                for (int c = 0; c < Children.Count; c++)
+                foreach (var child in Children)
                 {
-                    UIElement child = Children[c];
                     child.Measure(availableSize);
 
-                    double verticalMargin = GetVerticalMargin(child);
-                    double horizontalMargin = GetHorizontalMargin(child);
-
-                    if ((point.X + child.DesiredSize.Width + horizontalMargin) > availableSize.Width)
+                    if (i > 0 && (point.X + child.DesiredSize.Width) > availableSize.Width)
                     {
                         // start new row
                         point.X = 0;
                         point.Y = point.Y + largestHeightInRow;
                         largestHeightInRow = 0.0;
+                        i = -1;
                     }
-                    point.X += child.DesiredSize.Width + horizontalMargin;
 
-                    // Tallest item in the row
-                    largestHeightInRow = Math.Max(largestHeightInRow, child.DesiredSize.Height + verticalMargin);
-
-                    // Furthest right edge
-                    maxWidth = Math.Max(maxWidth, point.X);
+                    point.X += child.DesiredSize.Width;
+                    largestHeightInRow = Math.Max(largestHeightInRow, child.DesiredSize.Height);
+                    maxRowWidth = Math.Max(maxRowWidth, point.X);
+                    i++;
                 }
-                return new Size(maxWidth, point.Y + largestHeightInRow);
+                return new Size(maxRowWidth, point.Y + largestHeightInRow);
             }
             else
             {
-                double largestWidth = 0.0;
+                int i = 0;
+                double largestWidthInColumn = 0.0;
                 double maxHeight = 0;
 
-                // Loop invariant:
-                // at top of loop, point is top-left of where this child will try to go
-                // point.Y should never be 0 at the top except when c = 0
-                for (int c = 0; c < Children.Count; c++)
+                foreach (var child in Children)
                 {
-                    UIElement child = Children[c];
                     child.Measure(availableSize);
 
-                    if ((point.Y + child.DesiredSize.Height) > availableSize.Height)
+                    if (i > 0 && (point.Y + child.DesiredSize.Height) > availableSize.Height)
                     {
+                        // start new column
                         point.Y = 0;
-                        point.X = point.X + largestWidth;
-                        largestWidth = 0.0;
+                        point.X = point.X + largestWidthInColumn;
+                        largestWidthInColumn = 0.0;
+                        i = -1;
                     }
+
                     point.Y += child.DesiredSize.Height;
-
-                    // Widest item in the column
-                    largestWidth = Math.Max(largestWidth, child.DesiredSize.Width);
-
-                    // Furthest bottom edge
+                    largestWidthInColumn = Math.Max(largestWidthInColumn, child.DesiredSize.Width);
                     maxHeight = Math.Max(maxHeight, point.Y);
+                    i++;
                 }
-                return new Size(point.X + largestWidth, maxHeight);
+                return new Size(point.X + largestWidthInColumn, maxHeight);
             }
         }
 
@@ -117,19 +115,17 @@ namespace Utilz.Controlz
 
             for (int j = 0; j < rowDatas.Count; j++)
             {
-                for (int i = 0; i < rowDatas[j].Points0.Count; i++)
+                var maxHeightInRow = rowDatas[j].MaxHeightInRow;
+
+                for (int i = 0; i < rowDatas[j].Point0s.Count; i++)
                 {
-                    var maxHeightInRow = rowDatas[j].MaxHeightInRow;
                     var child = rowDatas[j].Children[i];
-                    var point0 = rowDatas[j].Points0[i];
-                    var point1 = rowDatas[j].Points1[i];
+                    var point0 = rowDatas[j].Point0s[i];
+                    var point1 = rowDatas[j].Point1s[i];
+
                     double deltaY = 0.0;
-                    // LOLLO TODO deal with margins, and remember they can be like  like 5 top, 20 bottom.
                     switch (VerticalContentAlignment)
                     {
-                        case VerticalAlignment.Top:
-                            child.Arrange(new Rect(point0, point1));
-                            break;
                         case VerticalAlignment.Center:
                             deltaY = (maxHeightInRow - point1.Y - 1) / 2.0;
                             if (deltaY > 0)
@@ -137,7 +133,6 @@ namespace Utilz.Controlz
                                 point0.Y += deltaY;
                                 point1.Y += deltaY;
                             }
-                            child.Arrange(new Rect(point0, point1));
                             break;
                         case VerticalAlignment.Bottom:
                             deltaY = maxHeightInRow - point1.Y - 1;
@@ -146,20 +141,11 @@ namespace Utilz.Controlz
                                 point0.Y += deltaY;
                                 point1.Y += deltaY;
                             }
-                            child.Arrange(new Rect(point0, point1));
                             break;
-                        //case VerticalAlignment.Stretch:
-                        //    break;
-                        default:
-                            deltaY = (maxHeightInRow - point1.Y - 1) / 2.0;
-                            if (deltaY > 0)
-                            {
-                                point0.Y += deltaY;
-                                point1.Y += deltaY;
-                            }
-                            child.Arrange(new Rect(point0, point1));
+                        default: // default is top, we don't do stretch
                             break;
                     }
+                    child.Arrange(new Rect(point0, point1));
                 }
             }
             // this is the old code
@@ -189,6 +175,138 @@ namespace Utilz.Controlz
             return base.ArrangeOverride(finalSize);
         }
 
+        private Size ArrangeOverrideVerticalAlignment(Size finalSize)
+        {
+            var columnDatas = GetColumnData4VerticalAlignment(Children, finalSize);
+
+            for (int j = 0; j < columnDatas.Count; j++)
+            {
+                var maxWidthInColumn = columnDatas[j].MaxWidthInColumn;
+
+                for (int i = 0; i < columnDatas[j].Point0s.Count; i++)
+                {
+                    var child = columnDatas[j].Children[i];
+                    var point0 = columnDatas[j].Point0s[i];
+                    var point1 = columnDatas[j].Point1s[i];
+
+                    double deltaX = 0.0;
+                    switch (HorizontalContentAlignment)
+                    {
+                        case HorizontalAlignment.Center:
+                            deltaX = (maxWidthInColumn - point1.X - 1) / 2.0;
+                            if (deltaX > 0)
+                            {
+                                point0.X += deltaX;
+                                point1.X += deltaX;
+                            }
+                            break;
+                        case HorizontalAlignment.Right:
+                            deltaX = maxWidthInColumn - point1.X - 1;
+                            if (deltaX > 0)
+                            {
+                                point0.X += deltaX;
+                                point1.X += deltaX;
+                            }
+                            break;
+                        default: // default is left, we don't do stretch
+                            break;
+                    }
+                    child.Arrange(new Rect(point0, point1));
+                }
+            }
+            // this is the old code
+            //Point point = new Point(0, 0);
+            //int i = 0; int j = 0;
+
+            //double largestWidth = 0.0;
+
+            //foreach (UIElement child in Children)
+            //{
+            //    child.Arrange(new Rect(point, new Point(point.X +
+            //      child.DesiredSize.Width, point.Y + child.DesiredSize.Height)));
+
+            //    if (child.DesiredSize.Width > largestWidth)
+            //        largestWidth = child.DesiredSize.Width;
+
+            //    point.Y = point.Y + child.DesiredSize.Height;
+
+            //    if ((i + 1) < Children.Count)
+            //    {
+            //        if ((point.Y + Children[i + 1].DesiredSize.Height) > finalSize.Height)
+            //        {
+            //            point.Y = 0;
+            //            point.X = point.X + largestWidth;
+            //            largestWidth = 0.0;
+            //        }
+            //    }
+
+            //    i++;
+            //}
+
+            return base.ArrangeOverride(finalSize);
+        }
+
+        private static List<ColumnData> GetColumnData4VerticalAlignment(UIElementCollection Children, Size finalSize)
+        {
+            List<ColumnData> columnDatas = new List<ColumnData>(Children.Count);
+
+            int i = 0; int j = 0;
+            foreach (UIElement child in Children)
+            {
+                if (columnDatas.Count - 1 < j) columnDatas.Add(new ColumnData());
+                var currentColumnData = columnDatas[j];
+                currentColumnData.Column = j;
+
+                var currentPoint0 = new Point();
+                var currentPoint1 = new Point();
+
+                if (i == 0)
+                {
+                    // first element of a column
+                    currentPoint0.Y = 0.0;
+                    currentPoint1.Y = child.DesiredSize.Height - 1;
+                    currentPoint0.X = columnDatas.Take(j).Sum(rd => rd.MaxWidthInColumn);
+                    currentPoint1.X = currentPoint0.X + child.DesiredSize.Width - 1;
+                    currentColumnData.Point0s.Add(currentPoint0);
+                    currentColumnData.Point1s.Add(currentPoint1);
+                    currentColumnData.Children.Add(child);
+                    currentColumnData.MaxWidthInColumn = Math.Max(child.DesiredSize.Width, currentColumnData.MaxWidthInColumn);
+                    i++;
+                }
+                else if ((currentColumnData.Point1s[i - 1].Y + child.DesiredSize.Height) <= finalSize.Height)
+                {
+                    // append to existing column
+                    currentPoint0.Y = currentColumnData.Point1s[i - 1].Y + 1;
+                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1;
+                    currentPoint0.X = columnDatas.Take(j).Sum(rd => rd.MaxWidthInColumn);
+                    currentPoint1.X = currentPoint0.X + child.DesiredSize.Width - 1;
+                    currentColumnData.Point0s.Add(currentPoint0);
+                    currentColumnData.Point1s.Add(currentPoint1);
+                    currentColumnData.Children.Add(child);
+                    currentColumnData.MaxWidthInColumn = Math.Max(child.DesiredSize.Width, currentColumnData.MaxWidthInColumn);
+                    i++;
+                }
+                else
+                {
+                    // start new column                            
+                    currentPoint0.Y = 0.0;
+                    currentPoint1.Y = child.DesiredSize.Height - 1;
+                    currentPoint0.X = columnDatas.Sum(rd => rd.MaxWidthInColumn);
+                    currentPoint1.X = currentPoint0.X + child.DesiredSize.Width - 1;
+                    var newColumnData = new ColumnData();
+                    newColumnData.Point0s.Add(currentPoint0);
+                    newColumnData.Point1s.Add(currentPoint1);
+                    newColumnData.Children.Add(child);
+                    newColumnData.MaxWidthInColumn = child.DesiredSize.Width;
+                    columnDatas.Add(newColumnData);
+                    i = 1;
+                    j++;
+                }
+            }
+
+            return columnDatas;
+        }
+
         private static List<RowData> GetRowData4HorizontalAlignment(UIElementCollection Children, Size finalSize)
         {
             List<RowData> rowDatas = new List<RowData>(Children.Count);
@@ -200,9 +318,6 @@ namespace Utilz.Controlz
                 var currentRowData = rowDatas[j];
                 currentRowData.Row = j;
 
-                double verticalMargin = GetVerticalMargin(child);
-                double horizontalMargin = GetHorizontalMargin(child);
-
                 var currentPoint0 = new Point();
                 var currentPoint1 = new Point();
 
@@ -210,40 +325,40 @@ namespace Utilz.Controlz
                 {
                     // first element of a row
                     currentPoint0.X = 0.0;
-                    currentPoint1.X = child.DesiredSize.Width - 1 + horizontalMargin;
+                    currentPoint1.X = child.DesiredSize.Width - 1;
                     currentPoint0.Y = rowDatas.Take(j).Sum(rd => rd.MaxHeightInRow);
-                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1 + verticalMargin;
-                    currentRowData.Points0.Add(currentPoint0);
-                    currentRowData.Points1.Add(currentPoint1);
+                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1;
+                    currentRowData.Point0s.Add(currentPoint0);
+                    currentRowData.Point1s.Add(currentPoint1);
                     currentRowData.Children.Add(child);
-                    currentRowData.MaxHeightInRow = Math.Max(child.DesiredSize.Height + verticalMargin, rowDatas[j].MaxHeightInRow);
+                    currentRowData.MaxHeightInRow = Math.Max(child.DesiredSize.Height, currentRowData.MaxHeightInRow);
                     i++;
                 }
-                else if ((currentRowData.Points1[i - 1].X + child.DesiredSize.Width + horizontalMargin) <= finalSize.Width)
+                else if ((currentRowData.Point1s[i - 1].X + child.DesiredSize.Width) <= finalSize.Width)
                 {
                     // append to existing row
-                    currentPoint0.X = currentRowData.Points1[i - 1].X + 1;
-                    currentPoint1.X = currentPoint0.X + child.DesiredSize.Width - 1 + horizontalMargin;
+                    currentPoint0.X = currentRowData.Point1s[i - 1].X + 1;
+                    currentPoint1.X = currentPoint0.X + child.DesiredSize.Width - 1;
                     currentPoint0.Y = rowDatas.Take(j).Sum(rd => rd.MaxHeightInRow);
-                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1 + verticalMargin;
-                    currentRowData.Points0.Add(currentPoint0);
-                    currentRowData.Points1.Add(currentPoint1);
+                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1;
+                    currentRowData.Point0s.Add(currentPoint0);
+                    currentRowData.Point1s.Add(currentPoint1);
                     currentRowData.Children.Add(child);
-                    currentRowData.MaxHeightInRow = Math.Max(child.DesiredSize.Height + verticalMargin, rowDatas[j].MaxHeightInRow);
+                    currentRowData.MaxHeightInRow = Math.Max(child.DesiredSize.Height, currentRowData.MaxHeightInRow);
                     i++;
                 }
                 else
                 {
                     // start new row                            
                     currentPoint0.X = 0.0;
-                    currentPoint1.X = child.DesiredSize.Width - 1 + horizontalMargin;
+                    currentPoint1.X = child.DesiredSize.Width - 1;
                     currentPoint0.Y = rowDatas.Sum(rd => rd.MaxHeightInRow);
-                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1 + verticalMargin;
+                    currentPoint1.Y = currentPoint0.Y + child.DesiredSize.Height - 1;
                     var newRowData = new RowData();
-                    newRowData.Points0.Add(currentPoint0);
-                    newRowData.Points1.Add(currentPoint1);
+                    newRowData.Point0s.Add(currentPoint0);
+                    newRowData.Point1s.Add(currentPoint1);
                     newRowData.Children.Add(child);
-                    newRowData.MaxHeightInRow = child.DesiredSize.Height + verticalMargin;
+                    newRowData.MaxHeightInRow = child.DesiredSize.Height;
                     rowDatas.Add(newRowData);
                     i = 1;
                     j++;
@@ -252,57 +367,22 @@ namespace Utilz.Controlz
 
             return rowDatas;
         }
-        private static double GetHorizontalMargin(UIElement child)
+
+        internal class ColumnData
         {
-            if (!(child is FrameworkElement)) return 0.0;
-            var verticalMargin = (child as FrameworkElement).Margin;
-            return verticalMargin.Left + verticalMargin.Right;
+            internal int Column;
+            internal double MaxWidthInColumn;
+            internal List<Point> Point0s = new List<Point>();
+            internal List<Point> Point1s = new List<Point>();
+            internal List<UIElement> Children = new List<UIElement>();
+            internal ColumnData() { }
         }
-        private static double GetVerticalMargin(UIElement child)
-        {
-            if (!(child is FrameworkElement)) return 0.0;
-            var verticalMargin = (child as FrameworkElement).Margin;
-            return verticalMargin.Top + verticalMargin.Bottom;
-        }
-        private Size ArrangeOverrideVerticalAlignment(Size finalSize)
-        {
-            Point point = new Point(0, 0);
-            int i = 0; int j = 0;
-
-            double largestWidth = 0.0;
-
-            foreach (UIElement child in Children)
-            {
-                child.Arrange(new Rect(point, new Point(point.X +
-                  child.DesiredSize.Width, point.Y + child.DesiredSize.Height)));
-
-                if (child.DesiredSize.Width > largestWidth)
-                    largestWidth = child.DesiredSize.Width;
-
-                point.Y = point.Y + child.DesiredSize.Height;
-
-                if ((i + 1) < Children.Count)
-                {
-                    if ((point.Y + Children[i + 1].DesiredSize.Height) > finalSize.Height)
-                    {
-                        point.Y = 0;
-                        point.X = point.X + largestWidth;
-                        largestWidth = 0.0;
-                    }
-                }
-
-                i++;
-            }
-
-            return base.ArrangeOverride(finalSize);
-        }
-
         internal class RowData
         {
             internal int Row;
             internal double MaxHeightInRow;
-            internal List<Point> Points0 = new List<Point>();
-            internal List<Point> Points1 = new List<Point>();
+            internal List<Point> Point0s = new List<Point>();
+            internal List<Point> Point1s = new List<Point>();
             internal List<UIElement> Children = new List<UIElement>();
             internal RowData() { }
         }
