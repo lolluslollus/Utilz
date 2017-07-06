@@ -8,6 +8,7 @@
 
 // LOLLO http://igrali.com/2012/09/17/layout-transform-in-windows-8-winrt-xaml/
 // LOLLO NOTE don't forget to include the style in LayoutTransformer.xaml in your app, or it won't work!
+// LOLLO TODO try to do this automatically, without bothering the user
 
 using System;
 using System.Diagnostics.CodeAnalysis;

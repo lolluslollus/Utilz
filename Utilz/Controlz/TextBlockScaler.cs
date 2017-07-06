@@ -26,6 +26,7 @@ namespace Utilz.Controlz
         #region lifecycle
         public TextBlockScaler() : base()
         {
+            IsTabStop = false;
             _maxHeightChangedToken = RegisterPropertyChangedCallback(MaxHeightProperty, OnMaxHeightChanged);
             _maxWidthChangedToken = RegisterPropertyChangedCallback(MaxWidthProperty, OnMaxWidthChanged);
         }
