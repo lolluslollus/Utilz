@@ -142,7 +142,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProportionsTrigger.cs" />
     <Compile Include="RegistryAccess.cs" />
-    <Compile Include="ResourceGetter.cs" />
     <Compile Include="SafeCancellationTokenSource.cs" />
     <Compile Include="SemaphoreSlimSafeRelease.cs" />
     <Compile Include="SwitchableObservableCollection.cs" />
