@@ -14,5 +14,8 @@
         <Button Click="GotoUniversalWrapPanelVertical">
             <TextBlock Text="UniversalWrapPanel with vertical alignment"/>
         </Button>
+        <Button Click="GotoTextBlockScaler">
+            <TextBlock Text="TextBlockScaler"/>
+        </Button>
     </StackPanel>
 </Page>

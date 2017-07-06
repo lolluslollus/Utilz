@@ -36,5 +36,11 @@ namespace Sandbox.Views
             var rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(UniversalWrapPanelVertical));
         }
+
+        private void GotoTextBlockScaler(object sender, RoutedEventArgs e)
+        {
+            var rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(TextBlockScalerTests));
+        }
     }
 }
