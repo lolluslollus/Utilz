@@ -7,8 +7,6 @@
 // #define DIAGNOSTICWRITELINE
 
 // LOLLO http://igrali.com/2012/09/17/layout-transform-in-windows-8-winrt-xaml/
-// LOLLO NOTE don't forget to include the style in LayoutTransformer.xaml in your app, or it won't work!
-// LOLLO TODO try to do this automatically, without bothering the user
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -209,7 +207,7 @@ namespace Utilz.Controlz
             }
 
             // Process the RotateTransform
-            RotateTransform rotateTransform = transform as RotateTransform;
+            var rotateTransform = transform as RotateTransform;
             if (null != rotateTransform)
             {
                 double angle = rotateTransform.Angle;
@@ -220,7 +218,7 @@ namespace Utilz.Controlz
             }
 
             // Process the ScaleTransform
-            ScaleTransform scaleTransform = transform as ScaleTransform;
+            var scaleTransform = transform as ScaleTransform;
             if (null != scaleTransform)
             {
                 double scaleX = scaleTransform.ScaleX;
@@ -229,7 +227,7 @@ namespace Utilz.Controlz
             }
 
             // Process the SkewTransform
-            SkewTransform skewTransform = transform as SkewTransform;
+            var skewTransform = transform as SkewTransform;
             if (null != skewTransform)
             {
                 double angleX = skewTransform.AngleX;

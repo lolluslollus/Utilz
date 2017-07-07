@@ -5,11 +5,12 @@
     xmlns:uctl="using:Utilz.Controlz"
     xmlns:local="using:Sandbox"
     RequestedTheme="Light">
-    <Application.Resources>
+    <!-- LOLLO NOTE this is how to include a dictionary from another project -->
+    <!--<Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ms-appx:///Utilz/Resources/LayoutTransformer.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Application.Resources>
+    </Application.Resources>-->
 </Application>
