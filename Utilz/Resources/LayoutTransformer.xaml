@@ -1,19 +1,25 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ctl="using:Utilz.Controlz">
+    xmlns:uctl="using:Utilz.Controlz">
 
     <!-- LOLLO http://igrali.com/2012/09/17/layout-transform-in-windows-8-winrt-xaml/ -->
-    
-    <!-- declare this resource dictionary in App.xaml -->
-    <!-- <ResourceDictionary Source="Controlz/LayoutTransformer.xaml"/> -->
-    
+
+    <!-- declare this resource dictionary in the consumer's App.xaml -->
+    <!--<Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///Utilz/Resources/LayoutTransformer.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>-->
+
     <!-- declare this style without x:Key so it will always be used by default -->
-    <Style TargetType="ctl:LayoutTransformer">
-        <Setter Property="Foreground" Value="#FF000000"/>
+    <Style TargetType="uctl:LayoutTransformer">
+        <!--<Setter Property="Foreground" Value="#FF000000"/>-->
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ctl:LayoutTransformer">
+                <ControlTemplate TargetType="uctl:LayoutTransformer">
                     <Grid x:Name="TransformRoot" Background="{TemplateBinding Background}">
                         <ContentPresenter
 							x:Name="Presenter"

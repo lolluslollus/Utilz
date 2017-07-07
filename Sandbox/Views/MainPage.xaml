@@ -17,5 +17,8 @@
         <Button Click="GotoTextBlockScaler">
             <TextBlock Text="TextBlockScaler"/>
         </Button>
+        <Button Click="GotoLayoutTransformerTests">
+            <TextBlock Text="LayoutTransformer"/>
+        </Button>
     </StackPanel>
 </Page>

@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="Sandbox.Views.LayoutTransformerTests"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Sandbox.Views"
+    xmlns:uctl="using:Utilz.Controlz"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Button Click="OnGotoMainClick">
+            <TextBlock Text="Go back"/>
+        </Button>
+
+        <uctl:LayoutTransformer Grid.Row="1" HorizontalAlignment="Left">
+            <uctl:LayoutTransformer.LayoutTransform>
+                <RotateTransform Angle="90"/>
+            </uctl:LayoutTransformer.LayoutTransform>
+            <TextBlock Text="Rotated"/>
+        </uctl:LayoutTransformer>
+
+        <uctl:LayoutTransformer Grid.Row="2" HorizontalAlignment="Left">
+            <uctl:LayoutTransformer.LayoutTransform>
+                <RotateTransform Angle="-30"/>
+            </uctl:LayoutTransformer.LayoutTransform>
+            <TextBlock Text="Rotated"/>
+        </uctl:LayoutTransformer>
+
+    </Grid>
+</Page>

@@ -42,5 +42,11 @@ namespace Sandbox.Views
             var rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(TextBlockScalerTests));
         }
+
+        private void GotoLayoutTransformerTests(object sender, RoutedEventArgs e)
+        {
+            var rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(LayoutTransformerTests));
+        }
     }
 }
