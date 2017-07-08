@@ -25,6 +25,7 @@
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="ClosedDescriptorTextBlock"
@@ -33,10 +34,9 @@
                     IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"/>
-                <uctl:AppBarButtonReallyCompact Grid.Column="1"
+                <AppBarButton Grid.Column="2"
                     IsCompact="True" 
                     Icon="Edit"
-                    Margin="10,0,0,0"
                     Style="{Binding ElementName=me, Path=AppBarButtonStyle}"
                     IsDoubleTapEnabled="False" IsHoldingEnabled="False" IsRightTapEnabled="False"
                     VerticalAlignment="Center"
