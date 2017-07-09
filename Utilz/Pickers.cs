@@ -17,8 +17,14 @@ namespace Utilz
         public const string PICKED_FOLDER_TOKEN = "PickedFolderToken";
         public const string PICKED_SAVE_FILE_TOKEN = "PickedSaveFileToken";
         public const string PICKED_OPEN_FILE_TOKEN = "PickedOpenFileToken";
-
-        public static async Task<StorageFolder> PickDirectoryAsync(string[] extensions, string token = PICKED_FOLDER_TOKEN, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
+        /// <summary>
+        /// Picks a folder
+        /// </summary>
+        /// <param name="extensions">array of strings like ".txt"</param>
+        /// <param name="token">use this later to retrieve the folder without calling pickers</param>
+        /// <param name="startLocation"></param>
+        /// <returns></returns>
+        public static async Task<StorageFolder> PickFolderAsync(string[] extensions, string token, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
         {
             //bool unsnapped = ((ApplicationView.Value != ApplicationViewState.Snapped) || ApplicationView.TryUnsnap());
             //if (unsnapped)
@@ -59,8 +65,14 @@ namespace Utilz
             //}
             //return false;
         }
-
-        public static async Task<StorageFile> PickOpenFileAsync(string[] extensions, string token = PICKED_OPEN_FILE_TOKEN, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
+        /// <summary>
+        /// Picks a file to open
+        /// </summary>
+        /// <param name="extensions">array of strings like .txt</param>
+        /// <param name="token">use this later to retrieve the folder without calling pickers</param>
+        /// <param name="startLocation"></param>
+        /// <returns></returns>
+        public static async Task<StorageFile> PickOpenFileAsync(string[] extensions, string token, PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
         {
             StorageFile file = null;
             try
@@ -94,8 +106,14 @@ namespace Utilz
             }
             return file;
         }
-
-        public static async Task<StorageFile> PickSaveFileAsync(string[] extensions, string token = PICKED_SAVE_FILE_TOKEN, string suggestedFileName = "", PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
+        /// <summary>
+        /// Picks a file to save
+        /// </summary>
+        /// <param name="extensions">array of strings like .txt</param>
+        /// <param name="token">use this later to retrieve the folder without calling pickers</param>
+        /// <param name="startLocation"></param>
+        /// <returns></returns>
+        public static async Task<StorageFile> PickSaveFileAsync(string[] extensions, string token, string suggestedFileName = "", PickerLocationId startLocation = PickerLocationId.DocumentsLibrary)
         {
             StorageFile file = null;
             try
@@ -190,7 +208,12 @@ namespace Utilz
             }
         }
         // LOLLO TODO check if these setters really need to set the MRU. It can screw things, particularly when the file is internal to the app!
-        public static void SetLastPickedFolder(StorageFolder directory, string token = PICKED_FOLDER_TOKEN)
+        /// <summary>
+        /// After picking a folder, it associates it with a given token for later retrieval without pickers.
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="token"></param>
+        public static void SetLastPickedFolder(StorageFolder directory, string token)
         {
             try
             {
@@ -209,8 +232,12 @@ namespace Utilz
                 Logger.Add_TPL(ex.ToString(), Logger.FileErrorLogFilename);
             }
         }
-
-        public static void SetLastPickedOpenFile(StorageFile file, string token = PICKED_OPEN_FILE_TOKEN)
+        /// <summary>
+        /// After picking a file, it associates it with a given token for later retrieval without pickers.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="token"></param>
+        public static void SetLastPickedOpenFile(StorageFile file, string token)
         {
             try
             {
@@ -229,7 +256,12 @@ namespace Utilz
                 Logger.Add_TPL(ex.ToString(), Logger.FileErrorLogFilename);
             }
         }
-        public static void SetLastPickedSaveFile(StorageFile file, string token = PICKED_SAVE_FILE_TOKEN)
+        /// <summary>
+        /// After picking a file, it associates it with a given token for later retrieval without pickers.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="token"></param>
+        public static void SetLastPickedSaveFile(StorageFile file, string token)
         {
             try
             {
@@ -248,7 +280,7 @@ namespace Utilz
                 Logger.Add_TPL(ex.ToString(), Logger.FileErrorLogFilename);
             }
         }
-        public static void SetLastPickedFolderMRU(StorageFolder directory, string token = PICKED_FOLDER_TOKEN)
+        public static void SetLastPickedFolderMRU(StorageFolder directory, string token)
         {
             try
             {
@@ -265,7 +297,7 @@ namespace Utilz
             catch { }
         }
 
-        public static void SetLastPickedOpenFileMRU(StorageFile file, string token = PICKED_OPEN_FILE_TOKEN)
+        public static void SetLastPickedOpenFileMRU(StorageFile file, string token)
         {
             try
             {
@@ -281,7 +313,7 @@ namespace Utilz
             }
             catch { }
         }
-        public static void SetLastPickedSaveFileMRU(StorageFile file, string token = PICKED_SAVE_FILE_TOKEN)
+        public static void SetLastPickedSaveFileMRU(StorageFile file, string token)
         {
             try
             {
