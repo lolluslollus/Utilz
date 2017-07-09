@@ -153,7 +153,7 @@ namespace Utilz
         /// <param name="token">a token to retrieve a folder, it can be its path</param>
         /// <param name="cancToken">a cancellation token</param>
         /// <returns>StorageFolder</returns>
-        public static async Task<StorageFolder> GetLastPickedFolderAsync(string token, CancellationToken cancToken)
+        public static async Task<StorageFolder> GetPreviouslyPickedFolderAsync(string token, CancellationToken cancToken)
         {
             try
             {
@@ -173,7 +173,7 @@ namespace Utilz
         /// <param name="token">a token to retrieve a file, it can be its path</param>
         /// <param name="cancToken">a cancellation token</param>
         /// <returns>StorageFile</returns>
-        public static async Task<StorageFile> GetLastPickedOpenFileAsync(string token, CancellationToken cancToken)
+        public static async Task<StorageFile> GetPreviouslyPickedOpenFileAsync(string token, CancellationToken cancToken)
         {
             try
             {
@@ -193,7 +193,7 @@ namespace Utilz
         /// <param name="token">a token to retrieve a file, it can be its path</param>
         /// <param name="cancToken">a cancellation token</param>
         /// <returns>StorageFile</returns>
-        public static async Task<StorageFile> GetLastPickedSaveFileAsync(string token, CancellationToken cancToken)
+        public static async Task<StorageFile> GetPreviouslyPickedSaveFileAsync(string token, CancellationToken cancToken)
         {
             try
             {
