@@ -57,8 +57,8 @@ namespace Utilz
             }
             finally
             {
-                SetLastPickedFolder(directory, token);
-                SetLastPickedFolderMRU(directory, token);
+                SetPickedFolder(directory, token);
+                SetPickedFolderMRU(directory, token);
             }
             return directory;
 
@@ -101,8 +101,8 @@ namespace Utilz
             }
             finally
             {
-                SetLastPickedOpenFile(file, token);
-                SetLastPickedOpenFileMRU(file, token);
+                SetPickedOpenFile(file, token);
+                SetPickedOpenFileMRU(file, token);
             }
             return file;
         }
@@ -141,8 +141,8 @@ namespace Utilz
             }
             finally
             {
-                SetLastPickedSaveFile(file, token);
-                SetLastPickedSaveFileMRU(file, token);
+                SetPickedSaveFile(file, token);
+                SetPickedSaveFileMRU(file, token);
             }
             return file;
         }
@@ -213,7 +213,7 @@ namespace Utilz
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="token"></param>
-        public static void SetLastPickedFolder(StorageFolder directory, string token)
+        public static void SetPickedFolder(StorageFolder directory, string token)
         {
             try
             {
@@ -237,7 +237,7 @@ namespace Utilz
         /// </summary>
         /// <param name="file"></param>
         /// <param name="token"></param>
-        public static void SetLastPickedOpenFile(StorageFile file, string token)
+        public static void SetPickedOpenFile(StorageFile file, string token)
         {
             try
             {
@@ -261,7 +261,7 @@ namespace Utilz
         /// </summary>
         /// <param name="file"></param>
         /// <param name="token"></param>
-        public static void SetLastPickedSaveFile(StorageFile file, string token)
+        public static void SetPickedSaveFile(StorageFile file, string token)
         {
             try
             {
@@ -280,7 +280,7 @@ namespace Utilz
                 Logger.Add_TPL(ex.ToString(), Logger.FileErrorLogFilename);
             }
         }
-        public static void SetLastPickedFolderMRU(StorageFolder directory, string token)
+        public static void SetPickedFolderMRU(StorageFolder directory, string token)
         {
             try
             {
@@ -297,7 +297,7 @@ namespace Utilz
             catch { }
         }
 
-        public static void SetLastPickedOpenFileMRU(StorageFile file, string token)
+        public static void SetPickedOpenFileMRU(StorageFile file, string token)
         {
             try
             {
@@ -313,7 +313,7 @@ namespace Utilz
             }
             catch { }
         }
-        public static void SetLastPickedSaveFileMRU(StorageFile file, string token)
+        public static void SetPickedSaveFileMRU(StorageFile file, string token)
         {
             try
             {
