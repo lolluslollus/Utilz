@@ -122,6 +122,9 @@ namespace Utilz.Controlz
                     var child = rowDatas[j].Children[i];
                     var point0 = rowDatas[j].Point0s[i];
                     var point1 = rowDatas[j].Point1s[i];
+                    // LOLLO TODO BODGE to give a bit more space, there may be a rounding problem
+                    point1.X++;
+                    point1.Y++;
 
                     double deltaY = 0.0;
                     switch (VerticalContentAlignment)
