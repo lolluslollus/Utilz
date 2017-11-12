@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Utilz.Data;
 using Windows.ApplicationModel;
 using Windows.Foundation.Metadata;
 using Windows.Phone.UI.Input;
@@ -33,8 +32,13 @@ namespace Utilz.Controlz
             DependencyProperty.Register("LastNavigatedPageRegKey", typeof(string), typeof(OpenableObservablePage), new PropertyMetadata(""));
 
         private readonly object _isOnMeLocker = new object();
-        private bool _isOnMe = false;
-        protected bool IsOnMe { get { lock (_isOnMeLocker) { return _isOnMe; } } private set { lock (_isOnMeLocker) { _isOnMe = value; } } }
+        protected bool IsOnMe()
+        {
+            lock (_isOnMeLocker)
+            {
+                return RegistryAccess.GetValue(LastNavigatedPageRegKey) == GetType().Name;
+            }
+        }
 
         private readonly object _isOpenSemaphoreLocker = new object();
         protected volatile SemaphoreSlimSafeRelease _isOpenSemaphore = null;
@@ -78,14 +82,6 @@ namespace Utilz.Controlz
 
         private readonly object _ctsLocker = new object();
         private SafeCancellationTokenSource _cts = null;
-        //protected SafeCancellationTokenSource Cts
-        //{
-        //	get
-        //	{
-        //		lock (_ctsLocker) { return _cts; }
-        //	}
-        //}
-
         private CancellationToken _cancToken;
         protected CancellationToken CancToken
         {
@@ -119,7 +115,6 @@ namespace Utilz.Controlz
             var deferral = e.SuspendingOperation.GetDeferral();
             try
             {
-                if (IsOnMe) RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
                 await CloseAsync(LifecycleEvents.Suspending).ConfigureAwait(false);
             }
             finally
@@ -130,21 +125,20 @@ namespace Utilz.Controlz
 
         private async void OnResuming(object sender, object e)
         {
-            if (!IsOnMe) return;
+            if (!IsOnMe()) return;
             await OpenAsync(LifecycleEvents.Resuming).ConfigureAwait(false);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            IsOnMe = true;
+            RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
             base.OnNavigatedTo(e);
-            bool isAfterFileActivated = e.Parameter != null && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
-            Task open = isAfterFileActivated ? OpenAsync(LifecycleEvents.NavigatedToAfterFileActivated) : OpenAsync(LifecycleEvents.NavigatedToAfterLaunch);
+            bool isAfterFileActivated = e?.Parameter?.GetType() == typeof(NavigationParameters) && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
+            Task open = OpenAsync(isAfterFileActivated ? LifecycleEvents.NavigatedToAfterFileActivated : LifecycleEvents.NavigatedToAfterLaunch);
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
-            IsOnMe = false;
             base.OnNavigatingFrom(e);
             Task close = CloseAsync(LifecycleEvents.NavigatingFrom);
         }
