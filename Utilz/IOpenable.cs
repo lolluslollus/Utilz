@@ -63,16 +63,15 @@ namespace Utilz
                 foreach (var subscriber in eventSubscribers)
                 {
                     var iOpenable = subscriber.Target as IOpenable;
-                    if (iOpenable != null && iOpenable.IsOpen != mustBeOpen)
-                    {
-                        exitLoop = false;
+                    if (iOpenable == null || iOpenable.IsOpen == mustBeOpen) continue;
 
-                        if (mustBeOpen) Debug.WriteLine("Waiting for an ISuspenderResumer to be open");
-                        else Debug.WriteLine("Waiting for an ISuspenderResumer to be closed");
-
-                        await Task.Delay(MSecToWaitToConfirm).ConfigureAwait(false);
-                        break;
-                    }
+                    exitLoop = false;
+                    /*
+                    if (mustBeOpen) Debug.WriteLine("Waiting for an ISuspenderResumer to be open");
+                    else Debug.WriteLine("Waiting for an ISuspenderResumer to be closed");
+                    */
+                    await Task.Delay(MSecToWaitToConfirm).ConfigureAwait(false);
+                    //break;
                 }
             }
         }

@@ -21,7 +21,7 @@ namespace Utilz.Controlz
 
         #region properties
         /// <summary>
-        /// A registry key to store data when the page is suspended
+        /// A registry key to store the last page the user navigated to
         /// </summary>
         public string LastNavigatedPageRegKey
         {
@@ -131,7 +131,10 @@ namespace Utilz.Controlz
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
+            lock (_isOnMeLocker)
+            {
+                RegistryAccess.TrySetValue(LastNavigatedPageRegKey, GetType().Name);
+            }
             base.OnNavigatedTo(e);
             bool isAfterFileActivated = e?.Parameter?.GetType() == typeof(NavigationParameters) && (NavigationParameters)(e.Parameter) == NavigationParameters.FileActivated;
             Task open = OpenAsync(isAfterFileActivated ? LifecycleEvents.NavigatedToAfterFileActivated : LifecycleEvents.NavigatedToAfterLaunch);
