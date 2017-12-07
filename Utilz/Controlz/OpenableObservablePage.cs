@@ -96,39 +96,12 @@ namespace Utilz.Controlz
         #region ctor
         protected OpenableObservablePage() : base()
         {
-            var app = Application.Current as ISuspenderResumer;
-            if (app != null)
-            {
-                app.ResumeStarted -= OnResuming;
-                app.ResumeStarted += OnResuming;
-                app.SuspendStarted -= OnSuspending;
-                app.SuspendStarted += OnSuspending;
-            }
             Task upd = UpdateIsEnabledAsync();
         }
         #endregion ctor
 
 
-        #region event handlers        
-        private async void OnSuspending(object sender, SuspendingEventArgs e)
-        {
-            var deferral = e.SuspendingOperation.GetDeferral();
-            try
-            {
-                await CloseAsync(LifecycleEvents.Suspending).ConfigureAwait(false);
-            }
-            finally
-            {
-                deferral.Complete();
-            }
-        }
-
-        private async void OnResuming(object sender, object e)
-        {
-            if (!IsOnMe()) return;
-            await OpenAsync(LifecycleEvents.Resuming).ConfigureAwait(false);
-        }
-
+        #region event handlers
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             lock (_isOnMeLocker)
