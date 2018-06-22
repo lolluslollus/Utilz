@@ -33,7 +33,7 @@ namespace Utilz
 		public const string ForegroundLogFilename = "_ForegroundLog.lol";
 		public const string BackgroundLogFilename = "_BackgroundLog.lol";
 		public const string AppExceptionLogFilename = "_AppExceptionLog.lol";
-		public const string BackgroundCancelledLogFilename = "_BackgroundCancelledLog.lol";
+		public const string BackgroundTaskLogFilename = "_BackgroundCancelledLog.lol";
 		public const string PersistentDataLogFilename = "_PersistentData.lol";
 
 		public static async Task<string> ReadAsync(string fileName)
@@ -267,7 +267,7 @@ namespace Utilz
 			var sb = new StringBuilder();
 			sb.Append(await ReadOneLogIntoStringAsync(AppEventsLogFilename).ConfigureAwait(false));
 			sb.Append(await ReadOneLogIntoStringAsync(AppExceptionLogFilename).ConfigureAwait(false));
-			sb.Append(await ReadOneLogIntoStringAsync(BackgroundCancelledLogFilename).ConfigureAwait(false));
+			sb.Append(await ReadOneLogIntoStringAsync(BackgroundTaskLogFilename).ConfigureAwait(false));
 			sb.Append(await ReadOneLogIntoStringAsync(BackgroundLogFilename).ConfigureAwait(false));
 			sb.Append(await ReadOneLogIntoStringAsync(FileErrorLogFilename).ConfigureAwait(false));
 			sb.Append(await ReadOneLogIntoStringAsync(ForegroundLogFilename).ConfigureAwait(false));
